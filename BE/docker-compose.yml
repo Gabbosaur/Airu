@@ -47,6 +47,16 @@ services:
     expose:
       - "5432"
 
+  mongo:
+    image: "mongo:7.0"
+    ports:
+      - 27017:27017
+    env_file:
+      - ./src/.env
+    volumes:
+      - mongo_data:/data/db
+      - ./src/scripts/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js  # Load initial data from this file
+
   pgadmin:
     image: dpage/pgadmin4
     env_file:
@@ -120,3 +130,4 @@ services:
 volumes:
   postgres-data:
   redis-data:
+  mongo_data:
