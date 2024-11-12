@@ -2,19 +2,21 @@ version: '3.8'
 
 services:
   web:
-    build:
+    build: 
       context: .
       dockerfile: Dockerfile
+    # -------- Both of the following commands should be commented to run with nginx --------
+
     # -------- replace with comment to run with gunicorn --------
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     # command: gunicorn app.main:app -w 4 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8000
     env_file:
       - ./src/.env
-    # -------- replace with comment if you are using nginx --------
+    # -------- replace with expose if you are using nginx --------
     ports:
-      - "8000:8000"
+       - "8000:8000"
     # expose:
-    #   - "8000"
+    #    - "8000"
     depends_on:
       - db
       - redis
@@ -23,7 +25,7 @@ services:
       - ./src/.env:/code/.env
 
   worker:
-    build:
+    build: 
       context: .
       dockerfile: Dockerfile
     command: arq app.core.worker.settings.WorkerSettings
@@ -42,11 +44,17 @@ services:
       - ./src/.env
     volumes:
       - postgres-data:/var/lib/postgresql/data
-    # -------- replace with comment to run migrations with docker --------
     expose:
       - "5432"
-    # ports:
-    #  - 5432:5432
+
+  pgadmin:
+    image: dpage/pgadmin4
+    env_file:
+      - ./src/.env
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
 
   redis:
     image: redis:alpine
@@ -54,20 +62,6 @@ services:
       - redis-data:/data
     expose:
       - "6379"
-
-  #-------- uncomment to run with pgadmin --------
-  # pgadmin:
-  #   container_name: pgadmin4
-  #   image: dpage/pgadmin4:latest
-  #   restart: always
-  #   ports:
-  #     - "5050:80"
-  #   volumes:
-  #     - pgadmin-data:/var/lib/pgadmin
-  #   env_file:
-  #     - ./src/.env
-  #   depends_on:
-  #     - db
 
   #-------- uncomment to run with nginx --------
   # nginx:
@@ -80,41 +74,43 @@ services:
   #     - web
 
   #-------- uncomment to create first superuser --------
-  # create_superuser:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   env_file:
-  #     - ./src/.env
-  #   depends_on:
-  #     - db
-  #     - web
-  #   command: python -m src.scripts.create_first_superuser
-  #   volumes:
-  #     - ./src:/code/src
+  create_superuser:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - ./src/.env
+    depends_on:
+      - db
+      - web
+    command: python -m src.scripts.create_first_superuser
+    volumes:
+      - ./src:/code/src
 
   #-------- uncomment to run tests --------
-  # pytest:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   env_file:
-  #     - ./src/.env
-  #   depends_on:
-  #     - db
-  #     - redis
-  #   command: python -m pytest ./tests
-  #   volumes:
-  #     - .:/code
+  pytest:
+    build: 
+      context: .
+      dockerfile: Dockerfile 
+    env_file:
+      - ./src/.env
+    depends_on:
+      - db
+      - create_superuser
+      - redis
+    command: python -m pytest ./tests
+    volumes:
+      - .:/code
 
   #-------- uncomment to create first tier --------
   # create_tier:
-  #   build:
+  #   build: 
   #     context: .
   #     dockerfile: Dockerfile
   #   env_file:
   #     - ./src/.env
   #   depends_on:
+  #     - create_superuser
   #     - db
   #     - web
   #   command: python -m src.scripts.create_first_tier
@@ -124,4 +120,3 @@ services:
 volumes:
   postgres-data:
   redis-data:
-  #pgadmin-data:
