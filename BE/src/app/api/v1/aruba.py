@@ -18,6 +18,7 @@ from ...models.tier import Tier
 from ...schemas.tier import TierRead
 from ...schemas.user import UserCreate, UserCreateInternal, UserRead, UserTierUpdate, UserUpdate
 from motor.motor_asyncio import AsyncIOMotorClient
+import logging
 
 router = APIRouter(tags=["aruba"])
 
@@ -33,6 +34,12 @@ async def get_token():
 
     async with httpx.AsyncClient() as client:
         response = await client.post(url, headers=headers, data=data)
+
+        logging.info("Response json: ")
+        logging.info(response.json())
+        logging.info("Response : ")
+        logging.info(response)
+        
         return response.json()
 
 #use('aruba-catalog');
@@ -40,6 +47,7 @@ async def get_token():
 
 @router.get("/aruba/catalog_products")
 async def get_catalog_products():
+    #todo get from env
     encoded_username = quote_plus("mongoadmin")
     encoded_password = quote_plus("bMMZ9yGEgHgmT@2Dv6")
     client = AsyncIOMotorClient("mongodb://mongoadmin:"+quote_plus("bMMZ9yGEgHgmT@2Dv6")+"@mongo:27017")
