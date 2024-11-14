@@ -1,46 +1,45 @@
 import httpx
-from typing import Annotated, Any
-
 from urllib.parse import quote_plus
-
-from fastapi import APIRouter, Depends, Request
-from fastcrud.paginated import PaginatedListResponse, compute_offset, paginated_response
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from ...api.dependencies import get_current_superuser, get_current_user
-from ...core.db.database import async_get_db
-from ...core.exceptions.http_exceptions import DuplicateValueException, ForbiddenException, NotFoundException
-from ...core.security import blacklist_token, get_password_hash, oauth2_scheme
-from ...crud.crud_rate_limit import crud_rate_limits
-from ...crud.crud_tier import crud_tiers
-from ...crud.crud_users import crud_users
-from ...models.tier import Tier
-from ...schemas.tier import TierRead
-from ...schemas.user import UserCreate, UserCreateInternal, UserRead, UserTierUpdate, UserUpdate
+from fastapi import APIRouter, FastAPI
+from threading import Thread
 from motor.motor_asyncio import AsyncIOMotorClient
+import asyncio
 import logging
+from contextlib import asynccontextmanager
 
+app = FastAPI()
 router = APIRouter(tags=["aruba"])
 
+async def refresh_token():
+    while True:
+        url = "https://login.aruba.it/auth/realms/cmp-new-apikey/protocol/openid-connect/token"
+        headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+        data = {
+            'grant_type': 'client_credentials',
+            'client_id': 'cmp-8542d30e-1cec-4f41-928a-52f4263c555a',
+            'client_secret': 'qpVOYrJ6clZEJSngiQNiDAv8KajarBTu'
+        }
+
+        async with httpx.AsyncClient() as client:
+            response = await client.post(url, headers=headers, data=data)
+
+            logging.info("Response json: ")
+            logging.info(response.json())
+            logging.info("Response : ")
+            logging.info(response)
+        # Wait for 50 minutes before the next refresh
+        await asyncio.sleep(55*60)
+
+def start_background_refresh():
+    # Run the async function in a background thread using `asyncio.run`
+    thread = Thread(target=lambda: asyncio.run(refresh_token()))
+    thread.daemon = True
+    thread.start()
+    
 @router.post("/aruba/login")
 async def get_token():
-    url = "https://login.aruba.it/auth/realms/cmp-new-apikey/protocol/openid-connect/token"
-    headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-    data = {
-        'grant_type': 'client_credentials',
-        'client_id': 'cmp-8542d30e-1cec-4f41-928a-52f4263c555a',
-        'client_secret': 'qpVOYrJ6clZEJSngiQNiDAv8KajarBTu'
-    }
-
-    async with httpx.AsyncClient() as client:
-        response = await client.post(url, headers=headers, data=data)
-
-        logging.info("Response json: ")
-        logging.info(response.json())
-        logging.info("Response : ")
-        logging.info(response)
-        
-        return response.json()
+    start_background_refresh()
+    return {"message": "Token refresh started in background"}
 
 #use('aruba-catalog');
 #db.createCollection("catalog_products");
