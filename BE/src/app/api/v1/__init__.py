@@ -1,5 +1,4 @@
-from fastapi import APIRouter
-
+from fastapi import APIRouter, FastAPI
 from .login import router as login_router
 from .logout import router as logout_router
 from .posts import router as posts_router

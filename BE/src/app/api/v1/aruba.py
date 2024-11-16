@@ -7,7 +7,6 @@ import asyncio
 import logging
 from contextlib import asynccontextmanager
 
-app = FastAPI()
 router = APIRouter(tags=["aruba"])
 
 async def refresh_token():

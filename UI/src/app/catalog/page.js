@@ -2,55 +2,50 @@
 
 import ResourceTable from './ResourceTable';
 import {
-  Link,
   DataTableSkeleton,
   Pagination,
   Column,
   Grid,
   MultiSelect,
   TextInput,
-  Dropdown,
 } from '@carbon/react';
 import React, { useEffect, useState } from 'react';
-import { Octokit } from '@octokit/core';
-
-const octokitClient = new Octokit({});
+import axios from 'axios';
 
 const headers = [
-  { key: 'name', header: 'Name' },
-  { key: 'createdAt', header: 'Created' },
-  { key: 'updatedAt', header: 'Updated' },
-  { key: 'issueCount', header: 'Open Issues' },
-  { key: 'stars', header: 'Stars' },
-  { key: 'languages', header: 'Languages' },
-  { key: 'links', header: 'Links' },
+  { key: 'flavorName', header: 'Name' },
+  { key: 'flavorOsPlatform', header: 'Os' },
+  { key: 'flavorCpu', header: 'Cpu' },
+  { key: 'flavorRam', header: 'Ram' },
+  { key: 'flavorDisk', header: 'Disk' },
+  { key: 'resourceName', header: 'Resource' },
+  { key: 'resourceCategory', header: 'Category' },
+  { key: 'hourlyUnitPrice', header: 'Hourly Price' },
 ];
 
-const LinkList = ({ url, homepageUrl }) => (
-  <ul style={{ display: 'flex' }}>
-    <li>
-      <Link href={url}>GitHub</Link>
-    </li>
-    {homepageUrl && (
-      <li>
-        <span>&nbsp;|&nbsp;</span>
-        <Link href={homepageUrl}>Homepage</Link>
-      </li>
-    )}
-  </ul>
-);
-
 const getRowItems = (rows) =>
-  rows.map((row) => ({
-    ...row,
-    key: row.id,
-    stars: row.stargazers_count,
-    issueCount: row.open_issues_count,
-    createdAt: new Date(row.created_at).toLocaleDateString(),
-    updatedAt: new Date(row.updated_at).toLocaleDateString(),
-    languages: row.language ? [row.language] : [],
-    links: <LinkList url={row.html_url} homepageUrl={row.homepage} />,
-  }));
+  rows.map((row) => {
+    console.debug(row); // Log the row data for debugging
+    return {
+      id: row._id,
+      key: row._id,
+      resourceName: row.resourceName,
+      resourceCategory: row.resourceCategory,
+      currencyCode: row.currencyCode,
+      unitOfMeasure: row.unitOfMeasure,
+      unitPrice: row.unitPrice,
+      hourlyUnitPrice: row.unitPrice + ' ' + row.currencyCode,
+
+      productName: row.productName,
+      flavorName: row.flavor?.name || '', // Use empty string if flavor is null or undefined
+      flavorDescription: row.flavor?.description || '', // Use empty string if flavor is null or undefined
+      flavorOsPlatform: row.flavor?.osPlatform || '', // Use empty string if flavor is null or undefined
+      flavorCpu: row.flavor?.cpu || '', // Use empty string if flavor is null or undefined
+      flavorRam: row.flavor?.ram || '', // Use empty string if flavor is null or undefined
+      flavorDisk: row.flavor?.disk || '', // Use empty string if flavor is null or undefined
+      tiers: row.tiers,
+    };
+  });
 
 function ProductsPage() {
   const [firstRowIndex, setFirstRowIndex] = useState(0);
@@ -60,45 +55,67 @@ function ProductsPage() {
   const [rows, setRows] = useState([]);
   const [filteredRows, setFilteredRows] = useState([]);
   const [searchText, setSearchText] = useState('');
-  const [selectedStars, setSelectedStars] = useState([]);
-  const [selectedIssues, setSelectedIssues] = useState([]);
-  const [selectedLanguages, setSelectedLanguages] = useState([]);
+  const [selectedOs, setSelectedOs] = useState([]);
+  const [selectedCpu, setSelectedCpu] = useState([]);
+  const [selectedRam, setSelectedRam] = useState([]);
+  const [selectedDisk, setSelectedDisk] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState([]);
 
-  const starsOptions = [
-    { id: 'all', label: 'All Stars' },
-    { id: 'highStars', label: 'High Stars (> 1000)' },
-    { id: 'mediumStars', label: 'Medium Stars (500-1000)' },
+  const osOptions = [
+    { id: 'linux', label: 'Linux' },
+    { id: 'windows', label: 'Windows' },
   ];
 
-  const issuesOptions = [
-    { id: 'all', label: 'All Issues' },
-    { id: 'lowIssues', label: 'Low Issues (< 50)' },
-    { id: 'mediumIssues', label: 'Medium Issues (50-200)' },
+  const cpuOptions = [
+    { id: '2', label: '2' },
+    { id: '4', label: '4' },
+    { id: '8', label: '8' },
+    { id: '16', label: '16' },
   ];
 
-  const languagesOptions = [
-    { id: 'all', label: 'All Languages' },
-    { id: 'JavaScript', label: 'JavaScript' },
-    { id: 'Python', label: 'Python' },
-    { id: 'Ruby', label: 'Ruby' },
+  const ramOptions = [
+    { id: '2', label: '2GB' },
+    { id: '4', label: '4GB' },
+    { id: '8', label: '8GB' },
+    { id: '16', label: '16GB' },
+    { id: '32', label: '32GB' },
+    { id: '64', label: '64GB' },
+  ];
+
+  const diskOptions = [
+    { id: '20', label: '20GB' },
+    { id: '40', label: '40GB' },
+    { id: '80', label: '80GB' },
+    { id: '120', label: '120GB' },
+  ];
+
+  const categoryOptions = [
+    { id: 'disk	', label: 'Disk' },
+    { id: 'computing', label: 'Computing' },
+    { id: 'container', label: 'Container' },
+    { id: 'networking', label: 'Networking' },
   ];
 
   useEffect(() => {
     async function getProducts() {
-      const res = await octokitClient.request('GET /orgs/{org}/repos', {
-        org: 'carbon-design-system',
-        per_page: 75,
-        sort: 'updated',
-        direction: 'desc',
-      });
+      let config = {
+        method: 'get',
+        url: 'http://localhost:8000/api/v1/aruba/catalog_products',
+      };
 
-      if (res.status === 200) {
-        const items = getRowItems(res.data);
-        setRows(items);
-        setFilteredRows(items);
-      } else {
-        setError('Error obtaining repository data');
-      }
+      axios
+        .request(config)
+        .then((response) => {
+          console.debug(response.data);
+          const items = getRowItems(response.data);
+          setRows(items);
+          setFilteredRows(items);
+        })
+        .catch((error) => {
+          console.log(error);
+          setError(error);
+        });
+
       setLoading(false);
     }
 
@@ -107,44 +124,61 @@ function ProductsPage() {
 
   useEffect(() => {
     applyFilters();
-  }, [searchText, selectedStars, selectedIssues, selectedLanguages, rows]);
+  }, [
+    searchText,
+    selectedCategory,
+    selectedCpu,
+    selectedDisk,
+    selectedOs,
+    selectedRam,
+    rows,
+  ]);
 
   const applyFilters = () => {
     let updatedRows = [...rows];
 
-    // Apply text filter (search by name)
+    // Apply text filter (search by flavor name or resource name)
     if (searchText) {
-      updatedRows = updatedRows.filter((row) =>
-        row.name.toLowerCase().includes(searchText.toLowerCase())
+      const lowerCaseSearchText = searchText.toLowerCase();
+      updatedRows = updatedRows.filter(
+        (row) =>
+          row.flavorName.toLowerCase().includes(lowerCaseSearchText) ||
+          row.resourceName.toLowerCase().includes(lowerCaseSearchText)
       );
     }
 
-    // Apply stars filter
-    if (selectedStars.length > 0) {
+    // Apply OS filter (only filter if something is selected)
+    if (selectedOs.length > 0) {
       updatedRows = updatedRows.filter((row) =>
-        selectedStars.includes('highStars')
-          ? row.stars > 1000
-          : selectedStars.includes('mediumStars') &&
-            row.stars >= 500 &&
-            row.stars <= 1000
+        selectedOs.some((os) => row.flavorOsPlatform === os)
       );
     }
 
-    // Apply issues filter
-    if (selectedIssues.length > 0) {
+    // Apply CPU filter (numeric and only if selected)
+    if (selectedCpu.length > 0) {
       updatedRows = updatedRows.filter((row) =>
-        selectedIssues.includes('lowIssues')
-          ? row.issueCount < 50
-          : selectedIssues.includes('mediumIssues') &&
-            row.issueCount >= 50 &&
-            row.issueCount <= 200
+        selectedCpu.some((cpu) => parseInt(row.flavorCpu) === parseInt(cpu))
       );
     }
 
-    // Apply languages filter
-    if (selectedLanguages.length > 0) {
+    // Apply RAM filter (only if something is selected)
+    if (selectedRam.length > 0) {
       updatedRows = updatedRows.filter((row) =>
-        selectedLanguages.some((lang) => row.languages.includes(lang))
+        selectedRam.some((ram) => row.flavorRam.toString() === ram)
+      );
+    }
+
+    // Apply Disk filter (numeric and only if selected)
+    if (selectedDisk.length > 0) {
+      updatedRows = updatedRows.filter((row) =>
+        selectedDisk.some((disk) => parseInt(row.flavorDisk) === parseInt(disk))
+      );
+    }
+
+    // Apply Category filter (only filter if something is selected)
+    if (selectedCategory.length > 0) {
+      updatedRows = updatedRows.filter((row) =>
+        selectedCategory.some((category) => row.resourceCategory === category)
       );
     }
 
@@ -172,7 +206,6 @@ function ProductsPage() {
   return (
     <Grid className="product-page">
       <Column lg={16} md={8} sm={4} className="product-page__r1">
-        {/* Add margin-top before filters and margin-bottom under header */}
         <div style={{ marginBottom: '1rem' }}>
           <div
             style={{
@@ -183,76 +216,65 @@ function ProductsPage() {
             }}
           >
             <TextInput
-              id="search-text"
-              labelText="Search Repositories"
-              placeholder="Enter repository name"
+              labelText="Search"
+              placeholder="Search by Name"
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
             />
-            <Dropdown
-              id="stars-filter-dropdown"
-              titleText="Stars"
-              label="Select star rating"
-              items={starsOptions}
-              itemToString={(item) => (item ? item.label : '')}
-              onChange={({ selectedItem }) => setStarsFilter(selectedItem.id)}
-            />
             <MultiSelect
-              id="stars-filter-multiselect"
-              titleText="Stars"
-              label="Select Stars"
-              items={starsOptions}
+              id="os-filter-multiselect"
+              titleText="OS"
+              label="Select OS"
+              items={osOptions}
               itemToString={(item) => item.label}
-              selectedItems={selectedStars}
               onChange={({ selectedItems }) =>
-                setSelectedStars(selectedItems.map((item) => item.id))
+                setSelectedOs(selectedItems.map((item) => item.id))
               }
             />
             <MultiSelect
-              id="issues-filter-multiselect"
-              titleText="Issues"
-              label="Select Issues"
-              items={issuesOptions}
+              id="cpu-filter-multiselect"
+              titleText="CPU"
+              label="Select CPU"
+              items={cpuOptions}
               itemToString={(item) => item.label}
-              selectedItems={selectedIssues}
               onChange={({ selectedItems }) =>
-                setSelectedIssues(selectedItems.map((item) => item.id))
+                setSelectedCpu(selectedItems.map((item) => item.id))
               }
             />
             <MultiSelect
-              id="languages-filter-multiselect"
-              titleText="Languages"
-              label="Select Languages"
-              items={languagesOptions}
+              id="ram-filter-multiselect"
+              titleText="RAM"
+              label="Select RAM"
+              items={ramOptions}
               itemToString={(item) => item.label}
-              selectedItems={selectedLanguages}
               onChange={({ selectedItems }) =>
-                setSelectedLanguages(selectedItems.map((item) => item.id))
+                setSelectedRam(selectedItems.map((item) => item.id))
+              }
+            />
+            <MultiSelect
+              id="disk-filter-multiselect"
+              titleText="Disk"
+              label="Select Disk"
+              items={diskOptions}
+              itemToString={(item) => item.label}
+              onChange={({ selectedItems }) =>
+                setSelectedDisk(selectedItems.map((item) => item.id))
+              }
+            />
+
+            <MultiSelect
+              id="category-filter-multiselect"
+              titleText="Category"
+              label="Select Category"
+              items={categoryOptions}
+              itemToString={(item) => item.label}
+              onChange={({ selectedItems }) =>
+                setSelectedCategory(selectedItems.map((item) => item.id))
               }
             />
           </div>
+          <ResourceTable rows={filteredRows} headers={headers} />
         </div>
-        <ResourceTable
-          headers={headers}
-          rows={filteredRows.slice(
-            firstRowIndex,
-            firstRowIndex + currentPageSize
-          )}
-        />
-        <Pagination
-          totalItems={filteredRows.length}
-          backwardText="Previous page"
-          forwardText="Next page"
-          pageSize={currentPageSize}
-          pageSizes={[5, 10, 15, 25]}
-          itemsPerPageText="Items per page"
-          onChange={({ page, pageSize }) => {
-            if (pageSize !== currentPageSize) {
-              setCurrentPageSize(pageSize);
-            }
-            setFirstRowIndex(pageSize * (page - 1));
-          }}
-        />
       </Column>
     </Grid>
   );

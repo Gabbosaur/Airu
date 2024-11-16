@@ -27,6 +27,8 @@ from .config import (
 from .db.database import Base, async_engine as engine
 from .utils import cache, queue, rate_limit
 from ..models import *
+from fastapi.middleware.cors import CORSMiddleware
+
 
 # -------------- database --------------
 async def create_tables() -> None:
@@ -184,6 +186,14 @@ def create_application(
     lifespan = lifespan_factory(settings, create_tables_on_start=create_tables_on_start)
 
     application = FastAPI(lifespan=lifespan, **kwargs)
+        # Add CORS middleware here
+    application.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],  # Allow all origins or set to specific origins
+        allow_credentials=True,
+        allow_methods=["*"],  # Allow all HTTP methods
+        allow_headers=["*"],  # Allow all headers
+    )
     application.include_router(router)
 
     if isinstance(settings, ClientSideCacheSettings):

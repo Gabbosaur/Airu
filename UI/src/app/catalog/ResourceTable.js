@@ -48,18 +48,21 @@ const RepoTable = ({ rows, headers }) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {rows.map((row) => (
-                <React.Fragment key={row.id}>
-                  <TableExpandRow {...getRowProps({ row })}>
-                    {row.cells.map((cell) => (
-                      <TableCell key={cell.id}>{cell.value}</TableCell>
-                    ))}
-                  </TableExpandRow>
-                  <TableExpandedRow colSpan={headers.length + 1}>
-                    <p>{getRowDescription(row.id)}</p>
-                  </TableExpandedRow>
-                </React.Fragment>
-              ))}
+              {rows.map((row) => {
+                const rowProps = getRowProps({ row }); // Extract row props
+                return (
+                  <React.Fragment key={row.id}>
+                    <TableExpandRow {...rowProps} key={row.id}>
+                      {row.cells.map((cell) => (
+                        <TableCell key={cell.id}>{cell.value}</TableCell>
+                      ))}
+                    </TableExpandRow>
+                    <TableExpandedRow colSpan={headers.length + 1}>
+                      <p>{getRowDescription(row.id)}</p>
+                    </TableExpandedRow>
+                  </React.Fragment>
+                );
+              })}
             </TableBody>
           </Table>
         </TableContainer>
