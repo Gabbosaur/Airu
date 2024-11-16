@@ -12,7 +12,7 @@ from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
 from fastapi.openapi.utils import get_openapi
 
 from ..api.dependencies import get_current_superuser
-from ..middleware.client_cache_middleware import ClientCacheMiddleware
+from ..middleware.client_cache_middleware import ClientCacheMiddleware, ArubaMiddleware
 from .config import (
     AppSettings,
     ClientSideCacheSettings,
@@ -198,6 +198,7 @@ def create_application(
 
     if isinstance(settings, ClientSideCacheSettings):
         application.add_middleware(ClientCacheMiddleware, max_age=settings.CLIENT_CACHE_MAX_AGE)
+        application.add_middleware(ArubaMiddleware)
 
     if isinstance(settings, EnvironmentSettings):
         if settings.ENVIRONMENT != EnvironmentOption.PRODUCTION:

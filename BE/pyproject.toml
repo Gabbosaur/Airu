@@ -35,6 +35,8 @@ faker = "^26.0.0"
 psycopg2-binary = "^2.9.9"
 pytest-mock = "^3.14.0"
 motor = "^3.0.0"
+debugpy = "^1.8.0" 
+pyjwt = "^2.8.0"
 
 [build-system]
 requires = ["poetry-core"]

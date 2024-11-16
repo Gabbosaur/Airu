@@ -1,6 +1,6 @@
 import httpx
 from urllib.parse import quote_plus
-from fastapi import APIRouter, FastAPI
+from fastapi import APIRouter, FastAPI, Request
 from threading import Thread
 from motor.motor_asyncio import AsyncIOMotorClient
 import asyncio
@@ -12,40 +12,32 @@ from typing import List
 
 app = FastAPI()
 router = APIRouter(tags=["aruba"])
+aruba_login_url = "https://login.aruba.it/auth/realms/cmp-new-apikey/protocol/openid-connect/token"
+aruba_client_id = "cmp-8542d30e-1cec-4f41-928a-52f4263c555a"
+aruba_client_secret = "qpVOYrJ6clZEJSngiQNiDAv8KajarBTu"
+aruba_token = ""
 
-async def refresh_token():
-    while True:
-        url = "https://login.aruba.it/auth/realms/cmp-new-apikey/protocol/openid-connect/token"
-        headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-        data = {
-            'grant_type': 'client_credentials',
-            'client_id': 'cmp-8542d30e-1cec-4f41-928a-52f4263c555a',
-            'client_secret': 'qpVOYrJ6clZEJSngiQNiDAv8KajarBTu'
-        }
+aruba_base_url = "https://api.arubacloud.com"
 
-        async with httpx.AsyncClient() as client:
-            response = await client.post(url, headers=headers, data=data)
-
-            logging.info("Response json: ")
-            logging.info(response.json())
-            logging.info("Response : ")
-            logging.info(response)
-        # Wait for 50 minutes before the next refresh
-        await asyncio.sleep(55*60)
-
-def start_background_refresh():
-    # Run the async function in a background thread using `asyncio.run`
-    thread = Thread(target=lambda: asyncio.run(refresh_token()))
-    thread.daemon = True
-    thread.start()
     
 @router.post("/aruba/login")
 async def get_token():
-    start_background_refresh()
-    return {"message": "Token refresh started in background"}
+    url = aruba_login_url
+    headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+    data = {
+            'grant_type': 'client_credentials',
+            'client_id': aruba_client_id,
+            'client_secret': aruba_client_secret
+        }
 
-#use('aruba-catalog');
-#db.createCollection("catalog_products");
+    async with httpx.AsyncClient() as client:
+        response = await client.post(url, headers=headers, data=data)
+    return response.json()
+
+
+#Catalog products
+#
+#
 
 @router.get("/aruba/catalog_products")
 async def get_catalog_products():
@@ -58,15 +50,6 @@ async def get_catalog_products():
     products = await collection.find().to_list()
     return products
 
-class Product(BaseModel):
-    name: str
-    description: str
-    price: float
-
-class ProductInDB(Product):
-    id: str
-
-
 @router.get("/aruba/catalog_products/{product_id}")
 async def read_product(product_id: str):
     client = AsyncIOMotorClient("mongodb://mongoadmin:"+quote_plus("bMMZ9yGEgHgmT@2Dv6")+"@mongo:27017")
@@ -76,3 +59,21 @@ async def read_product(product_id: str):
     if product is None:
         return {"error": "Product not found"}
     return product
+
+
+# Projects
+#
+#
+@router.get("/aruba/projects")
+async def get_projects(request: Request):
+    url = f"{aruba_base_url}/projects"
+    headers = {
+        'Authorization': f'Bearer {aruba_token}',
+        'Content-Type': 'application/json'
+    }
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url, headers=headers)
+        if response.status_code != 200:
+            return {"error": "Failed to fetch projects"}
+        return response.json()

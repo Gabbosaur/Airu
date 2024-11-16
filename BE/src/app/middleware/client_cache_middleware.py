@@ -1,6 +1,41 @@
+import logging
 from fastapi import FastAPI, Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
+import jwt
+import datetime
 
+class ArubaMiddleware(BaseHTTPMiddleware):
+    def __init__(self, app: FastAPI, max_age: int = 60) -> None:
+        super().__init__(app)
+        self.max_age = max_age
+
+    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
+        #if request.url.path.startswith("/api/v1/aruba"):
+        #    logging.info(f"Intercepted a request to {request.url.path}")
+        #    auth_header = request.headers.get("Authorization")
+    #
+        #    logging.info("Bearer :" + auth_header.split(" ")[1])
+        #    
+        #    try:
+        #        decoded_token = jwt.decode(auth_header.split(" ")[1], options={"verify_signature": False})  # Adjust the algorithm as needed
+        #        
+        #        print("Token is valid:", decoded_token["exp"])
+        #        datetime.datetime.utcfromtimestamp()
+        #    except jwt.ExpiredSignatureError:
+        #        print("Token has expired.")
+        #    except jwt.InvalidTokenError:
+        #        print("Invalid token.")
+        #    response: Response = await call_next(request)
+        #    # Modify the response by adding a custom header
+        #    response.headers["X-Custom-Header"] = "This is a custom response header"
+        #
+        ## Process the request and get the response
+        ## Intercept the request to check for a Bearer token
+        #else:
+        #    response: Response = await call_next(request)
+            
+        response: Response = await call_next(request)
+        return response
 
 class ClientCacheMiddleware(BaseHTTPMiddleware):
     """Middleware to set the `Cache-Control` header for client-side caching on all responses.
