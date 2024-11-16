@@ -6,7 +6,11 @@ from motor.motor_asyncio import AsyncIOMotorClient
 import asyncio
 import logging
 from contextlib import asynccontextmanager
+from pydantic import BaseModel
+from bson import ObjectId
+from typing import List
 
+app = FastAPI()
 router = APIRouter(tags=["aruba"])
 
 async def refresh_token():
@@ -53,3 +57,22 @@ async def get_catalog_products():
     collection = db["catalog_products"]
     products = await collection.find().to_list()
     return products
+
+class Product(BaseModel):
+    name: str
+    description: str
+    price: float
+
+class ProductInDB(Product):
+    id: str
+
+
+@router.get("/aruba/catalog_products/{product_id}")
+async def read_product(product_id: str):
+    client = AsyncIOMotorClient("mongodb://mongoadmin:"+quote_plus("bMMZ9yGEgHgmT@2Dv6")+"@mongo:27017")
+    db = client["aruba-catalog"]
+    collection = db["catalog_products"]
+    product = await collection.find_one({"_id": product_id})
+    if product is None:
+        return {"error": "Product not found"}
+    return product
