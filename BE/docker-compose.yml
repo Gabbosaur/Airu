@@ -15,7 +15,6 @@ services:
     # -------- replace with expose if you are using nginx --------
     ports:
        - "8000:8000"
-       - "5678:5678"
     # expose:
     #    - "8000"
     depends_on:
