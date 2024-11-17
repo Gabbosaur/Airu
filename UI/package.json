@@ -20,6 +20,7 @@
     "@carbon/react": "^1.35.0",
     "@octokit/core": "4.2.0",
     "axios": "^1.7.7",
+    "ccat-api": "^0.11.3",
     "encoding": "^0.1.13",
     "eslint": "8.44.0",
     "eslint-config-next": "13.4.9",

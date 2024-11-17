@@ -1,3 +1,5 @@
 **/*.env
 
 /AI/stregatto/data/
+
+**/__pycache__/

@@ -59,8 +59,9 @@ const ChatWithHeader = () => {
   };
 
   const fetchAIResponse = async (input) => {
+    console.log(`User input: ${input}`);
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    return "Here's an AI-generated suggestion based on your needs!";
+    return "Your input is " + input;
   };
 
   return (
