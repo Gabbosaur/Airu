@@ -40,7 +40,10 @@ async def get_token():
 #
 
 @router.get("/aruba/catalog_products")
-async def get_catalog_products():
+async def get_catalog_products(request: Request):
+    
+    logging.info("Getting catalog products")
+    logging.info(request.headers.get("Authorization"))
     #todo get from env
     encoded_username = quote_plus("mongoadmin")
     encoded_password = quote_plus("bMMZ9yGEgHgmT@2Dv6")
