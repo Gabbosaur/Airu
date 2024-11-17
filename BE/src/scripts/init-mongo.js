@@ -1937,48 +1937,6 @@ db.catalog_products.insertMany([
                 "percentDiscount": 12.0
             }
         ]
-    },
-    {
-        "_id": "ff615eba519c49ffbbd8a6e91ccd0765",
-        "resourceName": "blockStorage",
-        "resourceCategory": "storage",
-        "currencyCode": "EUR",
-        "unitOfMeasure": "1 Hour",
-        "unitPrice": 5e-05,
-        "productName": "blockStorage",
-        "flavor": null,
-        "reservations": [
-            {
-                "term": "1 Month",
-                "price": 4.75e-05
-            },
-            {
-                "term": "1 Year",
-                "price": 4.5e-05
-            },
-            {
-                "term": "3 Years",
-                "price": 4e-05
-            }
-        ],
-        "tiers": [
-            {
-                "category": "Base",
-                "minimumUnits": 10,
-                "percentDiscount": 5.0
-            },
-            {
-                "category": "Partner",
-                "minimumUnits": 50,
-                "percentDiscount": 10.0
-            },
-            {
-                "category": "Premium",
-                "minimumUnits": 100,
-                "percentDiscount": 15.0
-            }
-        ]
     }
-
 ]);
 
