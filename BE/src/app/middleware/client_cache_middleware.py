@@ -41,21 +41,20 @@ class ArubaMiddleware(BaseHTTPMiddleware):
             # update request headers
             #current aruba_token we neew to check if it is expired or is null
             if current_aruba_token == "" :
-                logging.info(f"Token is empty : {current_aruba_token}")
+                logging.info(f"Token is empty ")
                 current_aruba_token = await self.get_token()
                 self.aruba_token = current_aruba_token['access_token']
             elif datetime.datetime.fromtimestamp(jwt.decode(current_aruba_token, options={"verify_signature": False})["exp"]) < datetime.datetime.now():
-                logging.info(f"Token is expired : {current_aruba_token}")
+                logging.info(f"Token is expired ")
                 current_aruba_token = await self.get_token()
                 self.aruba_token = current_aruba_token['access_token']
             else:
-                logging.info(f"Current token is valid : {current_aruba_token}")
+                logging.info(f"Current token is valid ")
             
-            logging.info(f"Token is : {self.aruba_token}")  
             headers = dict(request.scope['headers'])
-            headers['Authorization'] = f"Bearer {self.aruba_token}"
+            headers['Authorization'] = f'Bearer {self.aruba_token}'
             request.scope['headers'] = [(k, v) for k, v in headers.items()]
-
+            
         return await call_next(request)
 
 class ClientCacheMiddleware(BaseHTTPMiddleware):
