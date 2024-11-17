@@ -35,7 +35,6 @@ class ArubaMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
         
-        response: Response = Response()
         current_aruba_token = self.aruba_token
         
         if request.url.path.startswith("/api/v1/aruba"):
@@ -45,18 +44,19 @@ class ArubaMiddleware(BaseHTTPMiddleware):
                 logging.info(f"Token is empty : {current_aruba_token}")
                 current_aruba_token = await self.get_token()
                 self.aruba_token = current_aruba_token['access_token']
-            elif jwt.decode(current_aruba_token.split(" ")[1], options={"verify_signature": False})["exp"] < datetime.datetime.now():
+            elif datetime.datetime.fromtimestamp(jwt.decode(current_aruba_token, options={"verify_signature": False})["exp"]) < datetime.datetime.now():
                 logging.info(f"Token is expired : {current_aruba_token}")
                 current_aruba_token = await self.get_token()
                 self.aruba_token = current_aruba_token['access_token']
+            else:
+                logging.info(f"Current token is valid : {current_aruba_token}")
             
             logging.info(f"Token is : {self.aruba_token}")  
             headers = dict(request.scope['headers'])
             headers['Authorization'] = f"Bearer {self.aruba_token}"
             request.scope['headers'] = [(k, v) for k, v in headers.items()]
-            response: Response = await call_next(request)
 
-        return response
+        return await call_next(request)
 
 class ClientCacheMiddleware(BaseHTTPMiddleware):
     """Middleware to set the `Cache-Control` header for client-side caching on all responses.
