@@ -36,6 +36,8 @@ function formatToTwoDecimals(number) {
 const SelectedProductsPanel = ({
   selectedProducts,
   optionalResources,
+  budget,
+  duration,
   updateSelectedProducts,
 }) => {
   const handleRemoveProduct = (product) => {
@@ -121,7 +123,17 @@ const SelectedProductsPanel = ({
           ))}
           <br />
           <li>
-            <strong>Total:</strong> {formatToTwoDecimals(totalCost)} €/month
+            <strong>Total Monthly Cost:</strong>{' '}
+            {formatToTwoDecimals(totalCost)} €/month
+            <br />
+            <strong>Total Cost: </strong>
+            <span
+              style={{ color: totalCost * duration < budget ? 'green' : 'red' }}
+            >
+              {formatToTwoDecimals(totalCost) * duration} €
+            </span>
+            {/* <br />
+            <strong>Total budget:</strong> {budget} € */}
           </li>
         </ul>
       )}

@@ -3,11 +3,13 @@
 import ResourceTable from './ResourceTable';
 import {
   DataTableSkeleton,
-  Pagination,
   Column,
   Grid,
   MultiSelect,
   TextInput,
+  NumberInput,
+  Select,
+  SelectItem,
 } from '@carbon/react';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -65,11 +67,16 @@ function ProductsPage() {
   const [selectedDisk, setSelectedDisk] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState([]);
   const [selectedProducts, setSelectedProducts] = useState([]); // Stato per i prodotti selezionati
+  const [budget, setBudget] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [durationType, setDurationType] = useState(0);
 
   const osOptions = [
     { id: 'linux', label: 'Linux' },
     { id: 'windows', label: 'Windows' },
   ];
+
+  const durationTypeOptions = ['day/s', 'month/s', 'year/s'];
 
   const cpuOptions = [
     { id: '2', label: '2' },
@@ -95,10 +102,10 @@ function ProductsPage() {
   ];
 
   const categoryOptions = [
-    { id: 'disk	', label: 'Disk' },
+    // { id: 'disk	', label: 'Disk' },
     { id: 'computing', label: 'Computing' },
     { id: 'container', label: 'Container' },
-    { id: 'networking', label: 'Networking' },
+    // { id: 'networking', label: 'Networking' },
   ];
 
   useEffect(() => {
@@ -216,12 +223,47 @@ function ProductsPage() {
   if (loading) {
     return (
       <Grid className="product-page">
-        <Column lg={16} md={8} sm={4} className="product-page__r1">
-          <DataTableSkeleton
-            columnCount={headers.length + 1}
-            headers={headers}
-            onAdd={handleAddProduct}
-          />
+        <Column lg={12} md={8} sm={4} className="product-page__r1">
+          <div style={{ marginBottom: '1rem' }}>
+            <div
+              style={{
+                display: 'flex',
+                gap: '1rem',
+                marginBottom: '1rem',
+                marginTop: '1rem',
+              }}
+            >
+              {/* Skeleton for Search Input */}
+              <div
+                style={{
+                  width: '200px',
+                  height: '48px',
+                  backgroundColor: '#e0e0e0',
+                  borderRadius: '4px',
+                }}
+              ></div>
+
+              {/* Skeleton for MultiSelect Filters */}
+              {Array.from({ length: 5 }).map((_, index) => (
+                <div
+                  key={index}
+                  style={{
+                    width: '150px',
+                    height: '48px',
+                    backgroundColor: '#e0e0e0',
+                    borderRadius: '4px',
+                  }}
+                ></div>
+              ))}
+            </div>
+
+            {/* Resource Table Skeleton */}
+            <DataTableSkeleton
+              columnCount={headers.length + 1} // Includes action buttons
+              rowCount={5} // Simulate a few rows
+              headers={headers}
+            />
+          </div>
         </Column>
       </Grid>
     );
@@ -233,87 +275,141 @@ function ProductsPage() {
 
   return (
     <Grid className="product-page">
-      <Column lg={12} md={8} sm={4} className="product-page__r1">
+      {/* Filters Section */}
+      <Column lg={16} md={8} sm={4} className="product-page__r1">
         <div style={{ marginBottom: '1rem' }}>
-          <div
-            style={{
-              display: 'flex',
-              gap: '1rem',
-              marginBottom: '1rem',
-              marginTop: '1rem',
-            }}
+          <Grid
+            style={{ gap: '1rem', marginBottom: '1rem', marginTop: '1rem' }}
           >
-            <TextInput
-              labelText="Search"
-              placeholder="Search by Name"
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-            />
-            <MultiSelect
-              id="os-filter-multiselect"
-              titleText="OS"
-              label="Select OS"
-              items={osOptions}
-              itemToString={(item) => item.label}
-              onChange={({ selectedItems }) =>
-                setSelectedOs(selectedItems.map((item) => item.id))
-              }
-            />
-            <MultiSelect
-              id="cpu-filter-multiselect"
-              titleText="CPU"
-              label="Select CPU"
-              items={cpuOptions}
-              itemToString={(item) => item.label}
-              onChange={({ selectedItems }) =>
-                setSelectedCpu(selectedItems.map((item) => item.id))
-              }
-            />
-            <MultiSelect
-              id="ram-filter-multiselect"
-              titleText="RAM"
-              label="Select RAM"
-              items={ramOptions}
-              itemToString={(item) => item.label}
-              onChange={({ selectedItems }) =>
-                setSelectedRam(selectedItems.map((item) => item.id))
-              }
-            />
-            <MultiSelect
-              id="disk-filter-multiselect"
-              titleText="Disk"
-              label="Select Disk"
-              items={diskOptions}
-              itemToString={(item) => item.label}
-              onChange={({ selectedItems }) =>
-                setSelectedDisk(selectedItems.map((item) => item.id))
-              }
-            />
-
-            <MultiSelect
-              id="category-filter-multiselect"
-              titleText="Category"
-              label="Select Category"
-              items={categoryOptions}
-              itemToString={(item) => item.label}
-              onChange={({ selectedItems }) =>
-                setSelectedCategory(selectedItems.map((item) => item.id))
-              }
-            />
-          </div>
-          <ResourceTable
-            rows={filteredRows}
-            headers={headers}
-            onAdd={handleAddProduct}
-          />
+            <Column lg={2} md={4} sm={2}>
+              <TextInput
+                labelText="Search"
+                placeholder="Search by Name"
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+              />
+            </Column>
+            <Column lg={2} md={4} sm={2}>
+              <MultiSelect
+                id="os-filter-multiselect"
+                titleText="OS"
+                label="Select OS"
+                items={osOptions}
+                itemToString={(item) => item.label}
+                onChange={({ selectedItems }) =>
+                  setSelectedOs(selectedItems.map((item) => item.id))
+                }
+              />
+            </Column>
+            <Column lg={2} md={4} sm={2}>
+              <MultiSelect
+                id="cpu-filter-multiselect"
+                titleText="CPU"
+                label="Select CPU"
+                items={cpuOptions}
+                itemToString={(item) => item.label}
+                onChange={({ selectedItems }) =>
+                  setSelectedCpu(selectedItems.map((item) => item.id))
+                }
+              />
+            </Column>
+            <Column lg={2} md={4} sm={2}>
+              <MultiSelect
+                id="ram-filter-multiselect"
+                titleText="RAM"
+                label="Select RAM"
+                items={ramOptions}
+                itemToString={(item) => item.label}
+                onChange={({ selectedItems }) =>
+                  setSelectedRam(selectedItems.map((item) => item.id))
+                }
+              />
+            </Column>
+            <Column lg={2} md={4} sm={2}>
+              <MultiSelect
+                id="disk-filter-multiselect"
+                titleText="Disk"
+                label="Select Disk"
+                items={diskOptions}
+                itemToString={(item) => item.label}
+                onChange={({ selectedItems }) =>
+                  setSelectedDisk(selectedItems.map((item) => item.id))
+                }
+              />
+            </Column>
+            <Column lg={2} md={4} sm={2}>
+              <MultiSelect
+                id="category-filter-multiselect"
+                titleText="Category"
+                label="Select Category"
+                items={categoryOptions}
+                itemToString={(item) => item.label}
+                onChange={({ selectedItems }) =>
+                  setSelectedCategory(selectedItems.map((item) => item.id))
+                }
+              />
+            </Column>
+            <Column lg={2} md={4} sm={2}>
+              <NumberInput
+                id="budget-input" // Ensure a unique ID is set for accessibility
+                label="Budget (Euro)"
+                labelText="Enter your budget"
+                placeholder="Enter your budget"
+                onChange={(e) => setBudget(e.target.value)}
+                hideSteppers
+              />
+            </Column>
+            <Column lg={1} md={2} sm={1}>
+              <NumberInput
+                id="duration-input" // Ensure a unique ID is set for accessibility
+                label="Duration(Months)"
+                labelText="Enter your duration"
+                placeholder="Enter your duration"
+                onChange={(e) => setDuration(e.target.value)}
+                hideSteppers
+              />
+            </Column>
+            {/* <Column lg={1} md={2} sm={1}>
+          <Select
+            id="durationType-select" // Ensure a unique ID is set for accessibility
+            labelText="day/mon/year"
+            onChange={(e) => setDurationType(e.target.value)}
+            style={{ width: '100%' }}
+          >
+            {durationTypeOptions.map((item) => (
+              <SelectItem key={item} value={item}>
+                prova
+              </SelectItem>
+            ))}
+          </Select>
+          </Column> */}
+          </Grid>
         </div>
       </Column>
-      <Column lg={4} md={8} sm={4}>
-        <SelectedProductsPanel
-          selectedProducts={selectedProducts}
-          optionalResources={optionalResources}
-          updateSelectedProducts={setSelectedProducts}
-        />
+
+      {/* Main Content Section */}
+      <Column lg={16} md={8} sm={4}>
+        <Grid style={{ gap: '1rem' }}>
+          {/* Table Section */}
+          <Column lg={12} md={8} sm={4}>
+            <ResourceTable
+              rows={filteredRows}
+              headers={headers}
+              onAdd={handleAddProduct}
+            />
+          </Column>
+
+          {/* Selected Products Section */}
+          <Column lg={4} md={8} sm={4}>
+            <SelectedProductsPanel
+              selectedProducts={selectedProducts}
+              optionalResources={optionalResources}
+              budget={budget}
+              duration={duration}
+              updateSelectedProducts={setSelectedProducts}
+            />
+          </Column>
+        </Grid>
       </Column>
     </Grid>
   );
