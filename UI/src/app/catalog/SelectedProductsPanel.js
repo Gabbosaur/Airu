@@ -21,11 +21,6 @@ function getUniqueProductsWithQuantity(selectedProducts) {
   return uniqueProducts;
 }
 
-function extractNumberFromString(str) {
-  const match = str.match(/[\d.]+/);
-  return match ? parseFloat(match[0]) : null;
-}
-
 function formatToTwoDecimals(number) {
   if (typeof number !== 'number') {
     throw new Error('Input must be a number');
@@ -39,6 +34,7 @@ const SelectedProductsPanel = ({
   budget,
   duration,
   updateSelectedProducts,
+  handleAddButtonClick,
 }) => {
   const handleRemoveProduct = (product) => {
     const updatedProducts = [...selectedProducts];
@@ -61,18 +57,17 @@ const SelectedProductsPanel = ({
 
   const totalCost = uniqueProducts.reduce((sum, product) => {
     const productCost =
-      (extractNumberFromString(product.hourlyUnitPrice) +
-        product.blockStorage *
-          extractNumberFromString(optionalResources[0].hourlyUnitPrice) +
-        product.elasticIP *
-          extractNumberFromString(optionalResources[1].hourlyUnitPrice) +
-        product.highlyAvailable *
-          extractNumberFromString(optionalResources[2].hourlyUnitPrice)) *
+      (product.unitPrice +
+        product.blockStorage * optionalResources[0].unitPrice +
+        product.elasticIP * optionalResources[1].unitPrice +
+        product.highlyAvailable * optionalResources[2].unitPrice) *
       product.quantity *
       24 *
       30;
     return sum + productCost;
   }, 0);
+
+  const totalCostWithDuration = totalCost * duration;
 
   return (
     <div
@@ -95,24 +90,15 @@ const SelectedProductsPanel = ({
               {product.blockStorage > 0 && 'BS' + product.blockStorage} x{' '}
               {product.quantity} ={' '}
               {formatToTwoDecimals(
-                (extractNumberFromString(product.hourlyUnitPrice) +
-                  product.blockStorage *
-                    extractNumberFromString(
-                      optionalResources[0].hourlyUnitPrice
-                    ) +
-                  product.elasticIP *
-                    extractNumberFromString(
-                      optionalResources[1].hourlyUnitPrice
-                    ) +
-                  product.highlyAvailable *
-                    extractNumberFromString(
-                      optionalResources[2].hourlyUnitPrice
-                    )) *
-                  product.quantity *
-                  24 *
-                  30
-              )}{' '}
-              {'€/month'}
+                product.unitPrice +
+                  product.blockStorage * optionalResources[0].unitPrice +
+                  product.elasticIP * optionalResources[1].unitPrice +
+                  product.highlyAvailable * optionalResources[2].unitPrice
+              ) *
+                product.quantity *
+                24 *
+                30}{' '}
+              €/month
               <button
                 onClick={() => handleRemoveProduct(product)}
                 style={{ marginLeft: '10px' }}
@@ -128,12 +114,30 @@ const SelectedProductsPanel = ({
             <br />
             <strong>Total Cost: </strong>
             <span
-              style={{ color: totalCost * duration < budget ? 'green' : 'red' }}
+              style={{
+                color: totalCostWithDuration <= budget ? 'green' : 'red',
+              }}
             >
-              {formatToTwoDecimals(totalCost) * duration} €
+              {formatToTwoDecimals(totalCostWithDuration)} €
             </span>
-            {/* <br />
-            <strong>Total budget:</strong> {budget} € */}
+            <br />
+            <br />
+            <button
+              style={{
+                padding: '5px 10px',
+                backgroundColor:
+                  totalCostWithDuration > budget ? '#e0e0e0' : '#0f62fe',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '4px',
+                cursor:
+                  totalCostWithDuration > budget ? 'not-allowed' : 'pointer',
+              }}
+              disabled={totalCostWithDuration > budget}
+              onClick={() => handleAddButtonClick(row.id)}
+            >
+              Deploy solution
+            </button>
           </li>
         </ul>
       )}

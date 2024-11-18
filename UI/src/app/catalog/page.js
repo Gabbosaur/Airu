@@ -47,7 +47,15 @@ const getRowItems = (rows) =>
       flavorRam: row.flavor?.ram || '', // Use empty string if flavor is null or undefined
       flavorDisk: row.flavor?.disk || '', // Use empty string if flavor is null or undefined
       tiers: row.tiers,
-
+      unitPrice1Month: row.reservations[0].price,
+      unitPrice1Year: row.reservations[1].price,
+      unitPrice3Years: row.reservations[2].price,
+      tiers1MinimumUnits: row.reservations[0].minimumUnits,
+      tiers1PercentDiscount: row.reservations[0].percentDiscount,
+      tiers2MinimumUnits: row.reservations[1].minimumUnits,
+      tiers2PercentDiscount: row.reservations[1].percentDiscount,
+      tiers3MinimumUnits: row.reservations[2].minimumUnits,
+      tiers3PercentDiscount: row.reservations[2].percentDiscount,
       elasticIP: false,
       highlyAvailable: false,
       blockStorage: 0,
@@ -352,14 +360,14 @@ function ProductsPage() {
             <Column lg={2} md={4} sm={2}>
               <NumberInput
                 id="budget-input" // Ensure a unique ID is set for accessibility
-                label="Budget (Euro)"
+                label="Budget(Euro)"
                 labelText="Enter your budget"
                 placeholder="Enter your budget"
                 onChange={(e) => setBudget(e.target.value)}
                 hideSteppers
               />
             </Column>
-            <Column lg={1} md={2} sm={1}>
+            <Column lg={2} md={4} sm={2}>
               <NumberInput
                 id="duration-input" // Ensure a unique ID is set for accessibility
                 label="Duration(Months)"
