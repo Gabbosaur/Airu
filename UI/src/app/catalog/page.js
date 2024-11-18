@@ -11,6 +11,7 @@ import {
 } from '@carbon/react';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import SelectedProductsPanel from './SelectedProductsPanel';
 
 const headers = [
   { key: 'flavorName', header: 'Name' },
@@ -44,15 +45,18 @@ const getRowItems = (rows) =>
       flavorRam: row.flavor?.ram || '', // Use empty string if flavor is null or undefined
       flavorDisk: row.flavor?.disk || '', // Use empty string if flavor is null or undefined
       tiers: row.tiers,
+
+      elasticIP: false,
+      highlyAvailable: false,
+      blockStorage: 0,
     };
   });
 
 function ProductsPage() {
-  const [firstRowIndex, setFirstRowIndex] = useState(0);
-  const [currentPageSize, setCurrentPageSize] = useState(10);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState();
   const [rows, setRows] = useState([]);
+  const [optionalResources, setOptionalResources] = useState([]);
   const [filteredRows, setFilteredRows] = useState([]);
   const [searchText, setSearchText] = useState('');
   const [selectedOs, setSelectedOs] = useState([]);
@@ -60,6 +64,7 @@ function ProductsPage() {
   const [selectedRam, setSelectedRam] = useState([]);
   const [selectedDisk, setSelectedDisk] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState([]);
+  const [selectedProducts, setSelectedProducts] = useState([]); // Stato per i prodotti selezionati
 
   const osOptions = [
     { id: 'linux', label: 'Linux' },
@@ -106,10 +111,14 @@ function ProductsPage() {
       axios
         .request(config)
         .then((response) => {
-          console.debug(response.data);
           const items = getRowItems(response.data);
-          setRows(items);
-          setFilteredRows(items);
+          const coreItems = items.filter((item) => item.flavorCpu !== '');
+          // console.debug("coreItems", coreItems);
+          const specialItems = items.filter((item) => item.flavorCpu === '');
+          // console.debug("specialItems", specialItems);
+          setRows(coreItems);
+          setOptionalResources(specialItems);
+          setFilteredRows(coreItems);
         })
         .catch((error) => {
           console.log(error);
@@ -133,6 +142,25 @@ function ProductsPage() {
     selectedRam,
     rows,
   ]);
+
+  function generateUniqueId() {
+    return `id-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  const handleAddProduct = (productID, elasticIP, ha, blockStorage) => {
+    const foundProduct = rows.find((row) => row.id === productID); // Find the matching product in rows
+    let productToAdd = { ...foundProduct };
+    console.debug('productToAdd', productToAdd);
+    console.debug('productID', productID);
+
+    productToAdd.elasticIP = elasticIP;
+    productToAdd.highlyAvailable = ha;
+    productToAdd.blockStorage = blockStorage;
+    productToAdd.selectionId = generateUniqueId();
+    if (productToAdd) {
+      setSelectedProducts((prev) => [...prev, productToAdd]);
+    }
+  };
 
   const applyFilters = () => {
     let updatedRows = [...rows];
@@ -191,8 +219,8 @@ function ProductsPage() {
         <Column lg={16} md={8} sm={4} className="product-page__r1">
           <DataTableSkeleton
             columnCount={headers.length + 1}
-            rowCount={10}
             headers={headers}
+            onAdd={handleAddProduct}
           />
         </Column>
       </Grid>
@@ -205,7 +233,7 @@ function ProductsPage() {
 
   return (
     <Grid className="product-page">
-      <Column lg={16} md={8} sm={4} className="product-page__r1">
+      <Column lg={12} md={8} sm={4} className="product-page__r1">
         <div style={{ marginBottom: '1rem' }}>
           <div
             style={{
@@ -273,8 +301,19 @@ function ProductsPage() {
               }
             />
           </div>
-          <ResourceTable rows={filteredRows} headers={headers} />
+          <ResourceTable
+            rows={filteredRows}
+            headers={headers}
+            onAdd={handleAddProduct}
+          />
         </div>
+      </Column>
+      <Column lg={4} md={8} sm={4}>
+        <SelectedProductsPanel
+          selectedProducts={selectedProducts}
+          optionalResources={optionalResources}
+          updateSelectedProducts={setSelectedProducts}
+        />
       </Column>
     </Grid>
   );
