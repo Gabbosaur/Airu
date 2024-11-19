@@ -56,14 +56,44 @@ const SelectedProductsPanel = ({
   const uniqueProducts = getUniqueProductsWithQuantity(selectedProducts);
 
   const totalCost = uniqueProducts.reduce((sum, product) => {
-    const productCost =
-      (product.unitPrice +
-        product.blockStorage * optionalResources[0].unitPrice +
-        product.elasticIP * optionalResources[1].unitPrice +
-        product.highlyAvailable * optionalResources[2].unitPrice) *
-      product.quantity *
-      24 *
-      30;
+    let productCost = 0;
+    if (duration < 1) {
+      productCost =
+        (product.unitPrice +
+          product.blockStorage * optionalResources[0].unitPrice +
+          product.elasticIP * optionalResources[1].unitPrice +
+          product.highlyAvailable * optionalResources[2].unitPrice) *
+        product.quantity *
+        24 *
+        30;
+    } else if (duration >= 1 && duration < 12) {
+      productCost =
+        (product.unitPrice1Month +
+          product.blockStorage * optionalResources[0].unitPrice1Month +
+          product.elasticIP * optionalResources[1].unitPrice1Month +
+          product.highlyAvailable * optionalResources[2].unitPrice1Month) *
+        product.quantity *
+        24 *
+        30;
+    } else if (duration >= 12 && duration < 36) {
+      productCost =
+        (product.unitPrice1Year +
+          product.blockStorage * optionalResources[0].unitPrice1Year +
+          product.elasticIP * optionalResources[1].unitPrice1Year +
+          product.highlyAvailable * optionalResources[2].unitPrice1Year) *
+        product.quantity *
+        24 *
+        30;
+    } else if (duration >= 36) {
+      productCost =
+        (product.unitPrice3Years +
+          product.blockStorage * optionalResources[0].unitPrice3Years +
+          product.elasticIP * optionalResources[1].unitPrice3Years +
+          product.highlyAvailable * optionalResources[2].unitPrice3Years) *
+        product.quantity *
+        24 *
+        30;
+    }
     return sum + productCost;
   }, 0);
 
@@ -89,15 +119,53 @@ const SelectedProductsPanel = ({
               {product.elasticIP && 'EIP'}{' '}
               {product.blockStorage > 0 && 'BS' + product.blockStorage} x{' '}
               {product.quantity} ={' '}
-              {formatToTwoDecimals(
-                product.unitPrice +
-                  product.blockStorage * optionalResources[0].unitPrice +
-                  product.elasticIP * optionalResources[1].unitPrice +
-                  product.highlyAvailable * optionalResources[2].unitPrice
-              ) *
-                product.quantity *
-                24 *
-                30}{' '}
+              {duration < 1 &&
+                formatToTwoDecimals(
+                  product.unitPrice +
+                    product.blockStorage * optionalResources[0].unitPrice +
+                    product.elasticIP * optionalResources[1].unitPrice +
+                    product.highlyAvailable * optionalResources[2].unitPrice
+                ) *
+                  product.quantity *
+                  24 *
+                  30}{' '}
+              {duration >= 1 &&
+                duration < 12 &&
+                formatToTwoDecimals(
+                  product.unitPrice1Month +
+                    product.blockStorage *
+                      optionalResources[0].unitPrice1Month +
+                    product.elasticIP * optionalResources[1].unitPrice1Month +
+                    product.highlyAvailable *
+                      optionalResources[2].unitPrice1Month
+                ) *
+                  product.quantity *
+                  24 *
+                  30}{' '}
+              {duration >= 12 &&
+                duration < 36 &&
+                formatToTwoDecimals(
+                  product.unitPrice1Year +
+                    product.blockStorage * optionalResources[0].unitPrice1Year +
+                    product.elasticIP * optionalResources[1].unitPrice1Year +
+                    product.highlyAvailable *
+                      optionalResources[2].unitPrice1Year
+                ) *
+                  product.quantity *
+                  24 *
+                  30}{' '}
+              {duration >= 36 &&
+                formatToTwoDecimals(
+                  product.unitPrice3Years +
+                    product.blockStorage *
+                      optionalResources[0].unitPrice3Years +
+                    product.elasticIP * optionalResources[1].unitPrice3Years +
+                    product.highlyAvailable *
+                      optionalResources[2].unitPrice3Years
+                ) *
+                  product.quantity *
+                  24 *
+                  30}{' '}
               €/month
               <button
                 onClick={() => handleRemoveProduct(product)}
