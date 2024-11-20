@@ -11,42 +11,17 @@ import requests
 
 class ArubaMiddleware(BaseHTTPMiddleware):
     aruba_login_url = "https://login.aruba.it/auth/realms/cmp-new-apikey/protocol/openid-connect/token"
-    aruba_client_id = "cmp-8542d30e-1cec-4f41-928a-52f4263c555a"
-    aruba_client_secret = "qpVOYrJ6clZEJSngiQNiDAv8KajarBTu"
+    aruba_login_payload = 'grant_type=client_credentials&client_id=cmp-8542d30e-1cec-4f41-928a-52f4263c555a&client_secret=qpVOYrJ6clZEJSngiQNiDAv8KajarBTu'
+    aruba_login_headers = {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Cookie': 'COMMON_BACKEND=gob-comb6'
+        }
     aruba_token = ""
 
     aruba_base_url = "https://api.arubacloud.com"
 
     async def get_token(self):
-        # TODO fix code
-        # url = self.aruba_login_url
-        # headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-        # data = {
-        #     'grant_type': 'client_credentials',
-        #     'client_id': self.aruba_client_id,
-        #     'client_secret': self.aruba_client_secret
-        # }
-        # logging.info(f"Getting token " + data["grant_type"] + " " + data["client_id"] + " " + data["client_secret"])
-
-        # async with httpx.AsyncClient() as client:
-        #     response = await client.post(url, headers=headers, data=data)
-
-        # logging.info(f"response token: {response.json()}")
-
-
-        url = "https://login.aruba.it/auth/realms/cmp-new-apikey/protocol/openid-connect/token"
-
-        payload = 'grant_type=client_credentials&client_id=cmp-8542d30e-1cec-4f41-928a-52f4263c555a&client_secret=qpVOYrJ6clZEJSngiQNiDAv8KajarBTu'
-        headers = {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Cookie': 'COMMON_BACKEND=gob-comb6'
-        }
-
-        response = requests.request("POST", url, headers=headers, data=payload)
-
-        print(response.text)
-
-
+        response = requests.request("POST", self.aruba_login_url, headers=self.aruba_login_headers, data=self.aruba_login_payload)
         return response.json()
 
     def __init__(self, app: FastAPI, max_age: int = 60) -> None:
