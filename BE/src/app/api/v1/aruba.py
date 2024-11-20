@@ -61,6 +61,30 @@ async def read_product(product_id: str):
         return {"error": "Product not found"}
     return product
 
+#@router.get("/aruba/catalog_products/filter")
+#async def filter_catalog_products(request: Request, name: str = None, category: str = None, price_min: float = None, price_max: float = None):
+    logging.info("Filtering catalog products")
+    client = AsyncIOMotorClient("mongodb://mongoadmin:"+quote_plus("bMMZ9yGEgHgmT@2Dv6")+"@mongo:27017")
+    db = client["aruba-catalog"]
+    collection = db["catalog_products"]
+    
+    query = {}
+    if name:
+        query["name"] = {"$regex": name, "$options": "i"}
+    if category:
+        query["category"] = category
+    if price_min is not None:
+        query["price"] = {"$gte": price_min}
+    if price_max is not None:
+        if "price" in query:
+            query["price"]["$lte"] = price_max
+        else:
+            query["price"] = {"$lte": price_max}
+    
+    products = await collection.find(query).to_list()
+    return products
+#
+
 #
 # 01-Projects
 #
