@@ -3,14 +3,17 @@
 import ResourceTable from './ResourceTable';
 import {
   DataTableSkeleton,
-  Pagination,
   Column,
   Grid,
   MultiSelect,
   TextInput,
+  NumberInput,
+  Select,
+  SelectItem,
 } from '@carbon/react';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import SelectedProductsPanel from './SelectedProductsPanel';
 
 const headers = [
   { key: 'flavorName', header: 'Name' },
@@ -44,15 +47,26 @@ const getRowItems = (rows) =>
       flavorRam: row.flavor?.ram || '', // Use empty string if flavor is null or undefined
       flavorDisk: row.flavor?.disk || '', // Use empty string if flavor is null or undefined
       tiers: row.tiers,
+      unitPrice1Month: row.reservations[0].price,
+      unitPrice1Year: row.reservations[1].price,
+      unitPrice3Years: row.reservations[2].price,
+      tiers1MinimumUnits: row.reservations[0].minimumUnits,
+      tiers1PercentDiscount: row.reservations[0].percentDiscount,
+      tiers2MinimumUnits: row.reservations[1].minimumUnits,
+      tiers2PercentDiscount: row.reservations[1].percentDiscount,
+      tiers3MinimumUnits: row.reservations[2].minimumUnits,
+      tiers3PercentDiscount: row.reservations[2].percentDiscount,
+      elasticIP: false,
+      highlyAvailable: false,
+      blockStorage: 0,
     };
   });
 
 function ProductsPage() {
-  const [firstRowIndex, setFirstRowIndex] = useState(0);
-  const [currentPageSize, setCurrentPageSize] = useState(10);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState();
   const [rows, setRows] = useState([]);
+  const [optionalResources, setOptionalResources] = useState([]);
   const [filteredRows, setFilteredRows] = useState([]);
   const [searchText, setSearchText] = useState('');
   const [selectedOs, setSelectedOs] = useState([]);
@@ -60,11 +74,17 @@ function ProductsPage() {
   const [selectedRam, setSelectedRam] = useState([]);
   const [selectedDisk, setSelectedDisk] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState([]);
+  const [selectedProducts, setSelectedProducts] = useState([]); // Stato per i prodotti selezionati
+  const [budget, setBudget] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [durationType, setDurationType] = useState(0);
 
   const osOptions = [
     { id: 'linux', label: 'Linux' },
     { id: 'windows', label: 'Windows' },
   ];
+
+  const durationTypeOptions = ['day/s', 'month/s', 'year/s'];
 
   const cpuOptions = [
     { id: '2', label: '2' },
@@ -90,10 +110,10 @@ function ProductsPage() {
   ];
 
   const categoryOptions = [
-    { id: 'disk	', label: 'Disk' },
+    // { id: 'disk	', label: 'Disk' },
     { id: 'computing', label: 'Computing' },
     { id: 'container', label: 'Container' },
-    { id: 'networking', label: 'Networking' },
+    // { id: 'networking', label: 'Networking' },
   ];
 
   useEffect(() => {
@@ -106,10 +126,14 @@ function ProductsPage() {
       axios
         .request(config)
         .then((response) => {
-          console.debug(response.data);
           const items = getRowItems(response.data);
-          setRows(items);
-          setFilteredRows(items);
+          const coreItems = items.filter((item) => item.flavorCpu !== '');
+          // console.debug("coreItems", coreItems);
+          const specialItems = items.filter((item) => item.flavorCpu === '');
+          // console.debug("specialItems", specialItems);
+          setRows(coreItems);
+          setOptionalResources(specialItems);
+          setFilteredRows(coreItems);
         })
         .catch((error) => {
           console.log(error);
@@ -133,6 +157,25 @@ function ProductsPage() {
     selectedRam,
     rows,
   ]);
+
+  function generateUniqueId() {
+    return `id-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  const handleAddProduct = (productID, elasticIP, ha, blockStorage) => {
+    const foundProduct = rows.find((row) => row.id === productID); // Find the matching product in rows
+    let productToAdd = { ...foundProduct };
+    console.debug('productToAdd', productToAdd);
+    console.debug('productID', productID);
+
+    productToAdd.elasticIP = elasticIP;
+    productToAdd.highlyAvailable = ha;
+    productToAdd.blockStorage = blockStorage;
+    productToAdd.selectionId = generateUniqueId();
+    if (productToAdd) {
+      setSelectedProducts((prev) => [...prev, productToAdd]);
+    }
+  };
 
   const applyFilters = () => {
     let updatedRows = [...rows];
@@ -188,12 +231,47 @@ function ProductsPage() {
   if (loading) {
     return (
       <Grid className="product-page">
-        <Column lg={16} md={8} sm={4} className="product-page__r1">
-          <DataTableSkeleton
-            columnCount={headers.length + 1}
-            rowCount={10}
-            headers={headers}
-          />
+        <Column lg={12} md={8} sm={4} className="product-page__r1">
+          <div style={{ marginBottom: '1rem' }}>
+            <div
+              style={{
+                display: 'flex',
+                gap: '1rem',
+                marginBottom: '1rem',
+                marginTop: '1rem',
+              }}
+            >
+              {/* Skeleton for Search Input */}
+              <div
+                style={{
+                  width: '200px',
+                  height: '48px',
+                  backgroundColor: '#e0e0e0',
+                  borderRadius: '4px',
+                }}
+              ></div>
+
+              {/* Skeleton for MultiSelect Filters */}
+              {Array.from({ length: 5 }).map((_, index) => (
+                <div
+                  key={index}
+                  style={{
+                    width: '150px',
+                    height: '48px',
+                    backgroundColor: '#e0e0e0',
+                    borderRadius: '4px',
+                  }}
+                ></div>
+              ))}
+            </div>
+
+            {/* Resource Table Skeleton */}
+            <DataTableSkeleton
+              columnCount={headers.length + 1} // Includes action buttons
+              rowCount={5} // Simulate a few rows
+              headers={headers}
+            />
+          </div>
         </Column>
       </Grid>
     );
@@ -205,76 +283,141 @@ function ProductsPage() {
 
   return (
     <Grid className="product-page">
+      {/* Filters Section */}
       <Column lg={16} md={8} sm={4} className="product-page__r1">
         <div style={{ marginBottom: '1rem' }}>
-          <div
-            style={{
-              display: 'flex',
-              gap: '1rem',
-              marginBottom: '1rem',
-              marginTop: '1rem',
-            }}
+          <Grid
+            style={{ gap: '1rem', marginBottom: '1rem', marginTop: '1rem' }}
           >
-            <TextInput
-              labelText="Search"
-              placeholder="Search by Name"
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-            />
-            <MultiSelect
-              id="os-filter-multiselect"
-              titleText="OS"
-              label="Select OS"
-              items={osOptions}
-              itemToString={(item) => item.label}
-              onChange={({ selectedItems }) =>
-                setSelectedOs(selectedItems.map((item) => item.id))
-              }
-            />
-            <MultiSelect
-              id="cpu-filter-multiselect"
-              titleText="CPU"
-              label="Select CPU"
-              items={cpuOptions}
-              itemToString={(item) => item.label}
-              onChange={({ selectedItems }) =>
-                setSelectedCpu(selectedItems.map((item) => item.id))
-              }
-            />
-            <MultiSelect
-              id="ram-filter-multiselect"
-              titleText="RAM"
-              label="Select RAM"
-              items={ramOptions}
-              itemToString={(item) => item.label}
-              onChange={({ selectedItems }) =>
-                setSelectedRam(selectedItems.map((item) => item.id))
-              }
-            />
-            <MultiSelect
-              id="disk-filter-multiselect"
-              titleText="Disk"
-              label="Select Disk"
-              items={diskOptions}
-              itemToString={(item) => item.label}
-              onChange={({ selectedItems }) =>
-                setSelectedDisk(selectedItems.map((item) => item.id))
-              }
-            />
-
-            <MultiSelect
-              id="category-filter-multiselect"
-              titleText="Category"
-              label="Select Category"
-              items={categoryOptions}
-              itemToString={(item) => item.label}
-              onChange={({ selectedItems }) =>
-                setSelectedCategory(selectedItems.map((item) => item.id))
-              }
-            />
-          </div>
-          <ResourceTable rows={filteredRows} headers={headers} />
+            <Column lg={2} md={4} sm={2}>
+              <TextInput
+                labelText="Search"
+                placeholder="Search by Name"
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+              />
+            </Column>
+            <Column lg={2} md={4} sm={2}>
+              <MultiSelect
+                id="os-filter-multiselect"
+                titleText="OS"
+                label="Select OS"
+                items={osOptions}
+                itemToString={(item) => item.label}
+                onChange={({ selectedItems }) =>
+                  setSelectedOs(selectedItems.map((item) => item.id))
+                }
+              />
+            </Column>
+            <Column lg={2} md={4} sm={2}>
+              <MultiSelect
+                id="cpu-filter-multiselect"
+                titleText="CPU"
+                label="Select CPU"
+                items={cpuOptions}
+                itemToString={(item) => item.label}
+                onChange={({ selectedItems }) =>
+                  setSelectedCpu(selectedItems.map((item) => item.id))
+                }
+              />
+            </Column>
+            <Column lg={2} md={4} sm={2}>
+              <MultiSelect
+                id="ram-filter-multiselect"
+                titleText="RAM"
+                label="Select RAM"
+                items={ramOptions}
+                itemToString={(item) => item.label}
+                onChange={({ selectedItems }) =>
+                  setSelectedRam(selectedItems.map((item) => item.id))
+                }
+              />
+            </Column>
+            <Column lg={2} md={4} sm={2}>
+              <MultiSelect
+                id="disk-filter-multiselect"
+                titleText="Disk"
+                label="Select Disk"
+                items={diskOptions}
+                itemToString={(item) => item.label}
+                onChange={({ selectedItems }) =>
+                  setSelectedDisk(selectedItems.map((item) => item.id))
+                }
+              />
+            </Column>
+            <Column lg={2} md={4} sm={2}>
+              <MultiSelect
+                id="category-filter-multiselect"
+                titleText="Category"
+                label="Select Category"
+                items={categoryOptions}
+                itemToString={(item) => item.label}
+                onChange={({ selectedItems }) =>
+                  setSelectedCategory(selectedItems.map((item) => item.id))
+                }
+              />
+            </Column>
+            <Column lg={2} md={4} sm={2}>
+              <NumberInput
+                id="budget-input" // Ensure a unique ID is set for accessibility
+                label="Budget(Euro)"
+                labelText="Enter your budget"
+                placeholder="Enter your budget"
+                onChange={(e) => setBudget(e.target.value)}
+                hideSteppers
+              />
+            </Column>
+            <Column lg={2} md={4} sm={2}>
+              <NumberInput
+                id="duration-input" // Ensure a unique ID is set for accessibility
+                label="Duration(Months)"
+                labelText="Enter your duration"
+                placeholder="Enter your duration"
+                onChange={(e) => setDuration(e.target.value)}
+                hideSteppers
+              />
+            </Column>
+            {/* <Column lg={1} md={2} sm={1}>
+          <Select
+            id="durationType-select" // Ensure a unique ID is set for accessibility
+            labelText="day/mon/year"
+            onChange={(e) => setDurationType(e.target.value)}
+            style={{ width: '100%' }}
+          >
+            {durationTypeOptions.map((item) => (
+              <SelectItem key={item} value={item}>
+                prova
+              </SelectItem>
+            ))}
+          </Select>
+          </Column> */}
+          </Grid>
         </div>
+      </Column>
+
+      {/* Main Content Section */}
+      <Column lg={16} md={8} sm={4}>
+        <Grid style={{ gap: '1rem' }}>
+          {/* Table Section */}
+          <Column lg={12} md={8} sm={4}>
+            <ResourceTable
+              rows={filteredRows}
+              headers={headers}
+              onAdd={handleAddProduct}
+            />
+          </Column>
+
+          {/* Selected Products Section */}
+          <Column lg={4} md={8} sm={4}>
+            <SelectedProductsPanel
+              selectedProducts={selectedProducts}
+              optionalResources={optionalResources}
+              budget={budget}
+              duration={duration}
+              updateSelectedProducts={setSelectedProducts}
+            />
+          </Column>
+        </Grid>
       </Column>
     </Grid>
   );
