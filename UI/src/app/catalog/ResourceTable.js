@@ -98,20 +98,31 @@ const ProductTable = ({ rows, headers, onAdd }) => {
                             alignItems: 'center',
                           }}
                         >
-                          <span>Add elasticIP</span>
-                          <input
-                            type="checkbox"
-                            checked={elasticIP}
-                            onChange={() =>
-                              handleElasticIPCheckboxChange(row.id)
-                            }
-                          />
-                          <span>Add HA</span>
-                          <input
-                            type="checkbox"
-                            checked={ha}
-                            onChange={() => handleHACheckboxChange(row.id)}
-                          />
+                          {console.debug('row.resourceName', row)}
+                          {row.cells[5].value === 'cloudServer' && (
+                            <div>
+                              <span>Add elasticIP</span>
+                              <input
+                                type="checkbox"
+                                checked={elasticIP}
+                                onChange={() =>
+                                  handleElasticIPCheckboxChange(row.id)
+                                }
+                              />
+                            </div>
+                          )}
+
+                          {row.cells[5].value === 'kaas' && (
+                            <div>
+                              <span>Add HA</span>
+                              <input
+                                type="checkbox"
+                                checked={ha}
+                                onChange={() => handleHACheckboxChange(row.id)}
+                              />
+                            </div>
+                          )}
+
                           <span>
                             Add persistent storage with the following size (GB)
                           </span>
