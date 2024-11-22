@@ -50,7 +50,7 @@ async def get_catalog_products(request: Request):
     products = await collection.find().to_list()
     return products
 
-@router.get("/aruba/catalog_products/{product_id}")
+@router.get("/aruba/catalog_products/getById/{product_id}")
 async def read_product(product_id: str):
     logging.info("Getting catalog products by id")
     client = AsyncIOMotorClient("mongodb://mongoadmin:"+quote_plus("bMMZ9yGEgHgmT@2Dv6")+"@mongo:27017")
@@ -61,28 +61,37 @@ async def read_product(product_id: str):
         return {"error": "Product not found"}
     return product
 
-#@router.get("/aruba/catalog_products/filter")
-#async def filter_catalog_products(request: Request, name: str = None, category: str = None, price_min: float = None, price_max: float = None):
+@router.get("/aruba/catalog_products/filter")
+async def filter_catalog_products(request: Request, name: str = None, category: str = None, price_min: float = None, price_max: float = None):
     logging.info("Filtering catalog products")
     client = AsyncIOMotorClient("mongodb://mongoadmin:"+quote_plus("bMMZ9yGEgHgmT@2Dv6")+"@mongo:27017")
     db = client["aruba-catalog"]
     collection = db["catalog_products"]
     
-    query = {}
-    if name:
-        query["name"] = {"$regex": name, "$options": "i"}
-    if category:
-        query["category"] = category
-    if price_min is not None:
-        query["price"] = {"$gte": price_min}
-    if price_max is not None:
-        if "price" in query:
-            query["price"]["$lte"] = price_max
-        else:
-            query["price"] = {"$lte": price_max}
-    
-    products = await collection.find(query).to_list()
-    return products
+    """
+    Groups resources by the 'resourceCategory' field and returns the result.
+    """
+    try:
+        # MongoDB aggregation pipeline
+        pipeline = [
+            {
+                "$group": {
+                    "_id": "$resourceCategory",  # Group by resourceCategory
+                    "resources": {"$push": "$$ROOT"},  # Include all documents in the group
+                    "count": {"$sum": 1}  # Count documents in each group
+                }
+            }
+        ]
+
+        # Execute the aggregation pipeline
+        cursor = collection.aggregate(pipeline)
+        results = await cursor.to_list(length=None)
+
+        return {"grouped_data": results}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
+
 #
 
 #

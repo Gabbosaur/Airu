@@ -1226,6 +1226,718 @@ db.catalog_products.insertMany([
                 "percentDiscount": 12.0
             }
         ]
+    },
+    {
+        "_id": "8108329f04a04fb39725607694801461",
+        "resourceName": "kaas",
+        "resourceCategory": "container",
+        "currencyCode": "EUR",
+        "unitOfMeasure": "1 Hour",
+        "unitPrice": 0.05,
+        "productName": "masterHA",
+        "flavor": null,
+        "reservations": [
+            {
+                "term": "1 Month",
+                "price": 0.0475
+            },
+            {
+                "term": "1 Year",
+                "price": 0.045
+            },
+            {
+                "term": "3 Years",
+                "price": 0.04
+            }
+        ],
+        "tiers": [
+            {
+                "category": "Base",
+                "minimumUnits": 10,
+                "percentDiscount": 5.0
+            },
+            {
+                "category": "Partner",
+                "minimumUnits": 50,
+                "percentDiscount": 10.0
+            },
+            {
+                "category": "Premium",
+                "minimumUnits": 100,
+                "percentDiscount": 15.0
+            }
+        ]
+    },
+    {
+        "_id": "9fd8ae455a7e4b34838bf184c881a68f",
+        "resourceName": "kaas",
+        "resourceCategory": "container",
+        "currencyCode": "EUR",
+        "unitOfMeasure": "1 Hour",
+        "unitPrice": 0.14,
+        "productName": "kaasNode",
+        "flavor": {
+            "id": "41a4df9d024644d8996c7bb5db1d2109",
+            "name": "K12A24",
+            "code": "null",
+            "osPlatform": "linux",
+            "cpu": "12",
+            "ram": "24",
+            "disk": "120"
+        },
+        "reservations": [
+            {
+                "term": "1 Month",
+                "price": 0.133
+            },
+            {
+                "term": "1 Year",
+                "price": 0.126
+            },
+            {
+                "term": "3 Years",
+                "price": 0.112
+            }
+        ],
+        "tiers": [
+            {
+                "category": "Base",
+                "minimumUnits": 5,
+                "percentDiscount": 3.0
+            },
+            {
+                "category": "Partner",
+                "minimumUnits": 20,
+                "percentDiscount": 8.0
+            },
+            {
+                "category": "Premium",
+                "minimumUnits": 50,
+                "percentDiscount": 12.0
+            }
+        ]
+    },
+    {
+        "_id": "05c3efc1c8d246aa9b76fc29db6111b6",
+        "resourceName": "kaas",
+        "resourceCategory": "container",
+        "currencyCode": "EUR",
+        "unitOfMeasure": "1 Hour",
+        "unitPrice": 0.19,
+        "productName": "kaasNode",
+        "flavor": {
+            "id": "9efdc50169264acfb082205beefaee4f",
+            "name": "K16A32",
+            "code": "null",
+            "osPlatform": "linux",
+            "cpu": "16",
+            "ram": "32",
+            "disk": "120"
+        },
+        "reservations": [
+            {
+                "term": "1 Month",
+                "price": 0.1805
+            },
+            {
+                "term": "1 Year",
+                "price": 0.171
+            },
+            {
+                "term": "3 Years",
+                "price": 0.152
+            }
+        ],
+        "tiers": [
+            {
+                "category": "Base",
+                "minimumUnits": 5,
+                "percentDiscount": 3.0
+            },
+            {
+                "category": "Partner",
+                "minimumUnits": 20,
+                "percentDiscount": 8.0
+            },
+            {
+                "category": "Premium",
+                "minimumUnits": 50,
+                "percentDiscount": 12.0
+            }
+        ]
+    },
+    {
+        "_id": "f809890a909e4e91a830b5e41c9018c7",
+        "resourceName": "kaas",
+        "resourceCategory": "container",
+        "currencyCode": "EUR",
+        "unitOfMeasure": "1 Hour",
+        "unitPrice": 0.28,
+        "productName": "kaasNode",
+        "flavor": {
+            "id": "f9c8b4cecf80445db5442d0f0b0c98f0",
+            "name": "K24A48",
+            "code": "null",
+            "osPlatform": "linux",
+            "cpu": "24",
+            "ram": "48",
+            "disk": "120"
+        },
+        "reservations": [
+            {
+                "term": "1 Month",
+                "price": 0.266
+            },
+            {
+                "term": "1 Year",
+                "price": 0.252
+            },
+            {
+                "term": "3 Years",
+                "price": 0.224
+            }
+        ],
+        "tiers": [
+            {
+                "category": "Base",
+                "minimumUnits": 5,
+                "percentDiscount": 3.0
+            },
+            {
+                "category": "Partner",
+                "minimumUnits": 20,
+                "percentDiscount": 8.0
+            },
+            {
+                "category": "Premium",
+                "minimumUnits": 50,
+                "percentDiscount": 12.0
+            }
+        ]
+    },
+    {
+        "_id": "5e6a1900a65742a8b994b8a6d47593f6",
+        "resourceName": "kaas",
+        "resourceCategory": "container",
+        "currencyCode": "EUR",
+        "unitOfMeasure": "1 Hour",
+        "unitPrice": 0.026,
+        "productName": "kaasNode",
+        "flavor": {
+            "id": "47495b9ead404f8c82e3700d53aa68af",
+            "name": "K2A4",
+            "code": "null",
+            "osPlatform": "linux",
+            "cpu": "2",
+            "ram": "4",
+            "disk": "40"
+        },
+        "reservations": [
+            {
+                "term": "1 Month",
+                "price": 0.0247
+            },
+            {
+                "term": "1 Year",
+                "price": 0.0234
+            },
+            {
+                "term": "3 Years",
+                "price": 0.0208
+            }
+        ],
+        "tiers": [
+            {
+                "category": "Base",
+                "minimumUnits": 10,
+                "percentDiscount": 5.0
+            },
+            {
+                "category": "Partner",
+                "minimumUnits": 50,
+                "percentDiscount": 10.0
+            },
+            {
+                "category": "Premium",
+                "minimumUnits": 100,
+                "percentDiscount": 15.0
+            }
+        ]
+    },
+    {
+        "_id": "7dd112cae86b400283ca97cbad19032d",
+        "resourceName": "kaas",
+        "resourceCategory": "container",
+        "currencyCode": "EUR",
+        "unitOfMeasure": "1 Hour",
+        "unitPrice": 0.04,
+        "productName": "kaasNode",
+        "flavor": {
+            "id": "944c1e017b594733b0367636ffe90cf3",
+            "name": "K2A8R",
+            "code": "null",
+            "osPlatform": "linux",
+            "cpu": "2",
+            "ram": "8",
+            "disk": "80"
+        },
+        "reservations": [
+            {
+                "term": "1 Month",
+                "price": 0.038
+            },
+            {
+                "term": "1 Year",
+                "price": 0.036
+            },
+            {
+                "term": "3 Years",
+                "price": 0.032
+            }
+        ],
+        "tiers": [
+            {
+                "category": "Base",
+                "minimumUnits": 10,
+                "percentDiscount": 5.0
+            },
+            {
+                "category": "Partner",
+                "minimumUnits": 50,
+                "percentDiscount": 10.0
+            },
+            {
+                "category": "Premium",
+                "minimumUnits": 100,
+                "percentDiscount": 15.0
+            }
+        ]
+    },
+    {
+        "_id": "0c02b9e1d81940b0bad1005f1b18b141",
+        "resourceName": "kaas",
+        "resourceCategory": "container",
+        "currencyCode": "EUR",
+        "unitOfMeasure": "1 Hour",
+        "unitPrice": 0.38,
+        "productName": "kaasNode",
+        "flavor": {
+            "id": "9d455579a30b487885d5ece6a4dc4651",
+            "name": "K32A64",
+            "code": "null",
+            "osPlatform": "linux",
+            "cpu": "32",
+            "ram": "64",
+            "disk": "120"
+        },
+        "reservations": [
+            {
+                "term": "1 Month",
+                "price": 0.361
+            },
+            {
+                "term": "1 Year",
+                "price": 0.342
+            },
+            {
+                "term": "3 Years",
+                "price": 0.304
+            }
+        ],
+        "tiers": [
+            {
+                "category": "Base",
+                "minimumUnits": 10,
+                "percentDiscount": 5.0
+            },
+            {
+                "category": "Partner",
+                "minimumUnits": 50,
+                "percentDiscount": 10.0
+            },
+            {
+                "category": "Premium",
+                "minimumUnits": 100,
+                "percentDiscount": 15.0
+            }
+        ]
+    },
+    {
+        "_id": "4d24808b959d48d0b72cfbb51dbca036",
+        "resourceName": "kaas",
+        "resourceCategory": "container",
+        "currencyCode": "EUR",
+        "unitOfMeasure": "1 Hour",
+        "unitPrice": 0.074,
+        "productName": "kaasNode",
+        "flavor": {
+            "id": "3c5b650f640047c2968bef2fb9a53e56",
+            "name": "K4A16R",
+            "code": "null",
+            "osPlatform": "linux",
+            "cpu": "4",
+            "ram": "16",
+            "disk": "120"
+        },
+        "reservations": [
+            {
+                "term": "1 Month",
+                "price": 0.0703
+            },
+            {
+                "term": "1 Year",
+                "price": 0.0666
+            },
+            {
+                "term": "3 Years",
+                "price": 0.0592
+            }
+        ],
+        "tiers": [
+            {
+                "category": "Base",
+                "minimumUnits": 10,
+                "percentDiscount": 5.0
+            },
+            {
+                "category": "Partner",
+                "minimumUnits": 50,
+                "percentDiscount": 10.0
+            },
+            {
+                "category": "Premium",
+                "minimumUnits": 100,
+                "percentDiscount": 15.0
+            }
+        ]
+    },
+    {
+        "_id": "c2ec0c915904480fb67106c103088c0a",
+        "resourceName": "kaas",
+        "resourceCategory": "container",
+        "currencyCode": "EUR",
+        "unitOfMeasure": "1 Hour",
+        "unitPrice": 0.05,
+        "productName": "kaasNode",
+        "flavor": {
+            "id": "827ef08235384cdabb3310c0d7e93fb4",
+            "name": "K4A8",
+            "code": "null",
+            "osPlatform": "linux",
+            "cpu": "4",
+            "ram": "8",
+            "disk": "80"
+        },
+        "reservations": [
+            {
+                "term": "1 Month",
+                "price": 0.0475
+            },
+            {
+                "term": "1 Year",
+                "price": 0.045
+            },
+            {
+                "term": "3 Years",
+                "price": 0.04
+            }
+        ],
+        "tiers": [
+            {
+                "category": "Base",
+                "minimumUnits": 10,
+                "percentDiscount": 5.0
+            },
+            {
+                "category": "Partner",
+                "minimumUnits": 50,
+                "percentDiscount": 10.0
+            },
+            {
+                "category": "Premium",
+                "minimumUnits": 100,
+                "percentDiscount": 15.0
+            }
+        ]
+    },
+    {
+        "_id": "66079ef91da04a91bffeb104545d3464",
+        "resourceName": "kaas",
+        "resourceCategory": "container",
+        "currencyCode": "EUR",
+        "unitOfMeasure": "1 Hour",
+        "unitPrice": 0.095,
+        "productName": "kaasNode",
+        "flavor": {
+            "id": "5733158be46843de9ac0e9cf2eab3390",
+            "name": "K8A16",
+            "code": "null",
+            "osPlatform": "linux",
+            "cpu": "8",
+            "ram": "16",
+            "disk": "120"
+        },
+        "reservations": [
+            {
+                "term": "1 Month",
+                "price": 0.09025
+            },
+            {
+                "term": "1 Year",
+                "price": 0.0855
+            },
+            {
+                "term": "3 Years",
+                "price": 0.076
+            }
+        ],
+        "tiers": [
+            {
+                "category": "Base",
+                "minimumUnits": 10,
+                "percentDiscount": 5.0
+            },
+            {
+                "category": "Partner",
+                "minimumUnits": 50,
+                "percentDiscount": 10.0
+            },
+            {
+                "category": "Premium",
+                "minimumUnits": 100,
+                "percentDiscount": 15.0
+            }
+        ]
+    },
+    {
+        "_id": "83cbf1eea960400492515a54f2064420",
+        "resourceName": "kaas",
+        "resourceCategory": "container",
+        "currencyCode": "EUR",
+        "unitOfMeasure": "1 Hour",
+        "unitPrice": 0.135,
+        "productName": "kaasNode",
+        "flavor": {
+            "id": "1d95d5be4ec3473ba5258e3c1a8e6a1e",
+            "name": "K8A32R",
+            "code": "null",
+            "osPlatform": "linux",
+            "cpu": "8",
+            "ram": "32",
+            "disk": "120"
+        },
+        "reservations": [
+            {
+                "term": "1 Month",
+                "price": 0.12825
+            },
+            {
+                "term": "1 Year",
+                "price": 0.1215
+            },
+            {
+                "term": "3 Years",
+                "price": 0.108
+            }
+        ],
+        "tiers": [
+            {
+                "category": "Base",
+                "minimumUnits": 10,
+                "percentDiscount": 5.0
+            },
+            {
+                "category": "Partner",
+                "minimumUnits": 50,
+                "percentDiscount": 10.0
+            },
+            {
+                "category": "Premium",
+                "minimumUnits": 100,
+                "percentDiscount": 15.0
+            }
+        ]
+    },
+    {
+        "_id": "e22e3b5294734359a1d4c763f4af0b2b",
+        "resourceName": "kaas",
+        "resourceCategory": "container",
+        "currencyCode": "EUR",
+        "unitOfMeasure": "1 Hour",
+        "unitPrice": 0.26,
+        "productName": "kaasNode",
+        "flavor": {
+            "id": "3868e4e491f94708bc36fb3bf419eb30",
+            "name": "K16A64R",
+            "code": "null",
+            "osPlatform": "linux",
+            "cpu": "16",
+            "ram": "64",
+            "disk": "120"
+        },
+        "reservations": [
+            {
+                "term": "1 Month",
+                "price": 0.247
+            },
+            {
+                "term": "1 Year",
+                "price": 0.234
+            },
+            {
+                "term": "3 Years",
+                "price": 0.208
+            }
+        ],
+        "tiers": [
+            {
+                "category": "Base",
+                "minimumUnits": 10,
+                "percentDiscount": 5.0
+            },
+            {
+                "category": "Partner",
+                "minimumUnits": 50,
+                "percentDiscount": 10.0
+            },
+            {
+                "category": "Premium",
+                "minimumUnits": 100,
+                "percentDiscount": 15.0
+            }
+        ]
+    },
+    {
+        "_id": "104af25a94ed410fa53059afe0f0c349",
+        "resourceName": "kaas",
+        "resourceCategory": "container",
+        "currencyCode": "EUR",
+        "unitOfMeasure": "1 Hour",
+        "unitPrice": 0.5,
+        "productName": "kaasNode",
+        "flavor": {
+            "id": "51411ebf13db4c6bb921d6f25772effd",
+            "name": "K32A128R",
+            "code": "null",
+            "osPlatform": "linux",
+            "cpu": "32",
+            "ram": "128",
+            "disk": "120"
+        },
+        "reservations": [
+            {
+                "term": "1 Month",
+                "price": 0.475
+            },
+            {
+                "term": "1 Year",
+                "price": 0.45
+            },
+            {
+                "term": "3 Years",
+                "price": 0.4
+            }
+        ],
+        "tiers": [
+            {
+                "category": "Base",
+                "minimumUnits": 10,
+                "percentDiscount": 5.0
+            },
+            {
+                "category": "Partner",
+                "minimumUnits": 50,
+                "percentDiscount": 10.0
+            },
+            {
+                "category": "Premium",
+                "minimumUnits": 100,
+                "percentDiscount": 15.0
+            }
+        ]
+    },
+    {
+        "_id": "83dcd812afd8462cb3f17ed98decd42f",
+        "resourceName": "elasticIp",
+        "resourceCategory": "networking",
+        "currencyCode": "EUR",
+        "unitOfMeasure": "1 Hour",
+        "unitPrice": 0.005,
+        "productName": "elasticIp",
+        "flavor": null,
+        "reservations": [
+            {
+                "term": "1 Month",
+                "price": 0.00475
+            },
+            {
+                "term": "1 Year",
+                "price": 0.0045
+            },
+            {
+                "term": "3 Years",
+                "price": 0.004
+            }
+        ],
+        "tiers": [
+            {
+                "category": "Base",
+                "minimumUnits": 10,
+                "percentDiscount": 5.0
+            },
+            {
+                "category": "Partner",
+                "minimumUnits": 50,
+                "percentDiscount": 10.0
+            },
+            {
+                "category": "Premium",
+                "minimumUnits": 100,
+                "percentDiscount": 15.0
+            }
+        ]
+    },
+    {
+        "_id": "ff615eba519c49ffbbd8a6e91ccd0765",
+        "resourceName": "blockStorage",
+        "resourceCategory": "storage",
+        "currencyCode": "EUR",
+        "unitOfMeasure": "1 Hour",
+        "unitPrice": 5e-05,
+        "productName": "blockStorage",
+        "flavor": null,
+        "reservations": [
+            {
+                "term": "1 Month",
+                "price": 4.75e-05
+            },
+            {
+                "term": "1 Year",
+                "price": 4.5e-05
+            },
+            {
+                "term": "3 Years",
+                "price": 4e-05
+            }
+        ],
+        "tiers": [
+            {
+                "category": "Base",
+                "minimumUnits": 10,
+                "percentDiscount": 5.0
+            },
+            {
+                "category": "Partner",
+                "minimumUnits": 50,
+                "percentDiscount": 10.0
+            },
+            {
+                "category": "Premium",
+                "minimumUnits": 100,
+                "percentDiscount": 15.0
+            }
+        ]
     }
+
 ]);
 
