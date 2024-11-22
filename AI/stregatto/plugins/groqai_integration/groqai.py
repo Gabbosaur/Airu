@@ -9,8 +9,8 @@ class GroqAIConfig(LLMSettings):
     """The configuration for the GroqAI plugin."""
 
     groq_api_key: Optional[SecretStr]
-    model: str = "mixtral-8x7b-32768"
-    max_tokens: Optional[int] = 32768
+    model: str = "llama-3.1-70b-versatile"
+    max_tokens: Optional[int] = 8000
     top_p: float = 1
     temperature: float = 0.7
     streaming: bool = False
