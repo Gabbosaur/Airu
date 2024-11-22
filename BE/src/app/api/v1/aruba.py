@@ -112,3 +112,102 @@ async def get_projects(request: Request):
         if response.status_code != 200:
             return {"error": "Failed to fetch projects"}
         return response.json()
+    
+@router.post("/aruba/projects")
+async def create_project(request: Request):
+    body = await request.json()
+    logging.info("Creating project")
+    logging.info(body)
+    url = f"{aruba_base_url}/projects"
+    headers = {
+        'Authorization': dict(request.scope['headers'])['Authorization'],
+        'Content-Type': 'application/json'
+    }
+    
+
+    async with httpx.AsyncClient() as client:
+        response = await client.post(url, headers=headers, json=body)
+        if response.status_code != 201:
+            return {"error": "Failed to create project"}
+        return response.json()
+
+@router.get("/aruba/projects/{projectId}")
+async def get_project(request: Request, projectId: str):
+    logging.info("Getting project")
+    url = f"{aruba_base_url}/projects/{projectId}"
+    headers = {
+        'Authorization': dict(request.scope['headers'])['Authorization'],
+        'Content-Type': 'application/json'
+    }
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url, headers=headers)
+        if response.status_code != 200:
+            return {"error": "Failed to fetch project"}
+        return response.json()    
+
+@router.get("/aruba/projects/{projectId}/resources")
+async def get_project_resources(request: Request, projectId: str):
+    logging.info("Getting project resources")
+    url = f"{aruba_base_url}/projects/{projectId}/resources"
+    headers = {
+        'Authorization': dict(request.scope['headers'])['Authorization'],
+        'Content-Type': 'application/json'
+    }
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url, headers=headers)
+        if response.status_code != 200:
+            return {"error": "Failed to fetch project resources"}
+        return response.json()
+
+@router.put("/aruba/projects/{projectId}")
+async def update_project(request: Request, projectId: str):
+    body = await request.json()
+    logging.info("Updating project")
+    logging.info(body)
+    url = f"{aruba_base_url}/projects/{projectId}"
+    headers = {
+        'Authorization': dict(request.scope['headers'])['Authorization'],
+        'Content-Type': 'application/json'
+    }
+
+    async with httpx.AsyncClient() as client:
+        response = await client.put(url, headers=headers, json=body)
+        if response.status_code != 200:
+            return {"error": "Failed to update project"}
+        return response.json()
+
+@router.delete("/aruba/projects/{projectId}")
+async def delete_project(request: Request, projectId: str):
+    logging.info("Deleting project")
+    url = f"{aruba_base_url}/projects/{projectId}"
+    headers = {
+        'Authorization': dict(request.scope['headers'])['Authorization'],
+        'Content-Type': 'application/json'
+    }
+
+    async with httpx.AsyncClient() as client:
+        response = await client.delete(url, headers=headers)
+        if response.status_code != 204:
+            return {"error": "Failed to delete project"}
+        return {"message": "Project deleted successfully"}
+
+#
+# 04-Storage
+#
+
+@router.get("/projects/{projectIdCreated}/providers/Aruba.Storage/blockStorages")
+async def get_block_storages(request: Request, projectIdCreated: str):
+    logging.info("Getting block storages")
+    url = f"{aruba_base_url}/projects/{projectIdCreated}/providers/Aruba.Storage/blockStorages"
+    headers = {
+        'Authorization': dict(request.scope['headers'])['Authorization'],
+        'Content-Type': 'application/json'
+    }
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url, headers=headers)
+        if response.status_code != 200:
+            return {"error": "Failed to fetch projects"}
+        return response.json()
