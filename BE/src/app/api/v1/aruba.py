@@ -106,9 +106,10 @@ async def get_projects(request: Request):
         'Authorization': dict(request.scope['headers'])['Authorization'],
         'Content-Type': 'application/json'
     }
+    params = request.query_params
 
     async with httpx.AsyncClient() as client:
-        response = await client.get(url, headers=headers)
+        response = await client.get(url, headers=headers, params=params)
         if response.status_code != 200:
             return {"error": "Failed to fetch projects"}
         return response.json()
@@ -194,10 +195,66 @@ async def delete_project(request: Request, projectId: str):
         return {"message": "Project deleted successfully"}
 
 #
+# 02-Network
+#
+
+#
+# Vpc
+#
+
+@router.get("/aruba/projects/{projectIdCreated}/providers/Aruba.Network/vpcs")
+async def get_vpcs(request: Request, projectIdCreated: str):
+    logging.info("Getting vpcs")
+    url = f"{aruba_base_url}/projects/{projectIdCreated}/providers/Aruba.Network/vpcs"
+    headers = {
+        'Authorization': dict(request.scope['headers'])['Authorization'],
+        'Content-Type': 'application/json'
+    }
+    params = request.query_params
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url, headers=headers, params=params)
+        if response.status_code != 200:
+            return {"error": "Failed to fetch vpcs"}
+        return response.json()
+    
+@router.get("/aruba/projects/{projectIdCreated}/providers/Aruba.Network/vpcs/{vpcId}")
+async def get_vpc(request: Request, projectIdCreated: str, vpcId: str):
+    logging.info("Getting vpc")
+    url = f"{aruba_base_url}/projects/{projectIdCreated}/providers/Aruba.Network/vpcs/{vpcId}"
+    headers = {
+        'Authorization': dict(request.scope['headers'])['Authorization'],
+        'Content-Type': 'application/json'
+    }
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url, headers=headers)
+        if response.status_code != 200:
+            return {"error": "Failed to fetch vpc"}
+        return response.json()
+
+@router.post("/aruba/projects/{projectIdCreated}/providers/Aruba.Network/vpcs")
+async def create_vpc(request: Request, projectIdCreated: str):
+    body = await request.json()
+    logging.info("Creating vpc")
+    logging.info(body)
+    url = f"{aruba_base_url}/projects/{projectIdCreated}/providers/Aruba.Network/vpcs"
+    headers = {
+        'Authorization': dict(request.scope['headers'])['Authorization'],
+        'Content-Type': 'application/json'
+    }
+
+    async with httpx.AsyncClient() as client:
+        response = await client.post(url, headers=headers, json=body)
+        if response.status_code != 201:
+            return {"error": "Failed to create vpc"}
+        return response.json()
+
+#
 # 04-Storage
 #
 
-@router.get("/projects/{projectIdCreated}/providers/Aruba.Storage/blockStorages")
+@router.get("/aruba/projects/{projectIdCreated}/providers/Aruba.Storage/blockStorages")
 async def get_block_storages(request: Request, projectIdCreated: str):
     logging.info("Getting block storages")
     url = f"{aruba_base_url}/projects/{projectIdCreated}/providers/Aruba.Storage/blockStorages"
