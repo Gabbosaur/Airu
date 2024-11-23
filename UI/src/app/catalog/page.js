@@ -17,10 +17,10 @@ import SelectedProductsPanel from './SelectedProductsPanel';
 
 const headers = [
   { key: 'flavorName', header: 'Name' },
-  { key: 'flavorOsPlatform', header: 'Os' },
-  { key: 'flavorCpu', header: 'Cpu' },
-  { key: 'flavorRam', header: 'Ram' },
-  { key: 'flavorDisk', header: 'Disk' },
+  { key: 'flavorOsPlatform', header: 'OS' },
+  { key: 'flavorCpu', header: 'CPU' },
+  { key: 'flavorRam', header: 'RAM (GB)' },
+  { key: 'flavorDisk', header: 'Disk (GB)' },
   { key: 'resourceName', header: 'Resource' },
   { key: 'resourceCategory', header: 'Category' },
   { key: 'hourlyUnitPrice', header: 'Hourly Price' },
@@ -110,10 +110,10 @@ function ProductsPage() {
   ];
 
   const categoryOptions = [
-    // { id: 'disk	', label: 'Disk' },
+    { id: 'storage', label: 'Disk' },
     { id: 'computing', label: 'Computing' },
     { id: 'container', label: 'Container' },
-    // { id: 'networking', label: 'Networking' },
+    { id: 'networking', label: 'Networking' },
   ];
 
   useEffect(() => {
@@ -127,7 +127,9 @@ function ProductsPage() {
         .request(config)
         .then((response) => {
           const items = getRowItems(response.data);
-          const coreItems = items.filter((item) => item.flavorCpu !== '');
+          const coreItems = items.filter(
+            (item) => item.productName !== 'masterHA'
+          );
           // console.debug("coreItems", coreItems);
           const specialItems = items.filter((item) => item.flavorCpu === '');
           // console.debug("specialItems", specialItems);
