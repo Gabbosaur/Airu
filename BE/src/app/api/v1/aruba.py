@@ -4,6 +4,9 @@ from fastapi import APIRouter, Request
 from motor.motor_asyncio import AsyncIOMotorClient
 import logging
 import json
+import random
+import string
+import asyncio
 
 router = APIRouter(tags=["aruba"])
 
@@ -105,8 +108,6 @@ async def get_projects(request: Request):
 
     async with httpx.AsyncClient() as client:
         response = await client.get(url, headers=headers, params=params)
-        if response.status_code != 200:
-            return {"error": "Failed to fetch projects"}
         return response.json()
     
 @router.post("/aruba/projects")
@@ -119,12 +120,8 @@ async def create_project(request: Request):
         'Authorization': dict(request.scope['headers'])['Authorization'],
         'Content-Type': 'application/json'
     }
-    
-
     async with httpx.AsyncClient() as client:
         response = await client.post(url, headers=headers, json=body)
-        if response.status_code != 201:
-            return {"error": "Failed to create project"}
         return response.json()
 
 @router.get("/aruba/projects/{projectId}")
@@ -138,8 +135,6 @@ async def get_project(request: Request, projectId: str):
 
     async with httpx.AsyncClient() as client:
         response = await client.get(url, headers=headers)
-        if response.status_code != 200:
-            return {"error": "Failed to fetch project"}
         return response.json()    
 
 @router.get("/aruba/projects/{projectId}/resources")
@@ -153,8 +148,6 @@ async def get_project_resources(request: Request, projectId: str):
 
     async with httpx.AsyncClient() as client:
         response = await client.get(url, headers=headers)
-        if response.status_code != 200:
-            return {"error": "Failed to fetch project resources"}
         return response.json()
 
 @router.put("/aruba/projects/{projectId}")
@@ -170,8 +163,6 @@ async def update_project(request: Request, projectId: str):
 
     async with httpx.AsyncClient() as client:
         response = await client.put(url, headers=headers, json=body)
-        if response.status_code != 200:
-            return {"error": "Failed to update project"}
         return response.json()
 
 @router.delete("/aruba/projects/{projectId}")
@@ -185,9 +176,7 @@ async def delete_project(request: Request, projectId: str):
 
     async with httpx.AsyncClient() as client:
         response = await client.delete(url, headers=headers)
-        if response.status_code != 204:
-            return {"error": "Failed to delete project"}
-        return {"message": "Project deleted successfully"}
+        return response.json()
 
 #
 # 02-Network
@@ -209,8 +198,6 @@ async def get_vpcs(request: Request, projectIdCreated: str):
 
     async with httpx.AsyncClient() as client:
         response = await client.get(url, headers=headers, params=params)
-        if response.status_code != 200:
-            return {"error": "Failed to fetch vpcs"}
         return response.json()
     
 @router.get("/aruba/projects/{projectIdCreated}/providers/Aruba.Network/vpcs/{vpcId}")
@@ -224,8 +211,6 @@ async def get_vpc(request: Request, projectIdCreated: str, vpcId: str):
 
     async with httpx.AsyncClient() as client:
         response = await client.get(url, headers=headers)
-        if response.status_code != 200:
-            return {"error": "Failed to fetch vpc"}
         return response.json()
 
 @router.post("/aruba/projects/{projectIdCreated}/providers/Aruba.Network/vpcs")
@@ -241,8 +226,7 @@ async def create_vpc(request: Request, projectIdCreated: str):
 
     async with httpx.AsyncClient() as client:
         response = await client.post(url, headers=headers, json=body)
-        if response.status_code != 201:
-            return {"error": "Failed to create vpc"}
+
         return response.json()
 
 @router.put("/aruba/projects/{projectIdCreated}/providers/Aruba.Network/vpcs/{vpcId}")
@@ -258,8 +242,6 @@ async def update_vpc(request: Request, projectIdCreated: str, vpcId: str):
 
     async with httpx.AsyncClient() as client:
         response = await client.put(url, headers=headers, json=body)
-        if response.status_code != 200:
-            return {"error": "Failed to update vpc"}
         return response.json()
 
 @router.delete("/aruba/providers/projects/{projectIdCreated}/Aruba.Network/vpcs/{vpcId}")
@@ -273,9 +255,7 @@ async def delete_vpc(request: Request, projectIdCreated: str, vpcId: str):
 
     async with httpx.AsyncClient() as client:
         response = await client.delete(url, headers=headers)
-        if response.status_code != 204:
-            return {"error": "Failed to delete vpc"}
-        return {"message": "Vpc deleted successfully"}
+        return response.json()
 
 #
 # Subnet
@@ -293,8 +273,6 @@ async def get_subnets(request: Request, projectIdCreated: str, vpcIdCreated: str
 
     async with httpx.AsyncClient() as client:
         response = await client.get(url, headers=headers, params=params)
-        if response.status_code != 200:
-            return {"error": "Failed to fetch subnets"}
         return response.json()
 
 @router.post("/aruba/projects/{projectIdCreated}/providers/Aruba.Network/vpcs/{vpcIdCreated}/subnets")
@@ -310,8 +288,6 @@ async def create_subnet(request: Request, projectIdCreated: str, vpcIdCreated: s
 
     async with httpx.AsyncClient() as client:
         response = await client.post(url, headers=headers, json=body)
-        if response.status_code != 201:
-            return {"error": "Failed to create subnet"}
         return response.json()
 
 @router.put("/aruba/projects/{projectIdCreated}/providers/Aruba.Network/vpcs/{vpcIdCreated}/subnets/{subnetId}")
@@ -327,8 +303,6 @@ async def update_subnet(request: Request, projectIdCreated: str, vpcIdCreated: s
 
     async with httpx.AsyncClient() as client:
         response = await client.put(url, headers=headers, json=body)
-        if response.status_code != 200:
-            return {"error": "Failed to update subnet"}
         return response.json()
 
 @router.delete("/aruba/projects/{projectIdCreated}/providers/Aruba.Network/vpcs/{vpcIdCreated}/subnets/{subnetId}")
@@ -342,8 +316,6 @@ async def delete_subnet(request: Request, projectIdCreated: str, vpcIdCreated: s
     
     async with httpx.AsyncClient() as client:
         response = await client.delete(url, headers=headers)
-        if response.status_code != 204:
-            return {"error": "Failed to delete subnet"}
         return response.json()
     
 #
@@ -361,8 +333,6 @@ async def get_security_groups(request: Request, projectIdCreated: str, vpcIdCrea
     
     async with httpx.AsyncClient() as client:
         response = await client.get(url, headers=headers, params=params)
-        if response.status_code != 200:
-            return {"error": "Failed to fetch security groups"}
         return response.json()
 
 @router.get("/aruba/projects/{projectIdCreated}/providers/Aruba.Network/vpcs/{vpcIdCreated}/securityGroups/{securityGroupId}")
@@ -376,8 +346,6 @@ async def get_security_group(request: Request, projectIdCreated: str, vpcIdCreat
 
     async with httpx.AsyncClient() as client:
         response = await client.get(url, headers=headers)
-        if response.status_code != 200:
-            return {"error": "Failed to fetch security group"}
         return response.json()
 
 @router.post("/aruba/projects/{projectIdCreated}/providers/Aruba.Network/vpcs/{vpcIdCreated}/securityGroups")
@@ -393,8 +361,6 @@ async def create_security_group(request: Request, projectIdCreated: str, vpcIdCr
     
     async with httpx.AsyncClient() as client:
         response = await client.post(url, headers=headers, json=body)
-        if response.status_code != 201:
-            return {"error": "Failed to create security group"}
         return response.json()
     
 @router.put("/aruba/projects/{projectIdCreated}/providers/Aruba.Network/vpcs/{vpcIdCreated}/securityGroups/{securityGroupId}")
@@ -410,8 +376,6 @@ async def update_security_group(request: Request, projectIdCreated: str, vpcIdCr
     
     async with httpx.AsyncClient() as client:
         response = await client.put(url, headers=headers, json=body)
-        if response.status_code != 200:
-            return {"error": "Failed to update security group"}
         return response.json()
 
 @router.delete("/aruba/projects/{projectIdCreated}/providers/Aruba.Network/vpcs/{vpcIdCreated}/securityGroups/{securityGroupId}")
@@ -425,9 +389,7 @@ async def delete_security_group(request: Request, projectIdCreated: str, vpcIdCr
     
     async with httpx.AsyncClient() as client:
         response = await client.delete(url, headers=headers)
-        if response.status_code != 204:
-            return {"error": "Failed to delete security group"}
-        return {"message": "Security group deleted successfully"}
+        return response.json()
 
 
 #
@@ -446,8 +408,6 @@ async def get_elastic_ips(request: Request, projectIdCreated: str):
     
     async with httpx.AsyncClient() as client:
         response = await client.get(url, headers=headers, params=params)
-        if response.status_code != 200:
-            return {"error": "Failed to fetch elastic ips"}
         return response.json()
     
 @router.post("/aruba/projects/{projectIdCreated}/providers/Aruba.Network/elasticIps")
@@ -463,8 +423,6 @@ async def create_elastic_ip(request: Request, projectIdCreated: str):
     
     async with httpx.AsyncClient() as client:
         response = await client.post(url, headers=headers, json=body)
-        if response.status_code != 201:
-            return {"error": "Failed to create elastic ip"}
         return response.json()
 
 @router.get("/aruba/projects/{projectIdCreated}/providers/Aruba.Network/elasticIps/{elasticIpId}")
@@ -478,8 +436,6 @@ async def get_elastic_ip(request: Request, projectIdCreated: str, elasticIpId: s
     
     async with httpx.AsyncClient() as client:
         response = await client.get(url, headers=headers)
-        if response.status_code != 200:
-            return {"error": "Failed to fetch elastic ip"}
         return response.json()
 
 @router.put("/aruba/projects/{projectIdCreated}/providers/Aruba.Network/elasticIps/{elasticIpId}")
@@ -495,8 +451,6 @@ async def update_elastic_ip(request: Request, projectIdCreated: str, elasticIpId
     
     async with httpx.AsyncClient() as client:
         response = await client.put(url, headers=headers, json=body)
-        if response.status_code != 200:
-            return {"error": "Failed to update elastic ip"}
         return response.json()
 
 @router.delete("/aruba/projects/{projectIdCreated}/providers/Aruba.Network/elasticIps/{elasticIpId}")
@@ -510,9 +464,7 @@ async def delete_elastic_ip(request: Request, projectIdCreated: str, elasticIpId
     
     async with httpx.AsyncClient() as client:
         response = await client.delete(url, headers=headers)
-        if response.status_code != 204:
-            return {"error": "Failed to delete elastic ip"}
-        return {"message": "Elastic ip deleted successfully"}
+        return response.json()
 
 
 #
@@ -530,8 +482,6 @@ async def get_containers(request: Request, projectIdCreated: str):
     
     async with httpx.AsyncClient() as client:
         response = await client.get(url, headers=headers, params=params)
-        if response.status_code != 200:
-            return {"error": "Failed to fetch containers"}
         return response.json()
     
 @router.post("/aruba/projects/{projectIdCreated}/providers/Aruba.Container/kaas")
@@ -547,8 +497,6 @@ async def create_container(request: Request, projectIdCreated: str):
     
     async with httpx.AsyncClient() as client:
         response = await client.post(url, headers=headers, json=body)
-        if response.status_code != 201:
-            return {"error": "Failed to create container"}
         return response.json()
 
 @router.put("/aruba/projects/{projectIdCreated}/providers/Aruba.Container/kaas/{containerId}")
@@ -581,8 +529,6 @@ async def get_block_storages(request: Request, projectIdCreated: str):
      params = request.query_params
      async with httpx.AsyncClient() as client:
          response = await client.get(url, headers=headers, params=params)
-         if response.status_code != 200:
-             return {"error": "Failed to fetch block storages"}
          return response.json()
          
     
@@ -590,57 +536,106 @@ async def get_block_storages(request: Request, projectIdCreated: str):
 #
 # 06-Frontend
 #
-#@router.post("/aruba/airu/create/kaas")
-#async def create_kaas(request: Request):
-#    request_project_body = {
-#        "metadata": {
-#            "name": "meow-kaas",
-#            "tags": ["string"]
-#        },
-#        "properties": {
-#            "description": "string",
-#            "default": "default"
-#        }
-#    }
-#    logging.info("Creating kaas")
-#    logging.info(request_project_body)
-#    request_project = Request(scope={
-#        "type": "http",
-#        "method": "POST",
-#        "headers": {
-#            "Authorization": request.headers.get("Authorization"),
-#            "Content-Type": "application/json"
-#        },
-#        "path": "/aruba/projects",
-#        "query_string": b"",
-#        "server": ("testserver", 80),
-#        "client": ("testclient", 80)
-#    }, receive=request.receive)
-#    request._body = json.dumps(request_project_body)
-#    
-#    # 1 Creare un suo Project
-#    
-#    #{
-#    #    metadata": {
-#    #     "name": "aruusername-kaas", {aruusername} default - valore arriva da frontend
-#    #     "tags": [
-#    #       "string"
-#    #    ]
-#    #},
-#    #"properties": {
-#    #  "description": "string",
-#    #  "default": false
-#    #}
-#    #}
-#    
-#        
-#    result = await create_project(request_project)
-#    logging.info("Project created")
-#    logging.info(result)
-#    return result
-#    
-#    # 2 Creare un suo VPC
-#    
-#    # 3 Creare un suo Subnet
-#     
-#
+@router.post("/aruba/airu/create/kaas")
+async def create_kaas(request: Request):
+
+    logging.info("Creating Project")
+    logging.info(request)
+    body = await request.json()
+    complete_project_body = {
+        "metadata": {
+          "name": body["name"],
+          "tags": [
+            "string"
+          ]
+        },
+        "properties": {
+          "description": body["description"],
+          "default": False
+        }
+    }
+    logging.info("Body")
+    logging.info(type(body))
+    
+    url = f"{aruba_base_url}/projects"
+    headers = {
+        'Authorization': dict(request.scope['headers'])['Authorization'],
+        'Content-Type': 'application/json'
+    }
+    
+
+    async with httpx.AsyncClient() as client:
+        response = await client.post(url, headers=headers, json=complete_project_body)
+        project_result = response.json()
+    
+    logging.info("Project created")
+    logging.info(project_result)
+    
+    # 2 Creare un suo VPC
+    complete_vpc_body = {
+       "metadata":{
+          "name": generate_random_name(), #generate random name of id for the vpc
+          "tags":[
+             "tag-1",
+             "tag-2"
+          ],
+          "location": {
+            "value": "ITBG-Bergamo"
+           }
+       }
+    }
+        
+    url = f"{aruba_base_url}/projects/{project_result['metadata']['id']}/providers/Aruba.Network/vpcs"
+    headers = {
+        'Authorization': dict(request.scope['headers'])['Authorization'],
+        'Content-Type': 'application/json'
+    }
+
+    async with httpx.AsyncClient() as client:
+        response = await client.post(url, headers=headers, json=complete_vpc_body)
+        vpc_result = response.json()
+    
+    logging.info("VPC created")
+    logging.info(vpc_result)
+    
+    
+    # 3 Creare un suo Subnet
+    complete_subnet_body = {
+        "metadata":{
+           "name":generate_random_name(),
+           "tags":[
+              "tag-1",
+              "tag-2"
+           ]
+        },
+        "properties":{
+           "type":"Advanced",
+           "default":True,
+           "network":{
+              "address":"192.168.1.0/24"
+           },
+           "dhcp":{
+              "enabled":True         
+           }
+        }
+    }
+        
+    url = f"{aruba_base_url}/projects/{project_result['metadata']['id']}/providers/Aruba.Network/vpcs/{vpc_result['metadata']['id']}/subnets"
+    headers = {
+        'Authorization': dict(request.scope['headers'])['Authorization'],
+        'Content-Type': 'application/json'
+    }
+
+    async with httpx.AsyncClient() as client:
+        response = await client.post(url, headers=headers, json=complete_subnet_body)
+        complete_subnet_body = response.json()
+    
+    logging.info("Subnet created")
+    logging.info(complete_subnet_body)
+    
+    return {"project": project_result, "vpc": vpc_result, "subnet": complete_subnet_body}
+     
+
+def generate_random_name(length=7):
+    letters_and_digits = string.ascii_lowercase + string.digits
+    return ''.join(random.choice(letters_and_digits) for i in range(length))
