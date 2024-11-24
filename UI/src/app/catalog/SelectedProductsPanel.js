@@ -35,6 +35,7 @@ const SelectedProductsPanel = ({
   duration,
   updateSelectedProducts,
   handleAddButtonClick,
+  tier,
 }) => {
   const handleRemoveProduct = (product) => {
     const updatedProducts = [...selectedProducts];
@@ -57,43 +58,296 @@ const SelectedProductsPanel = ({
 
   const totalCost = uniqueProducts.reduce((sum, product) => {
     let productCost = 0;
-    if (duration < 1) {
-      productCost =
-        (product.unitPrice +
-          product.blockStorage * optionalResources[0].unitPrice +
-          product.elasticIP * optionalResources[1].unitPrice +
-          product.highlyAvailable * optionalResources[2].unitPrice) *
-        product.quantity *
-        24 *
-        30;
-    } else if (duration >= 1 && duration < 12) {
-      productCost =
-        (product.unitPrice1Month +
-          product.blockStorage * optionalResources[0].unitPrice1Month +
-          product.elasticIP * optionalResources[1].unitPrice1Month +
-          product.highlyAvailable * optionalResources[2].unitPrice1Month) *
-        product.quantity *
-        24 *
-        30;
-    } else if (duration >= 12 && duration < 36) {
-      productCost =
-        (product.unitPrice1Year +
-          product.blockStorage * optionalResources[0].unitPrice1Year +
-          product.elasticIP * optionalResources[1].unitPrice1Year +
-          product.highlyAvailable * optionalResources[2].unitPrice1Year) *
-        product.quantity *
-        24 *
-        30;
-    } else if (duration >= 36) {
-      productCost =
-        (product.unitPrice3Years +
-          product.blockStorage * optionalResources[0].unitPrice3Years +
-          product.elasticIP * optionalResources[1].unitPrice3Years +
-          product.highlyAvailable * optionalResources[2].unitPrice3Years) *
-        product.quantity *
-        24 *
-        30;
+
+    if (tier === 'None') {
+      if (duration < 1) {
+        productCost =
+          (product.unitPrice +
+            product.blockStorage * optionalResources[0].unitPrice +
+            product.elasticIP * optionalResources[1].unitPrice +
+            product.highlyAvailable * optionalResources[2].unitPrice) *
+          product.quantity *
+          24 *
+          30;
+      } else if (duration >= 1 && duration < 12) {
+        productCost =
+          (product.unitPrice1Month +
+            product.blockStorage * optionalResources[0].unitPrice1Month +
+            product.elasticIP * optionalResources[1].unitPrice1Month +
+            product.highlyAvailable * optionalResources[2].unitPrice1Month) *
+          product.quantity *
+          24 *
+          30;
+      } else if (duration >= 12 && duration < 36) {
+        productCost =
+          (product.unitPrice1Year +
+            product.blockStorage * optionalResources[0].unitPrice1Year +
+            product.elasticIP * optionalResources[1].unitPrice1Year +
+            product.highlyAvailable * optionalResources[2].unitPrice1Year) *
+          product.quantity *
+          24 *
+          30;
+      } else if (duration >= 36) {
+        productCost =
+          (product.unitPrice3Years +
+            product.blockStorage * optionalResources[0].unitPrice3Years +
+            product.elasticIP * optionalResources[1].unitPrice3Years +
+            product.highlyAvailable * optionalResources[2].unitPrice3Years) *
+          product.quantity *
+          24 *
+          30;
+      }
+    } else if (tier === 'Base') {
+      if (duration < 1) {
+        if (product.quantity > product.tiers1MinimumUnits) {
+          productCost =
+            (product.unitPrice * (1 - tiers1PercentDiscount) +
+              product.blockStorage * optionalResources[0].unitPrice +
+              product.elasticIP * optionalResources[1].unitPrice +
+              product.highlyAvailable * optionalResources[2].unitPrice) *
+            product.quantity *
+            24 *
+            30;
+        } else {
+          productCost =
+            (product.unitPrice *
+              product.blockStorage *
+              optionalResources[0].unitPrice +
+              product.elasticIP * optionalResources[1].unitPrice +
+              product.highlyAvailable * optionalResources[2].unitPrice) *
+            product.quantity *
+            24 *
+            30;
+        }
+      } else if (duration >= 1 && duration < 12) {
+        if (product.quantity > product.tiers1MinimumUnits) {
+          productCost =
+            (product.unitPrice1Month * (1 - tiers1PercentDiscount) +
+              product.blockStorage * optionalResources[0].unitPrice1Month +
+              product.elasticIP * optionalResources[1].unitPrice1Month +
+              product.highlyAvailable * optionalResources[2].unitPrice1Month) *
+            product.quantity *
+            24 *
+            30;
+        } else {
+          productCost =
+            (product.unitPrice1Month +
+              product.blockStorage * optionalResources[0].unitPrice1Month +
+              product.elasticIP * optionalResources[1].unitPrice1Month +
+              product.highlyAvailable * optionalResources[2].unitPrice1Month) *
+            product.quantity *
+            24 *
+            30;
+        }
+      } else if (duration >= 12 && duration < 36) {
+        if (product.quantity > product.tiers1MinimumUnits) {
+          productCost =
+            (product.unitPrice1Year * (1 - tiers1PercentDiscount) +
+              product.blockStorage * optionalResources[0].unitPrice1Year +
+              product.elasticIP * optionalResources[1].unitPrice1Year +
+              product.highlyAvailable * optionalResources[2].unitPrice1Year) *
+            product.quantity *
+            24 *
+            30;
+        } else {
+          productCost =
+            (product.unitPrice1Year +
+              product.blockStorage * optionalResources[0].unitPrice1Year +
+              product.elasticIP * optionalResources[1].unitPrice1Year +
+              product.highlyAvailable * optionalResources[2].unitPrice1Year) *
+            product.quantity *
+            24 *
+            30;
+        }
+      } else if (duration >= 36) {
+        if (product.quantity > product.tiers1MinimumUnits) {
+          productCost =
+            (product.unitPrice3Years * (1 - tiers1PercentDiscount) +
+              product.blockStorage * optionalResources[0].unitPrice3Years +
+              product.elasticIP * optionalResources[1].unitPrice3Years +
+              product.highlyAvailable * optionalResources[2].unitPrice3Years) *
+            product.quantity *
+            24 *
+            30;
+        } else {
+          productCost =
+            (product.unitPrice3Years +
+              product.blockStorage * optionalResources[0].unitPrice3Years +
+              product.elasticIP * optionalResources[1].unitPrice3Years +
+              product.highlyAvailable * optionalResources[2].unitPrice3Years) *
+            product.quantity *
+            24 *
+            30;
+        }
+      }
+    } else if (tier === 'Partner') {
+      if (duration < 1) {
+        if (product.quantity > product.tiers2MinimumUnits) {
+          productCost =
+            (product.unitPrice * (1 - tiers2PercentDiscount) +
+              product.blockStorage * optionalResources[0].unitPrice +
+              product.elasticIP * optionalResources[1].unitPrice +
+              product.highlyAvailable * optionalResources[2].unitPrice) *
+            product.quantity *
+            24 *
+            30;
+        } else {
+          productCost =
+            (product.unitPrice *
+              product.blockStorage *
+              optionalResources[0].unitPrice +
+              product.elasticIP * optionalResources[1].unitPrice +
+              product.highlyAvailable * optionalResources[2].unitPrice) *
+            product.quantity *
+            24 *
+            30;
+        }
+      } else if (duration >= 1 && duration < 12) {
+        if (product.quantity > product.tiers2MinimumUnits) {
+          productCost =
+            (product.unitPrice1Month * (1 - tiers2PercentDiscount) +
+              product.blockStorage * optionalResources[0].unitPrice1Month +
+              product.elasticIP * optionalResources[1].unitPrice1Month +
+              product.highlyAvailable * optionalResources[2].unitPrice1Month) *
+            product.quantity *
+            24 *
+            30;
+        } else {
+          productCost =
+            (product.unitPrice1Month +
+              product.blockStorage * optionalResources[0].unitPrice1Month +
+              product.elasticIP * optionalResources[1].unitPrice1Month +
+              product.highlyAvailable * optionalResources[2].unitPrice1Month) *
+            product.quantity *
+            24 *
+            30;
+        }
+      } else if (duration >= 12 && duration < 36) {
+        if (product.quantity > product.tiers2MinimumUnits) {
+          productCost =
+            (product.unitPrice1Year * (1 - tiers2PercentDiscount) +
+              product.blockStorage * optionalResources[0].unitPrice1Year +
+              product.elasticIP * optionalResources[1].unitPrice1Year +
+              product.highlyAvailable * optionalResources[2].unitPrice1Year) *
+            product.quantity *
+            24 *
+            30;
+        } else {
+          productCost =
+            (product.unitPrice1Year +
+              product.blockStorage * optionalResources[0].unitPrice1Year +
+              product.elasticIP * optionalResources[1].unitPrice1Year +
+              product.highlyAvailable * optionalResources[2].unitPrice1Year) *
+            product.quantity *
+            24 *
+            30;
+        }
+      } else if (duration >= 36) {
+        if (product.quantity > product.tiers2MinimumUnits) {
+          productCost =
+            (product.unitPrice3Years * (1 - tiers2PercentDiscount) +
+              product.blockStorage * optionalResources[0].unitPrice3Years +
+              product.elasticIP * optionalResources[1].unitPrice3Years +
+              product.highlyAvailable * optionalResources[2].unitPrice3Years) *
+            product.quantity *
+            24 *
+            30;
+        } else {
+          productCost =
+            (product.unitPrice3Years +
+              product.blockStorage * optionalResources[0].unitPrice3Years +
+              product.elasticIP * optionalResources[1].unitPrice3Years +
+              product.highlyAvailable * optionalResources[2].unitPrice3Years) *
+            product.quantity *
+            24 *
+            30;
+        }
+      }
+    } else if (tier === 'Premium') {
+      if (duration < 1) {
+        if (product.quantity > product.tiers3MinimumUnits) {
+          productCost =
+            (product.unitPrice * (1 - tiers3PercentDiscount) +
+              product.blockStorage * optionalResources[0].unitPrice +
+              product.elasticIP * optionalResources[1].unitPrice +
+              product.highlyAvailable * optionalResources[2].unitPrice) *
+            product.quantity *
+            24 *
+            30;
+        } else {
+          productCost =
+            (product.unitPrice *
+              product.blockStorage *
+              optionalResources[0].unitPrice +
+              product.elasticIP * optionalResources[1].unitPrice +
+              product.highlyAvailable * optionalResources[2].unitPrice) *
+            product.quantity *
+            24 *
+            30;
+        }
+      } else if (duration >= 1 && duration < 12) {
+        if (product.quantity > product.tiers3MinimumUnits) {
+          productCost =
+            (product.unitPrice1Month * (1 - tiers3PercentDiscount) +
+              product.blockStorage * optionalResources[0].unitPrice1Month +
+              product.elasticIP * optionalResources[1].unitPrice1Month +
+              product.highlyAvailable * optionalResources[2].unitPrice1Month) *
+            product.quantity *
+            24 *
+            30;
+        } else {
+          productCost =
+            (product.unitPrice1Month +
+              product.blockStorage * optionalResources[0].unitPrice1Month +
+              product.elasticIP * optionalResources[1].unitPrice1Month +
+              product.highlyAvailable * optionalResources[2].unitPrice1Month) *
+            product.quantity *
+            24 *
+            30;
+        }
+      } else if (duration >= 12 && duration < 36) {
+        if (product.quantity > product.tiers3MinimumUnits) {
+          productCost =
+            (product.unitPrice1Year * (1 - tiers3PercentDiscount) +
+              product.blockStorage * optionalResources[0].unitPrice1Year +
+              product.elasticIP * optionalResources[1].unitPrice1Year +
+              product.highlyAvailable * optionalResources[2].unitPrice1Year) *
+            product.quantity *
+            24 *
+            30;
+        } else {
+          productCost =
+            (product.unitPrice1Year +
+              product.blockStorage * optionalResources[0].unitPrice1Year +
+              product.elasticIP * optionalResources[1].unitPrice1Year +
+              product.highlyAvailable * optionalResources[2].unitPrice1Year) *
+            product.quantity *
+            24 *
+            30;
+        }
+      } else if (duration >= 36) {
+        if (product.quantity > product.tiers3MinimumUnits) {
+          productCost =
+            (product.unitPrice3Years * (1 - tiers3PercentDiscount) +
+              product.blockStorage * optionalResources[0].unitPrice3Years +
+              product.elasticIP * optionalResources[1].unitPrice3Years +
+              product.highlyAvailable * optionalResources[2].unitPrice3Years) *
+            product.quantity *
+            24 *
+            30;
+        } else {
+          productCost =
+            (product.unitPrice3Years +
+              product.blockStorage * optionalResources[0].unitPrice3Years +
+              product.elasticIP * optionalResources[1].unitPrice3Years +
+              product.highlyAvailable * optionalResources[2].unitPrice3Years) *
+            product.quantity *
+            24 *
+            30;
+        }
+      }
     }
+
     return sum + productCost;
   }, 0);
 
@@ -120,49 +374,39 @@ const SelectedProductsPanel = ({
               {product.blockStorage > 0 && 'BS' + product.blockStorage} x{' '}
               {product.quantity} ={' '}
               {duration < 1 &&
-                formatToTwoDecimals(
-                  product.unitPrice +
-                    product.blockStorage * optionalResources[0].unitPrice +
-                    product.elasticIP * optionalResources[1].unitPrice +
-                    product.highlyAvailable * optionalResources[2].unitPrice
-                ) *
+                (product.unitPrice +
+                  product.blockStorage * optionalResources[0].unitPrice +
+                  product.elasticIP * optionalResources[1].unitPrice +
+                  product.highlyAvailable * optionalResources[2].unitPrice) *
                   product.quantity *
                   24 *
                   30}{' '}
               {duration >= 1 &&
                 duration < 12 &&
-                formatToTwoDecimals(
-                  product.unitPrice1Month +
-                    product.blockStorage *
-                      optionalResources[0].unitPrice1Month +
-                    product.elasticIP * optionalResources[1].unitPrice1Month +
-                    product.highlyAvailable *
-                      optionalResources[2].unitPrice1Month
-                ) *
+                (product.unitPrice1Month +
+                  product.blockStorage * optionalResources[0].unitPrice1Month +
+                  product.elasticIP * optionalResources[1].unitPrice1Month +
+                  product.highlyAvailable *
+                    optionalResources[2].unitPrice1Month) *
                   product.quantity *
                   24 *
                   30}{' '}
               {duration >= 12 &&
                 duration < 36 &&
-                formatToTwoDecimals(
-                  product.unitPrice1Year +
-                    product.blockStorage * optionalResources[0].unitPrice1Year +
-                    product.elasticIP * optionalResources[1].unitPrice1Year +
-                    product.highlyAvailable *
-                      optionalResources[2].unitPrice1Year
-                ) *
+                (product.unitPrice1Year +
+                  product.blockStorage * optionalResources[0].unitPrice1Year +
+                  product.elasticIP * optionalResources[1].unitPrice1Year +
+                  product.highlyAvailable *
+                    optionalResources[2].unitPrice1Year) *
                   product.quantity *
                   24 *
                   30}{' '}
               {duration >= 36 &&
-                formatToTwoDecimals(
-                  product.unitPrice3Years +
-                    product.blockStorage *
-                      optionalResources[0].unitPrice3Years +
-                    product.elasticIP * optionalResources[1].unitPrice3Years +
-                    product.highlyAvailable *
-                      optionalResources[2].unitPrice3Years
-                ) *
+                (product.unitPrice3Years +
+                  product.blockStorage * optionalResources[0].unitPrice3Years +
+                  product.elasticIP * optionalResources[1].unitPrice3Years +
+                  product.highlyAvailable *
+                    optionalResources[2].unitPrice3Years) *
                   product.quantity *
                   24 *
                   30}{' '}
