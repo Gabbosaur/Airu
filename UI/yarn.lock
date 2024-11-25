@@ -1087,7 +1087,16 @@ axe-core@^4.10.0:
   resolved "https://registry.yarnpkg.com/axe-core/-/axe-core-4.10.2.tgz#85228e3e1d8b8532a27659b332e39b7fa0e022df"
   integrity sha512-RE3mdQ7P3FRSe7eqCWoeQ/Z9QXrtniSjp1wUjt5nRC3WIpz5rSCve6o3fsZ2aCpJtrZjSZgjwXAoTO5k4tEI0w==
 
-axios@^1.7.2, axios@^1.7.7:
+axios@^1.6.8:
+  version "1.7.8"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-1.7.8.tgz#1997b1496b394c21953e68c14aaa51b7b5de3d6e"
+  integrity sha512-Uu0wb7KNqK2t5K+YQyVCLM76prD5sRFjKHbJYCP1J7JFGEQ6nN7HWn9+04LAeiJ3ji54lgS/gZCH1oxyrf1SPw==
+  dependencies:
+    follow-redirects "^1.15.6"
+    form-data "^4.0.0"
+    proxy-from-env "^1.1.0"
+
+axios@^1.7.7:
   version "1.7.7"
   resolved "https://registry.yarnpkg.com/axios/-/axios-1.7.7.tgz#2f554296f9892a72ac8d8e4c5b79c14a91d0a47f"
   integrity sha512-S4kL7XrjgBmvdGut0sN3yJxqYzrDOnivkBiN0OFs6hLiUam3UPvswUo0kqGyhqUZGEOytHyumEdXsAkgCOUf3Q==
@@ -1248,16 +1257,16 @@ caniuse-lite@^1.0.30001579:
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001680.tgz#5380ede637a33b9f9f1fc6045ea99bd142f3da5e"
   integrity sha512-rPQy70G6AGUMnbwS1z6Xg+RkHYPAi18ihs47GH0jcxIG7wArmPgY3XbS2sRdBbxJljp3thdT8BIqv9ccCypiPA==
 
-ccat-api@^0.11.3:
-  version "0.11.3"
-  resolved "https://registry.yarnpkg.com/ccat-api/-/ccat-api-0.11.3.tgz#dc0722a1600998fd060a77b52deb2d49c83ac66f"
-  integrity sha512-avn5zqJbA/6aiI71UhnvoTfxt3og8kWq8+HDhoznBOo9TNJcfZXFu8j+/H1WRBSh3FlkLGc99xjS1j523as8mw==
+ccat-api@0.10.6:
+  version "0.10.6"
+  resolved "https://registry.yarnpkg.com/ccat-api/-/ccat-api-0.10.6.tgz#ae3ec6907a10911c6828eaa011829527f99fb125"
+  integrity sha512-MuKeZj52JJDIidX/6RF/SV2IQmsKPs/WwM3CawRAFF7fa5p0t7m9DKaAc00czYpBa0cHQ0DhAFZ9r8DwwKrXjA==
   dependencies:
     "@types/ws" "^8.5.10"
-    axios "^1.7.2"
+    axios "^1.6.8"
     form-data "^4.0.0"
     isomorphic-ws "^5.0.0"
-    ws "^8.18.0"
+    ws "^8.16.0"
 
 chalk@2.3.1:
   version "2.3.1"
@@ -3410,6 +3419,11 @@ map-visit@^1.0.0:
   dependencies:
     object-visit "^1.0.0"
 
+marked@^15.0.2:
+  version "15.0.2"
+  resolved "https://registry.yarnpkg.com/marked/-/marked-15.0.2.tgz#e6f8c351554e05cfbe77fee5fa2d6116d361787b"
+  integrity sha512-85RUkoYKIVB21PbMKrnD6aCl9ws+XKEyhJNMbLn206NyD3jbBo7Ec7Wi4Jrsn4dV1a2ng7K/jfkmIN0DNoS41w==
+
 matcher@^1.0.0:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/matcher/-/matcher-1.1.1.tgz#51d8301e138f840982b338b116bb0c09af62c1c2"
@@ -5137,7 +5151,7 @@ wrappy@1:
   resolved "https://registry.yarnpkg.com/wrappy/-/wrappy-1.0.2.tgz#b5243d8f3ec1aa35f1364605bc0d1036e30ab69f"
   integrity sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==
 
-ws@^8.18.0:
+ws@^8.16.0:
   version "8.18.0"
   resolved "https://registry.yarnpkg.com/ws/-/ws-8.18.0.tgz#0d7505a6eafe2b0e712d232b42279f53bc289bbc"
   integrity sha512-8VbfWfHLbbwu3+N6OKsOMpBdT4kXPDDB9cJk2bJ6mh9ucxdlnNvH1e+roYkKmN9Nxw2yjz7VzeO9oOz2zJ04Pw==

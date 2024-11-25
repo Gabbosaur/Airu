@@ -5,6 +5,7 @@ import './widget_CCAT.css';
 import { TextInput, Button } from '@carbon/react';
 import { IoSend } from 'react-icons/io5';
 import { CatClient } from 'ccat-api';
+import { marked } from 'marked';
 
 const Widget_CCAT = ({
   baseUrl = 'localhost',
@@ -22,8 +23,6 @@ const Widget_CCAT = ({
   const messagesContainerRef = useRef(null);
   const [gatto_attivo, setGattoAttivo] = useState(false);
   const [cat, setcat] = useState(false);
-
-  // Il resto del codice rimane invariato fino a sendMessage
 
   const sendMessage = async () => {
     if (input !== '') {

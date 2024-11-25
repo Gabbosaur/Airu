@@ -112,7 +112,7 @@ const ChatWithHeader = () => {
   return (
     <div>
       <WidgetCCAT
-        baseUrl="http://localhost"
+        baseUrl="localhost"
         port="1865"
         initialPhrase="Ciao! Sono il tuo assistente virtuale. Come posso aiutarti?"
         sorryPhrase="Mi dispiace, al momento non sono disponibile. Riprova più tardi."
