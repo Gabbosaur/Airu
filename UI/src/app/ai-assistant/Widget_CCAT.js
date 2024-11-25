@@ -5,7 +5,7 @@ import './widget_CCAT.css';
 import { TextInput, Button } from '@carbon/react';
 import { IoSend } from 'react-icons/io5';
 import { CatClient } from 'ccat-api';
-import { marked } from 'marked';
+import ReactMarkdown from 'react-markdown';
 
 const Widget_CCAT = ({
   baseUrl = 'localhost',
@@ -171,7 +171,7 @@ const Widget_CCAT = ({
                       <div></div>
                     </div>
                   ) : (
-                    message.text
+                    <ReactMarkdown>{message.text}</ReactMarkdown>
                   )}
                 </div>
               ))}
