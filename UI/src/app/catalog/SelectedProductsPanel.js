@@ -35,7 +35,7 @@ const SelectedProductsPanel = ({
   duration,
   updateSelectedProducts,
   handleAddButtonClick,
-  tier,
+  tier = 'None',
 }) => {
   const handleRemoveProduct = (product) => {
     const updatedProducts = [...selectedProducts];
@@ -58,6 +58,8 @@ const SelectedProductsPanel = ({
 
   const totalCost = uniqueProducts.reduce((sum, product) => {
     let productCost = 0;
+    console.debug('product', product);
+    console.debug('optionalResources', optionalResources);
 
     if (tier === 'None') {
       if (duration < 1) {

@@ -2,6 +2,13 @@ version: '3.8'
 
 services:
 
+  ui:
+      build: 
+        context: ./UI
+        dockerfile: Dockerfile
+      ports:
+        - "3000:3000"
+
   cheshire-cat-core:
     image: ghcr.io/cheshire-cat-ai/core:latest
     container_name: cheshire_cat_core

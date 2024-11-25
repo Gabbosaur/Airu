@@ -128,11 +128,12 @@ function ProductsPage() {
         .then((response) => {
           const items = getRowItems(response.data);
           const coreItems = items.filter(
-            (item) => item.productName !== 'masterHA'
+            (item) => item.resourceName !== 'masterHA'
           );
-          // console.debug("coreItems", coreItems);
+          console.debug('items', items);
+          console.debug('coreItems', coreItems);
           const specialItems = items.filter((item) => item.flavorCpu === '');
-          // console.debug("specialItems", specialItems);
+          console.debug('specialItems', specialItems);
           setRows(coreItems);
           setOptionalResources(specialItems);
           setFilteredRows(coreItems);
