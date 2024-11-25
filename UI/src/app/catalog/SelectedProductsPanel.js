@@ -12,12 +12,12 @@ function getUniqueProductsWithQuantity(selectedProducts) {
     );
 
     if (existingProduct) {
-      existingProduct.quantity += 1;
+      existingProduct.quantity += product.quantity; // Aggiungi la quantità del prodotto corrente
     } else {
-      uniqueProducts.push({ ...product, quantity: 1 });
+      uniqueProducts.push({ ...product }); // Aggiungi il prodotto con la sua quantità originale
     }
   });
-
+  console.debug('uniqueProducts', uniqueProducts);
   return uniqueProducts;
 }
 
@@ -103,7 +103,7 @@ const SelectedProductsPanel = ({
       if (duration < 1) {
         if (product.quantity > product.tiers1MinimumUnits) {
           productCost =
-            (product.unitPrice * (1 - tiers1PercentDiscount) +
+            (product.unitPrice * (1 - tiers1PercentDiscount / 100) +
               product.blockStorage * optionalResources[0].unitPrice +
               product.elasticIP * optionalResources[1].unitPrice +
               product.highlyAvailable * optionalResources[2].unitPrice) *
@@ -124,7 +124,7 @@ const SelectedProductsPanel = ({
       } else if (duration >= 1 && duration < 12) {
         if (product.quantity > product.tiers1MinimumUnits) {
           productCost =
-            (product.unitPrice1Month * (1 - tiers1PercentDiscount) +
+            (product.unitPrice1Month * (1 - tiers1PercentDiscount / 100) +
               product.blockStorage * optionalResources[0].unitPrice1Month +
               product.elasticIP * optionalResources[1].unitPrice1Month +
               product.highlyAvailable * optionalResources[2].unitPrice1Month) *
@@ -144,7 +144,7 @@ const SelectedProductsPanel = ({
       } else if (duration >= 12 && duration < 36) {
         if (product.quantity > product.tiers1MinimumUnits) {
           productCost =
-            (product.unitPrice1Year * (1 - tiers1PercentDiscount) +
+            (product.unitPrice1Year * (1 - tiers1PercentDiscount / 100) +
               product.blockStorage * optionalResources[0].unitPrice1Year +
               product.elasticIP * optionalResources[1].unitPrice1Year +
               product.highlyAvailable * optionalResources[2].unitPrice1Year) *
@@ -164,7 +164,7 @@ const SelectedProductsPanel = ({
       } else if (duration >= 36) {
         if (product.quantity > product.tiers1MinimumUnits) {
           productCost =
-            (product.unitPrice3Years * (1 - tiers1PercentDiscount) +
+            (product.unitPrice3Years * (1 - tiers1PercentDiscount / 100) +
               product.blockStorage * optionalResources[0].unitPrice3Years +
               product.elasticIP * optionalResources[1].unitPrice3Years +
               product.highlyAvailable * optionalResources[2].unitPrice3Years) *
@@ -363,7 +363,7 @@ const SelectedProductsPanel = ({
         borderRadius: '8px',
       }}
     >
-      <h4>Selected products</h4>
+      <h4>Selected products - {tier}</h4>
 
       {selectedProducts.length === 0 ? (
         <p>No products selected.</p>

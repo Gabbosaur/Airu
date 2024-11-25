@@ -11,6 +11,7 @@ import {
 } from '@carbon/react';
 import { useState, useEffect, useRef } from 'react';
 import styles from './_ai-assistant.module.scss';
+import WidgetCCAT from './Widget_CCAT';
 
 const ChatWithHeader = () => {
   const [messages, setMessages] = useState([]);
@@ -61,51 +62,63 @@ const ChatWithHeader = () => {
   const fetchAIResponse = async (input) => {
     console.log(`User input: ${input}`);
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    return "Your input is " + input;
+    return 'Your input is ' + input;
   };
 
+  //   return (
+  //     <div className={styles['chat-page']} style={{ height: `${chatHeight}px` }}>
+  //       <div className={styles['conversation-history']}>
+  //         {messages.map((msg, index) => (
+  //           <Tile
+  //             key={index}
+  //             className={`${styles.message} ${
+  //               msg.type === 'user'
+  //                 ? styles['user-message']
+  //                 : styles['ai-message']
+  //             }`}
+  //           >
+  //             <span
+  //               className={
+  //                 msg.type === 'user' ? styles['user-label'] : styles['ai-label']
+  //               }
+  //             >
+  //               {msg.type === 'user' ? 'You: ' : 'AI: '}
+  //             </span>
+  //             {msg.text}
+  //           </Tile>
+  //         ))}
+  //         {isTyping && <InlineLoading description="AI is typing..." />}
+  //         <div ref={messageEndRef} />
+  //       </div>
+  //       <div ref={inputRef} className={styles['input-section']}>
+  //         <TextInput
+  //           id="user-input"
+  //           labelText=""
+  //           placeholder="Type your question..."
+  //           value={userInput}
+  //           onChange={(e) => setUserInput(e.target.value)}
+  //           onKeyPress={(e) => {
+  //             if (e.key === 'Enter') handleSend();
+  //           }}
+  //         />
+  //         <Button onClick={handleSend} kind="primary">
+  //           Send
+  //         </Button>
+  //       </div>
+  //     </div>
+  //   );
+  // };
+
   return (
-    <div className={styles['chat-page']} style={{ height: `${chatHeight}px` }}>
-      <div className={styles['conversation-history']}>
-        {messages.map((msg, index) => (
-          <Tile
-            key={index}
-            className={`${styles.message} ${
-              msg.type === 'user'
-                ? styles['user-message']
-                : styles['ai-message']
-            }`}
-          >
-            <span
-              className={
-                msg.type === 'user' ? styles['user-label'] : styles['ai-label']
-              }
-            >
-              {msg.type === 'user' ? 'You: ' : 'AI: '}
-            </span>
-            {msg.text}
-          </Tile>
-        ))}
-        {isTyping && <InlineLoading description="AI is typing..." />}
-        <div ref={messageEndRef} />
-      </div>
-      <div ref={inputRef} className={styles['input-section']}>
-        <TextInput
-          id="user-input"
-          labelText=""
-          placeholder="Type your question..."
-          value={userInput}
-          onChange={(e) => setUserInput(e.target.value)}
-          onKeyPress={(e) => {
-            if (e.key === 'Enter') handleSend();
-          }}
-        />
-        <Button onClick={handleSend} kind="primary">
-          Send
-        </Button>
-      </div>
+    <div>
+      <WidgetCCAT
+        baseUrl="localhost"
+        port="1865"
+        initialPhrase="Ciao! Sono il tuo assistente virtuale. Come posso aiutarti?"
+        sorryPhrase="Mi dispiace, al momento non sono disponibile. Riprova più tardi."
+        chatUnderneathMessage="Ricorda che sono ancora in fase di apprendimento e potrei commettere errori."
+      />
     </div>
   );
 };
-
 export default ChatWithHeader;

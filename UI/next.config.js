@@ -4,7 +4,7 @@ const nextConfig = {
   output: 'standalone', // Enables Next.js standalone mode (optimized for Docker)
   // trailingSlash: false, // Ensures no extra slashes in routes unless needed
   // outputFileTracingRoot: './',
-  assetPrefix: './', // Ensures assets are served from the correct path
+  //assetPrefix: './', // Ensures assets are served from the correct path
 };
 
 module.exports = nextConfig;

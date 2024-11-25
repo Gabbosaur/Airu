@@ -17,30 +17,38 @@ import {
 
 const ProductTable = ({ rows, headers, onAdd }) => {
   const [expandedRowId, setExpandedRowId] = useState(null); // Track expanded row ID
-  const [elasticIP, setElasticIP] = useState(false);
-  const [ha, setHA] = useState(false);
-  const [blockStorage, setBlockStorage] = useState(0);
+  const [rowOptions, setRowOptions] = useState({}); // Store options per row
 
-  const handleElasticIPCheckboxChange = (rowId) => {
-    console.log(`ElasticIP checkbox clicked for row ID: ${rowId}`);
-    setElasticIP(!elasticIP);
+  const handleCheckboxChange = (rowId, field) => {
+    setRowOptions((prevOptions) => ({
+      ...prevOptions,
+      [rowId]: {
+        ...prevOptions[rowId],
+        [field]: !prevOptions[rowId]?.[field],
+      },
+    }));
   };
 
-  const handleHACheckboxChange = (rowId) => {
-    console.log(`HA checkbox clicked for row ID: ${rowId}`);
-    setHA(!ha);
-  };
-
-  const handleInputChange = (rowId, value) => {
-    console.log(
-      `Numeric input value changed for row ID: ${rowId}, Value: ${value}`
-    );
-    setBlockStorage(value);
+  const handleInputChange = (rowId, field, value) => {
+    setRowOptions((prevOptions) => ({
+      ...prevOptions,
+      [rowId]: {
+        ...prevOptions[rowId],
+        [field]: value,
+      },
+    }));
   };
 
   const handleAddButtonClick = (rowId) => {
-    console.log(`Add button clicked for row: ${rowId}`);
-    onAdd(rowId, elasticIP, ha, blockStorage);
+    const options = rowOptions[rowId] || {};
+    console.log(`Add button clicked for row: ${rowId}`, options);
+    onAdd(
+      rowId,
+      options.elasticIP || false,
+      options.ha || false,
+      options.blockStorage || 0,
+      options.quantity || 1 // Default quantity to 1 if not set
+    );
   };
 
   const handleRowExpandToggle = (rowId) => {
@@ -77,6 +85,8 @@ const ProductTable = ({ rows, headers, onAdd }) => {
               {rows.map((row) => {
                 const rowProps = getRowProps({ row });
                 const isExpanded = expandedRowId === row.id;
+                const options = rowOptions[row.id] || {};
+
                 return (
                   <React.Fragment key={row.id}>
                     <TableExpandRow
@@ -98,15 +108,14 @@ const ProductTable = ({ rows, headers, onAdd }) => {
                             alignItems: 'center',
                           }}
                         >
-                          {console.debug('row.resourceName', row)}
                           {row.cells[5].value === 'cloudServer' && (
                             <div>
                               <span>Add elasticIP</span>
                               <input
                                 type="checkbox"
-                                checked={elasticIP}
+                                checked={options.elasticIP || false}
                                 onChange={() =>
-                                  handleElasticIPCheckboxChange(row.id)
+                                  handleCheckboxChange(row.id, 'elasticIP')
                                 }
                               />
                             </div>
@@ -117,25 +126,54 @@ const ProductTable = ({ rows, headers, onAdd }) => {
                               <span>Add HA</span>
                               <input
                                 type="checkbox"
-                                checked={ha}
-                                onChange={() => handleHACheckboxChange(row.id)}
+                                checked={options.ha || false}
+                                onChange={() =>
+                                  handleCheckboxChange(row.id, 'ha')
+                                }
                               />
                             </div>
                           )}
 
-                          <span>
-                            Add persistent storage with the following size (GB)
-                          </span>
-                          <input
-                            type="number"
-                            min="0"
-                            max="16000"
-                            placeholder="0-16000"
-                            value={blockStorage}
-                            onChange={(e) =>
-                              handleInputChange(row.id, e.target.value)
-                            }
-                          />
+                          {row.cells[5].value !== 'elasticIp' && (
+                            <div>
+                              <span>
+                                Add persistent storage with the following size
+                                (GB)
+                              </span>
+                              <input
+                                type="number"
+                                min="0"
+                                max="16000"
+                                placeholder="0-16000"
+                                value={options.blockStorage || ''}
+                                onChange={(e) =>
+                                  handleInputChange(
+                                    row.id,
+                                    'blockStorage',
+                                    e.target.value
+                                  )
+                                }
+                              />
+                            </div>
+                          )}
+
+                          {/* Add quantity input */}
+                          <div>
+                            <span>Quantity</span>
+                            <input
+                              type="number"
+                              min="1"
+                              value={options.quantity || 1}
+                              onChange={(e) =>
+                                handleInputChange(
+                                  row.id,
+                                  'quantity',
+                                  parseInt(e.target.value, 10)
+                                )
+                              }
+                            />
+                          </div>
+
                           <button
                             style={{
                               padding: '5px 10px',

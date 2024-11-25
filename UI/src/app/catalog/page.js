@@ -50,12 +50,12 @@ const getRowItems = (rows) =>
       unitPrice1Month: row.reservations[0].price,
       unitPrice1Year: row.reservations[1].price,
       unitPrice3Years: row.reservations[2].price,
-      tiers1MinimumUnits: row.reservations[0].minimumUnits,
-      tiers1PercentDiscount: row.reservations[0].percentDiscount,
-      tiers2MinimumUnits: row.reservations[1].minimumUnits,
-      tiers2PercentDiscount: row.reservations[1].percentDiscount,
-      tiers3MinimumUnits: row.reservations[2].minimumUnits,
-      tiers3PercentDiscount: row.reservations[2].percentDiscount,
+      tiers1MinimumUnits: row.tiers[0].minimumUnits,
+      tiers1PercentDiscount: row.tiers[0].percentDiscount,
+      tiers2MinimumUnits: row.tiers[1].minimumUnits,
+      tiers2PercentDiscount: row.tiers[1].percentDiscount,
+      tiers3MinimumUnits: row.tiers[2].minimumUnits,
+      tiers3PercentDiscount: row.tiers[2].percentDiscount,
       elasticIP: false,
       highlyAvailable: false,
       blockStorage: 0,
@@ -128,7 +128,7 @@ function ProductsPage() {
         .then((response) => {
           const items = getRowItems(response.data);
           const coreItems = items.filter(
-            (item) => item.resourceName !== 'masterHA'
+            (item) => item.productName !== 'masterHA'
           );
           console.debug('items', items);
           console.debug('coreItems', coreItems);
@@ -165,7 +165,13 @@ function ProductsPage() {
     return `id-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   }
 
-  const handleAddProduct = (productID, elasticIP, ha, blockStorage) => {
+  const handleAddProduct = (
+    productID,
+    elasticIP,
+    ha,
+    blockStorage,
+    quantity
+  ) => {
     const foundProduct = rows.find((row) => row.id === productID); // Find the matching product in rows
     let productToAdd = { ...foundProduct };
     console.debug('productToAdd', productToAdd);
@@ -173,8 +179,11 @@ function ProductsPage() {
 
     productToAdd.elasticIP = elasticIP;
     productToAdd.highlyAvailable = ha;
+    productToAdd.quantity = quantity;
     productToAdd.blockStorage = blockStorage;
     productToAdd.selectionId = generateUniqueId();
+    console.debug('productToAdd After', productToAdd);
+
     if (productToAdd) {
       setSelectedProducts((prev) => [...prev, productToAdd]);
     }
@@ -412,13 +421,40 @@ function ProductsPage() {
 
           {/* Selected Products Section */}
           <Column lg={4} md={8} sm={4}>
-            <SelectedProductsPanel
+            {/* <SelectedProductsPanel
               selectedProducts={selectedProducts}
               optionalResources={optionalResources}
               budget={budget}
               duration={duration}
               updateSelectedProducts={setSelectedProducts}
             />
+            <br /> */}
+            <SelectedProductsPanel
+              selectedProducts={selectedProducts}
+              optionalResources={optionalResources}
+              budget={budget}
+              duration={duration}
+              updateSelectedProducts={setSelectedProducts}
+              tier="Base"
+            />
+            {/* <br />
+            <SelectedProductsPanel
+              selectedProducts={selectedProducts}
+              optionalResources={optionalResources}
+              budget={budget}
+              duration={duration}
+              updateSelectedProducts={setSelectedProducts}
+              tier="Partner"
+            />
+            <br />
+            <SelectedProductsPanel
+              selectedProducts={selectedProducts}
+              optionalResources={optionalResources}
+              budget={budget}
+              duration={duration}
+              updateSelectedProducts={setSelectedProducts}
+              tier="Premium"
+            /> */}
           </Column>
         </Grid>
       </Column>
