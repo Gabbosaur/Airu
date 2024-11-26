@@ -8,6 +8,7 @@ import {
   MultiSelect,
   TextInput,
   NumberInput,
+  Checkbox,
   Select,
   SelectItem,
 } from '@carbon/react';
@@ -40,7 +41,7 @@ const getRowItems = (rows) =>
       hourlyUnitPrice: row.unitPrice + ' ' + row.currencyCode,
 
       productName: row.productName,
-      flavorName: row.flavor?.name || '', // Use empty string if flavor is null or undefined
+      flavorName: row.flavor?.name || row.resourceName, // Use empty string if flavor is null or undefined
       flavorDescription: row.flavor?.description || '', // Use empty string if flavor is null or undefined
       flavorOsPlatform: row.flavor?.osPlatform || '', // Use empty string if flavor is null or undefined
       flavorCpu: row.flavor?.cpu || '', // Use empty string if flavor is null or undefined
@@ -78,6 +79,7 @@ function ProductsPage() {
   const [budget, setBudget] = useState(0);
   const [duration, setDuration] = useState(0);
   const [durationType, setDurationType] = useState(0);
+  const [selectedPanels, setSelectedPanels] = useState([]); // Stato per i pannelli selezionati
 
   const osOptions = [
     { id: 'linux', label: 'Linux' },
@@ -114,6 +116,12 @@ function ProductsPage() {
     { id: 'computing', label: 'Computing' },
     { id: 'container', label: 'Container' },
     { id: 'networking', label: 'Networking' },
+  ];
+
+  const panelOptions = [
+    { id: 'Base', label: 'Base' },
+    { id: 'Partner', label: 'Partner' },
+    { id: 'Premium', label: 'Premium' },
   ];
 
   useEffect(() => {
@@ -186,6 +194,14 @@ function ProductsPage() {
 
     if (productToAdd) {
       setSelectedProducts((prev) => [...prev, productToAdd]);
+    }
+  };
+
+  const handlePanelSelection = (id, isChecked) => {
+    if (isChecked) {
+      setSelectedPanels((prev) => [...prev, id]);
+    } else {
+      setSelectedPanels((prev) => prev.filter((panelId) => panelId !== id));
     }
   };
 
@@ -385,6 +401,7 @@ function ProductsPage() {
                 label="Duration(Months)"
                 labelText="Enter your duration"
                 placeholder="Enter your duration"
+                step={0.01} // Allow increments of 0.1 for floating-point input
                 onChange={(e) => setDuration(e.target.value)}
                 hideSteppers
               />
@@ -421,15 +438,42 @@ function ProductsPage() {
 
           {/* Selected Products Section */}
           <Column lg={4} md={8} sm={4}>
-            {/* <SelectedProductsPanel
+            <h4>Select other Tier to Compare:</h4>
+            <br />
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              {panelOptions.map((option) => (
+                <Checkbox
+                  id={option.id}
+                  labelText={option.label}
+                  onChange={(e) =>
+                    handlePanelSelection(option.id, e.target.checked)
+                  }
+                />
+              ))}
+            </div>
+            <br />
+            <SelectedProductsPanel
               selectedProducts={selectedProducts}
               optionalResources={optionalResources}
               budget={budget}
               duration={duration}
               updateSelectedProducts={setSelectedProducts}
             />
-            <br /> */}
-            <SelectedProductsPanel
+            <br />
+            {selectedPanels.map((panelId) => (
+              <div>
+                <SelectedProductsPanel
+                  selectedProducts={selectedProducts}
+                  optionalResources={optionalResources}
+                  budget={budget}
+                  duration={duration}
+                  updateSelectedProducts={setSelectedProducts}
+                  tier={panelId}
+                />
+                <br />
+              </div>
+            ))}
+            {/* <SelectedProductsPanel
               selectedProducts={selectedProducts}
               optionalResources={optionalResources}
               budget={budget}
@@ -437,7 +481,7 @@ function ProductsPage() {
               updateSelectedProducts={setSelectedProducts}
               tier="Base"
             />
-            {/* <br />
+            <br />
             <SelectedProductsPanel
               selectedProducts={selectedProducts}
               optionalResources={optionalResources}

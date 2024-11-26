@@ -157,36 +157,45 @@ const ProductTable = ({ rows, headers, onAdd }) => {
                             </div>
                           )}
 
-                          {/* Add quantity input */}
-                          <div>
-                            <span>Quantity</span>
-                            <input
-                              type="number"
-                              min="1"
-                              value={options.quantity || 1}
-                              onChange={(e) =>
-                                handleInputChange(
-                                  row.id,
-                                  'quantity',
-                                  parseInt(e.target.value, 10)
-                                )
-                              }
-                            />
-                          </div>
-
-                          <button
+                          {/* Quantity input and Add button container */}
+                          <div
                             style={{
-                              padding: '5px 10px',
-                              backgroundColor: '#0f62fe',
-                              color: '#fff',
-                              border: 'none',
-                              borderRadius: '4px',
-                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '5px',
+                              marginLeft: 'auto', // Push to the right
                             }}
-                            onClick={() => handleAddButtonClick(row.id)}
                           >
-                            Add
-                          </button>
+                            <div>
+                              <span>Quantity</span>
+                              <input
+                                type="number"
+                                min="1"
+                                value={options.quantity || 1}
+                                onChange={(e) =>
+                                  handleInputChange(
+                                    row.id,
+                                    'quantity',
+                                    parseInt(e.target.value, 10)
+                                  )
+                                }
+                              />
+                            </div>
+
+                            <button
+                              style={{
+                                padding: '5px 10px',
+                                backgroundColor: '#0f62fe',
+                                color: '#fff',
+                                border: 'none',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                              }}
+                              onClick={() => handleAddButtonClick(row.id)}
+                            >
+                              Add
+                            </button>
+                          </div>
                         </div>
                       </TableExpandedRow>
                     )}

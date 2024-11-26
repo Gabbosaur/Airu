@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import './widget_CCAT.css';
+import './Widget_CCAT.css';
 
 import { TextInput, Button } from '@carbon/react';
 import { IoSend } from 'react-icons/io5';

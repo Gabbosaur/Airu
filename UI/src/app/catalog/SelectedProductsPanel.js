@@ -56,10 +56,8 @@ const SelectedProductsPanel = ({
 
   const uniqueProducts = getUniqueProductsWithQuantity(selectedProducts);
 
-  const totalCost = uniqueProducts.reduce((sum, product) => {
+  const calculateProductCost = (product) => {
     let productCost = 0;
-    console.debug('product', product);
-    console.debug('optionalResources', optionalResources);
 
     if (tier === 'None') {
       if (duration < 1) {
@@ -101,9 +99,9 @@ const SelectedProductsPanel = ({
       }
     } else if (tier === 'Base') {
       if (duration < 1) {
-        if (product.quantity > product.tiers1MinimumUnits) {
+        if (product.quantity >= product.tiers1MinimumUnits) {
           productCost =
-            (product.unitPrice * (1 - tiers1PercentDiscount / 100) +
+            (product.unitPrice * (1 - product.tiers1PercentDiscount / 100) +
               product.blockStorage * optionalResources[0].unitPrice +
               product.elasticIP * optionalResources[1].unitPrice +
               product.highlyAvailable * optionalResources[2].unitPrice) *
@@ -112,9 +110,8 @@ const SelectedProductsPanel = ({
             30;
         } else {
           productCost =
-            (product.unitPrice *
-              product.blockStorage *
-              optionalResources[0].unitPrice +
+            (product.unitPrice +
+              product.blockStorage * optionalResources[0].unitPrice +
               product.elasticIP * optionalResources[1].unitPrice +
               product.highlyAvailable * optionalResources[2].unitPrice) *
             product.quantity *
@@ -122,9 +119,10 @@ const SelectedProductsPanel = ({
             30;
         }
       } else if (duration >= 1 && duration < 12) {
-        if (product.quantity > product.tiers1MinimumUnits) {
+        if (product.quantity >= product.tiers1MinimumUnits) {
           productCost =
-            (product.unitPrice1Month * (1 - tiers1PercentDiscount / 100) +
+            (product.unitPrice1Month *
+              (1 - product.tiers1PercentDiscount / 100) +
               product.blockStorage * optionalResources[0].unitPrice1Month +
               product.elasticIP * optionalResources[1].unitPrice1Month +
               product.highlyAvailable * optionalResources[2].unitPrice1Month) *
@@ -142,9 +140,10 @@ const SelectedProductsPanel = ({
             30;
         }
       } else if (duration >= 12 && duration < 36) {
-        if (product.quantity > product.tiers1MinimumUnits) {
+        if (product.quantity >= product.tiers1MinimumUnits) {
           productCost =
-            (product.unitPrice1Year * (1 - tiers1PercentDiscount / 100) +
+            (product.unitPrice1Year *
+              (1 - product.tiers1PercentDiscount / 100) +
               product.blockStorage * optionalResources[0].unitPrice1Year +
               product.elasticIP * optionalResources[1].unitPrice1Year +
               product.highlyAvailable * optionalResources[2].unitPrice1Year) *
@@ -162,9 +161,10 @@ const SelectedProductsPanel = ({
             30;
         }
       } else if (duration >= 36) {
-        if (product.quantity > product.tiers1MinimumUnits) {
+        if (product.quantity >= product.tiers1MinimumUnits) {
           productCost =
-            (product.unitPrice3Years * (1 - tiers1PercentDiscount / 100) +
+            (product.unitPrice3Years *
+              (1 - product.tiers1PercentDiscount / 100) +
               product.blockStorage * optionalResources[0].unitPrice3Years +
               product.elasticIP * optionalResources[1].unitPrice3Years +
               product.highlyAvailable * optionalResources[2].unitPrice3Years) *
@@ -184,9 +184,9 @@ const SelectedProductsPanel = ({
       }
     } else if (tier === 'Partner') {
       if (duration < 1) {
-        if (product.quantity > product.tiers2MinimumUnits) {
+        if (product.quantity >= product.tiers2MinimumUnits) {
           productCost =
-            (product.unitPrice * (1 - tiers2PercentDiscount) +
+            (product.unitPrice * (1 - product.tiers2PercentDiscount / 100) +
               product.blockStorage * optionalResources[0].unitPrice +
               product.elasticIP * optionalResources[1].unitPrice +
               product.highlyAvailable * optionalResources[2].unitPrice) *
@@ -195,9 +195,8 @@ const SelectedProductsPanel = ({
             30;
         } else {
           productCost =
-            (product.unitPrice *
-              product.blockStorage *
-              optionalResources[0].unitPrice +
+            (product.unitPrice +
+              product.blockStorage * optionalResources[0].unitPrice +
               product.elasticIP * optionalResources[1].unitPrice +
               product.highlyAvailable * optionalResources[2].unitPrice) *
             product.quantity *
@@ -205,9 +204,10 @@ const SelectedProductsPanel = ({
             30;
         }
       } else if (duration >= 1 && duration < 12) {
-        if (product.quantity > product.tiers2MinimumUnits) {
+        if (product.quantity >= product.tiers2MinimumUnits) {
           productCost =
-            (product.unitPrice1Month * (1 - tiers2PercentDiscount) +
+            (product.unitPrice1Month *
+              (1 - product.tiers2PercentDiscount / 100) +
               product.blockStorage * optionalResources[0].unitPrice1Month +
               product.elasticIP * optionalResources[1].unitPrice1Month +
               product.highlyAvailable * optionalResources[2].unitPrice1Month) *
@@ -225,9 +225,10 @@ const SelectedProductsPanel = ({
             30;
         }
       } else if (duration >= 12 && duration < 36) {
-        if (product.quantity > product.tiers2MinimumUnits) {
+        if (product.quantity >= product.tiers2MinimumUnits) {
           productCost =
-            (product.unitPrice1Year * (1 - tiers2PercentDiscount) +
+            (product.unitPrice1Year *
+              (1 - product.tiers2PercentDiscount / 100) +
               product.blockStorage * optionalResources[0].unitPrice1Year +
               product.elasticIP * optionalResources[1].unitPrice1Year +
               product.highlyAvailable * optionalResources[2].unitPrice1Year) *
@@ -245,9 +246,10 @@ const SelectedProductsPanel = ({
             30;
         }
       } else if (duration >= 36) {
-        if (product.quantity > product.tiers2MinimumUnits) {
+        if (product.quantity >= product.tiers2MinimumUnits) {
           productCost =
-            (product.unitPrice3Years * (1 - tiers2PercentDiscount) +
+            (product.unitPrice3Years *
+              (1 - product.tiers2PercentDiscount / 100) +
               product.blockStorage * optionalResources[0].unitPrice3Years +
               product.elasticIP * optionalResources[1].unitPrice3Years +
               product.highlyAvailable * optionalResources[2].unitPrice3Years) *
@@ -267,9 +269,9 @@ const SelectedProductsPanel = ({
       }
     } else if (tier === 'Premium') {
       if (duration < 1) {
-        if (product.quantity > product.tiers3MinimumUnits) {
+        if (product.quantity >= product.tiers3MinimumUnits) {
           productCost =
-            (product.unitPrice * (1 - tiers3PercentDiscount) +
+            (product.unitPrice * (1 - product.tiers3PercentDiscount / 100) +
               product.blockStorage * optionalResources[0].unitPrice +
               product.elasticIP * optionalResources[1].unitPrice +
               product.highlyAvailable * optionalResources[2].unitPrice) *
@@ -278,9 +280,8 @@ const SelectedProductsPanel = ({
             30;
         } else {
           productCost =
-            (product.unitPrice *
-              product.blockStorage *
-              optionalResources[0].unitPrice +
+            (product.unitPrice +
+              product.blockStorage * optionalResources[0].unitPrice +
               product.elasticIP * optionalResources[1].unitPrice +
               product.highlyAvailable * optionalResources[2].unitPrice) *
             product.quantity *
@@ -288,9 +289,10 @@ const SelectedProductsPanel = ({
             30;
         }
       } else if (duration >= 1 && duration < 12) {
-        if (product.quantity > product.tiers3MinimumUnits) {
+        if (product.quantity >= product.tiers3MinimumUnits) {
           productCost =
-            (product.unitPrice1Month * (1 - tiers3PercentDiscount) +
+            (product.unitPrice1Month *
+              (1 - product.tiers3PercentDiscount / 100) +
               product.blockStorage * optionalResources[0].unitPrice1Month +
               product.elasticIP * optionalResources[1].unitPrice1Month +
               product.highlyAvailable * optionalResources[2].unitPrice1Month) *
@@ -308,9 +310,10 @@ const SelectedProductsPanel = ({
             30;
         }
       } else if (duration >= 12 && duration < 36) {
-        if (product.quantity > product.tiers3MinimumUnits) {
+        if (product.quantity >= product.tiers3MinimumUnits) {
           productCost =
-            (product.unitPrice1Year * (1 - tiers3PercentDiscount) +
+            (product.unitPrice1Year *
+              (1 - product.tiers3PercentDiscount / 100) +
               product.blockStorage * optionalResources[0].unitPrice1Year +
               product.elasticIP * optionalResources[1].unitPrice1Year +
               product.highlyAvailable * optionalResources[2].unitPrice1Year) *
@@ -328,9 +331,10 @@ const SelectedProductsPanel = ({
             30;
         }
       } else if (duration >= 36) {
-        if (product.quantity > product.tiers3MinimumUnits) {
+        if (product.quantity >= product.tiers3MinimumUnits) {
           productCost =
-            (product.unitPrice3Years * (1 - tiers3PercentDiscount) +
+            (product.unitPrice3Years *
+              (1 - product.tiers3PercentDiscount / 100) +
               product.blockStorage * optionalResources[0].unitPrice3Years +
               product.elasticIP * optionalResources[1].unitPrice3Years +
               product.highlyAvailable * optionalResources[2].unitPrice3Years) *
@@ -349,8 +353,11 @@ const SelectedProductsPanel = ({
         }
       }
     }
+    return formatToTwoDecimals(productCost);
+  };
 
-    return sum + productCost;
+  const totalCost = uniqueProducts.reduce((sum, product) => {
+    return sum + calculateProductCost(product);
   }, 0);
 
   const totalCostWithDuration = totalCost * duration;
@@ -363,64 +370,30 @@ const SelectedProductsPanel = ({
         borderRadius: '8px',
       }}
     >
-      <h4>Selected products - {tier}</h4>
+      {tier === 'None' ? <h4>Selected products</h4> : <h4>Compare {tier}</h4>}
 
       {selectedProducts.length === 0 ? (
         <p>No products selected.</p>
       ) : (
         <ul>
-          {uniqueProducts.map((product) => (
-            <li key={product.selectionId}>
-              {product.flavorName} {product.highlyAvailable && 'HA'}{' '}
-              {product.elasticIP && 'EIP'}{' '}
-              {product.blockStorage > 0 && 'BS' + product.blockStorage} x{' '}
-              {product.quantity} ={' '}
-              {duration < 1 &&
-                (product.unitPrice +
-                  product.blockStorage * optionalResources[0].unitPrice +
-                  product.elasticIP * optionalResources[1].unitPrice +
-                  product.highlyAvailable * optionalResources[2].unitPrice) *
-                  product.quantity *
-                  24 *
-                  30}{' '}
-              {duration >= 1 &&
-                duration < 12 &&
-                (product.unitPrice1Month +
-                  product.blockStorage * optionalResources[0].unitPrice1Month +
-                  product.elasticIP * optionalResources[1].unitPrice1Month +
-                  product.highlyAvailable *
-                    optionalResources[2].unitPrice1Month) *
-                  product.quantity *
-                  24 *
-                  30}{' '}
-              {duration >= 12 &&
-                duration < 36 &&
-                (product.unitPrice1Year +
-                  product.blockStorage * optionalResources[0].unitPrice1Year +
-                  product.elasticIP * optionalResources[1].unitPrice1Year +
-                  product.highlyAvailable *
-                    optionalResources[2].unitPrice1Year) *
-                  product.quantity *
-                  24 *
-                  30}{' '}
-              {duration >= 36 &&
-                (product.unitPrice3Years +
-                  product.blockStorage * optionalResources[0].unitPrice3Years +
-                  product.elasticIP * optionalResources[1].unitPrice3Years +
-                  product.highlyAvailable *
-                    optionalResources[2].unitPrice3Years) *
-                  product.quantity *
-                  24 *
-                  30}{' '}
-              €/month
-              <button
-                onClick={() => handleRemoveProduct(product)}
-                style={{ marginLeft: '10px' }}
-              >
-                Remove
-              </button>
-            </li>
-          ))}
+          {uniqueProducts.map((product) => {
+            const productCost = calculateProductCost(product);
+            return (
+              <li key={product.selectionId}>
+                {product.flavorName} {product.highlyAvailable && 'HA'}{' '}
+                {product.elasticIP && 'EIP'}{' '}
+                {product.blockStorage > 0 && 'BS' + product.blockStorage} x{' '}
+                {product.quantity} = {productCost}
+                €/month
+                <button
+                  onClick={() => handleRemoveProduct(product)}
+                  style={{ marginLeft: '10px' }}
+                >
+                  Remove
+                </button>
+              </li>
+            );
+          })}
           <br />
           <li>
             <strong>Total Monthly Cost:</strong>{' '}
@@ -435,23 +408,29 @@ const SelectedProductsPanel = ({
               {formatToTwoDecimals(totalCostWithDuration)} €
             </span>
             <br />
-            <br />
-            <button
-              style={{
-                padding: '5px 10px',
-                backgroundColor:
-                  totalCostWithDuration > budget ? '#e0e0e0' : '#0f62fe',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '4px',
-                cursor:
-                  totalCostWithDuration > budget ? 'not-allowed' : 'pointer',
-              }}
-              disabled={totalCostWithDuration > budget}
-              onClick={() => handleAddButtonClick(row.id)}
-            >
-              Deploy solution
-            </button>
+            {tier === 'None' && (
+              <div>
+                <br />
+                <button
+                  style={{
+                    padding: '5px 10px',
+                    backgroundColor:
+                      totalCostWithDuration > budget ? '#e0e0e0' : '#0f62fe',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor:
+                      totalCostWithDuration > budget
+                        ? 'not-allowed'
+                        : 'pointer',
+                  }}
+                  disabled={totalCostWithDuration > budget}
+                  onClick={() => handleAddButtonClick(row.id)}
+                >
+                  Deploy solution
+                </button>
+              </div>
+            )}
           </li>
         </ul>
       )}
