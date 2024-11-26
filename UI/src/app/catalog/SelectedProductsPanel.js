@@ -1,7 +1,15 @@
 import React from 'react';
 
-function getUniqueProductsWithQuantity(selectedProducts) {
+let elasticIPDiscount = 0;
+let blockStorageDiscount = 0;
+
+function getUniqueProductsWithQuantity(
+  selectedProducts,
+  optionalResources,
+  tier
+) {
   const uniqueProducts = [];
+
   selectedProducts.forEach((product) => {
     const existingProduct = uniqueProducts.find(
       (uniqueProduct) =>
@@ -17,6 +25,73 @@ function getUniqueProductsWithQuantity(selectedProducts) {
       uniqueProducts.push({ ...product }); // Aggiungi il prodotto con la sua quantità originale
     }
   });
+
+  const totalConnectedElasticIPs = selectedProducts.reduce((sum, product) => {
+    return product.elasticIP ? sum + product.quantity : sum;
+  }, 0);
+
+  const elasticIPProduct = uniqueProducts.find(
+    (uniqueProduct) => uniqueProduct.flavorName === 'elasticIp'
+  );
+
+  const totalIndividualElasticIPs = elasticIPProduct
+    ? elasticIPProduct.quantity
+    : 0;
+
+  const totalConnectedBlockStorage = selectedProducts.reduce((sum, product) => {
+    return product.blockStorage
+      ? sum + product.quantity * product.blockStorage
+      : sum;
+  }, 0);
+
+  const blockStorageProduct = uniqueProducts.find(
+    (uniqueProduct) => uniqueProduct.flavorName === 'blockStorage'
+  );
+  const totalIndividualBlockStorage = blockStorageProduct
+    ? blockStorageProduct.quantity * blockStorageProduct.blockStorage
+    : 0;
+
+  if (tier === 'Base') {
+    if (
+      totalConnectedBlockStorage + totalIndividualBlockStorage >=
+      optionalResources[0].tiers1MinimumUnits
+    ) {
+      blockStorageDiscount = optionalResources[0].tiers1PercentDiscount;
+    }
+    if (
+      totalConnectedElasticIPs + totalIndividualElasticIPs >=
+      optionalResources[1].tiers1MinimumUnits
+    ) {
+      elasticIPDiscount = optionalResources[1].tiers1PercentDiscount;
+    }
+  } else if (tier === 'Partner') {
+    if (
+      totalConnectedBlockStorage + totalIndividualBlockStorage >=
+      optionalResources[0].tiers2MinimumUnits
+    ) {
+      blockStorageDiscount = optionalResources[0].tiers2PercentDiscount;
+    }
+    if (
+      totalConnectedElasticIPs + totalIndividualElasticIPs >=
+      optionalResources[1].tiers2MinimumUnits
+    ) {
+      elasticIPDiscount = optionalResources[1].tiers2PercentDiscount;
+    }
+  } else if (tier === 'Premium') {
+    if (
+      totalConnectedBlockStorage + totalIndividualBlockStorage >=
+      optionalResources[0].tiers3MinimumUnits
+    ) {
+      blockStorageDiscount = optionalResources[0].tiers3PercentDiscount;
+    }
+    if (
+      totalConnectedElasticIPs + totalIndividualElasticIPs >=
+      optionalResources[1].tiers3MinimumUnits
+    ) {
+      elasticIPDiscount = optionalResources[1].tiers3PercentDiscount;
+    }
+  }
+
   console.debug('uniqueProducts', uniqueProducts);
   return uniqueProducts;
 }
@@ -54,7 +129,11 @@ const SelectedProductsPanel = ({
     updateSelectedProducts(updatedProducts);
   };
 
-  const uniqueProducts = getUniqueProductsWithQuantity(selectedProducts);
+  const uniqueProducts = getUniqueProductsWithQuantity(
+    selectedProducts,
+    optionalResources,
+    tier
+  );
 
   const calculateProductCost = (product) => {
     let productCost = 0;
@@ -102,8 +181,12 @@ const SelectedProductsPanel = ({
         if (product.quantity >= product.tiers1MinimumUnits) {
           productCost =
             (product.unitPrice * (1 - product.tiers1PercentDiscount / 100) +
-              product.blockStorage * optionalResources[0].unitPrice +
-              product.elasticIP * optionalResources[1].unitPrice +
+              product.blockStorage *
+                optionalResources[0].unitPrice *
+                (1 - blockStorageDiscount / 100) +
+              product.elasticIP *
+                optionalResources[1].unitPrice *
+                (1 - elasticIPDiscount / 100) +
               product.highlyAvailable * optionalResources[2].unitPrice) *
             product.quantity *
             24 *
@@ -111,8 +194,12 @@ const SelectedProductsPanel = ({
         } else {
           productCost =
             (product.unitPrice +
-              product.blockStorage * optionalResources[0].unitPrice +
-              product.elasticIP * optionalResources[1].unitPrice +
+              product.blockStorage *
+                optionalResources[0].unitPrice *
+                (1 - blockStorageDiscount / 100) +
+              product.elasticIP *
+                optionalResources[1].unitPrice *
+                (1 - elasticIPDiscount / 100) +
               product.highlyAvailable * optionalResources[2].unitPrice) *
             product.quantity *
             24 *
@@ -123,8 +210,12 @@ const SelectedProductsPanel = ({
           productCost =
             (product.unitPrice1Month *
               (1 - product.tiers1PercentDiscount / 100) +
-              product.blockStorage * optionalResources[0].unitPrice1Month +
-              product.elasticIP * optionalResources[1].unitPrice1Month +
+              product.blockStorage *
+                optionalResources[0].unitPrice1Month *
+                (1 - blockStorageDiscount / 100) +
+              product.elasticIP *
+                optionalResources[1].unitPrice1Month *
+                (1 - elasticIPDiscount / 100) +
               product.highlyAvailable * optionalResources[2].unitPrice1Month) *
             product.quantity *
             24 *
@@ -132,8 +223,12 @@ const SelectedProductsPanel = ({
         } else {
           productCost =
             (product.unitPrice1Month +
-              product.blockStorage * optionalResources[0].unitPrice1Month +
-              product.elasticIP * optionalResources[1].unitPrice1Month +
+              product.blockStorage *
+                optionalResources[0].unitPrice1Month *
+                (1 - blockStorageDiscount / 100) +
+              product.elasticIP *
+                optionalResources[1].unitPrice1Month *
+                (1 - elasticIPDiscount / 100) +
               product.highlyAvailable * optionalResources[2].unitPrice1Month) *
             product.quantity *
             24 *
@@ -144,8 +239,12 @@ const SelectedProductsPanel = ({
           productCost =
             (product.unitPrice1Year *
               (1 - product.tiers1PercentDiscount / 100) +
-              product.blockStorage * optionalResources[0].unitPrice1Year +
-              product.elasticIP * optionalResources[1].unitPrice1Year +
+              product.blockStorage *
+                optionalResources[0].unitPrice1Year *
+                (1 - blockStorageDiscount / 100) +
+              product.elasticIP *
+                optionalResources[1].unitPrice1Year *
+                (1 - elasticIPDiscount / 100) +
               product.highlyAvailable * optionalResources[2].unitPrice1Year) *
             product.quantity *
             24 *
@@ -153,8 +252,12 @@ const SelectedProductsPanel = ({
         } else {
           productCost =
             (product.unitPrice1Year +
-              product.blockStorage * optionalResources[0].unitPrice1Year +
-              product.elasticIP * optionalResources[1].unitPrice1Year +
+              product.blockStorage *
+                optionalResources[0].unitPrice1Year *
+                (1 - blockStorageDiscount / 100) +
+              product.elasticIP *
+                optionalResources[1].unitPrice1Year *
+                (1 - elasticIPDiscount / 100) +
               product.highlyAvailable * optionalResources[2].unitPrice1Year) *
             product.quantity *
             24 *
@@ -165,8 +268,12 @@ const SelectedProductsPanel = ({
           productCost =
             (product.unitPrice3Years *
               (1 - product.tiers1PercentDiscount / 100) +
-              product.blockStorage * optionalResources[0].unitPrice3Years +
-              product.elasticIP * optionalResources[1].unitPrice3Years +
+              product.blockStorage *
+                optionalResources[0].unitPrice3Years *
+                (1 - blockStorageDiscount / 100) +
+              product.elasticIP *
+                optionalResources[1].unitPrice3Years *
+                (1 - elasticIPDiscount / 100) +
               product.highlyAvailable * optionalResources[2].unitPrice3Years) *
             product.quantity *
             24 *
@@ -174,8 +281,12 @@ const SelectedProductsPanel = ({
         } else {
           productCost =
             (product.unitPrice3Years +
-              product.blockStorage * optionalResources[0].unitPrice3Years +
-              product.elasticIP * optionalResources[1].unitPrice3Years +
+              product.blockStorage *
+                optionalResources[0].unitPrice3Years *
+                (1 - blockStorageDiscount / 100) +
+              product.elasticIP *
+                optionalResources[1].unitPrice3Years *
+                (1 - elasticIPDiscount / 100) +
               product.highlyAvailable * optionalResources[2].unitPrice3Years) *
             product.quantity *
             24 *
@@ -187,8 +298,12 @@ const SelectedProductsPanel = ({
         if (product.quantity >= product.tiers2MinimumUnits) {
           productCost =
             (product.unitPrice * (1 - product.tiers2PercentDiscount / 100) +
-              product.blockStorage * optionalResources[0].unitPrice +
-              product.elasticIP * optionalResources[1].unitPrice +
+              product.blockStorage *
+                optionalResources[0].unitPrice *
+                (1 - blockStorageDiscount / 100) +
+              product.elasticIP *
+                optionalResources[1].unitPrice *
+                (1 - elasticIPDiscount / 100) +
               product.highlyAvailable * optionalResources[2].unitPrice) *
             product.quantity *
             24 *
@@ -196,8 +311,12 @@ const SelectedProductsPanel = ({
         } else {
           productCost =
             (product.unitPrice +
-              product.blockStorage * optionalResources[0].unitPrice +
-              product.elasticIP * optionalResources[1].unitPrice +
+              product.blockStorage *
+                optionalResources[0].unitPrice *
+                (1 - blockStorageDiscount / 100) +
+              product.elasticIP *
+                optionalResources[1].unitPrice *
+                (1 - elasticIPDiscount / 100) +
               product.highlyAvailable * optionalResources[2].unitPrice) *
             product.quantity *
             24 *
@@ -208,8 +327,12 @@ const SelectedProductsPanel = ({
           productCost =
             (product.unitPrice1Month *
               (1 - product.tiers2PercentDiscount / 100) +
-              product.blockStorage * optionalResources[0].unitPrice1Month +
-              product.elasticIP * optionalResources[1].unitPrice1Month +
+              product.blockStorage *
+                optionalResources[0].unitPrice1Month *
+                (1 - blockStorageDiscount / 100) +
+              product.elasticIP *
+                optionalResources[1].unitPrice1Month *
+                (1 - elasticIPDiscount / 100) +
               product.highlyAvailable * optionalResources[2].unitPrice1Month) *
             product.quantity *
             24 *
@@ -217,8 +340,12 @@ const SelectedProductsPanel = ({
         } else {
           productCost =
             (product.unitPrice1Month +
-              product.blockStorage * optionalResources[0].unitPrice1Month +
-              product.elasticIP * optionalResources[1].unitPrice1Month +
+              product.blockStorage *
+                optionalResources[0].unitPrice1Month *
+                (1 - blockStorageDiscount / 100) +
+              product.elasticIP *
+                optionalResources[1].unitPrice1Month *
+                (1 - elasticIPDiscount / 100) +
               product.highlyAvailable * optionalResources[2].unitPrice1Month) *
             product.quantity *
             24 *
@@ -229,8 +356,12 @@ const SelectedProductsPanel = ({
           productCost =
             (product.unitPrice1Year *
               (1 - product.tiers2PercentDiscount / 100) +
-              product.blockStorage * optionalResources[0].unitPrice1Year +
-              product.elasticIP * optionalResources[1].unitPrice1Year +
+              product.blockStorage *
+                optionalResources[0].unitPrice1Year *
+                (1 - blockStorageDiscount / 100) +
+              product.elasticIP *
+                optionalResources[1].unitPrice1Year *
+                (1 - elasticIPDiscount / 100) +
               product.highlyAvailable * optionalResources[2].unitPrice1Year) *
             product.quantity *
             24 *
@@ -238,8 +369,12 @@ const SelectedProductsPanel = ({
         } else {
           productCost =
             (product.unitPrice1Year +
-              product.blockStorage * optionalResources[0].unitPrice1Year +
-              product.elasticIP * optionalResources[1].unitPrice1Year +
+              product.blockStorage *
+                optionalResources[0].unitPrice1Year *
+                (1 - blockStorageDiscount / 100) +
+              product.elasticIP *
+                optionalResources[1].unitPrice1Year *
+                (1 - elasticIPDiscount / 100) +
               product.highlyAvailable * optionalResources[2].unitPrice1Year) *
             product.quantity *
             24 *
@@ -250,8 +385,12 @@ const SelectedProductsPanel = ({
           productCost =
             (product.unitPrice3Years *
               (1 - product.tiers2PercentDiscount / 100) +
-              product.blockStorage * optionalResources[0].unitPrice3Years +
-              product.elasticIP * optionalResources[1].unitPrice3Years +
+              product.blockStorage *
+                optionalResources[0].unitPrice3Years *
+                (1 - blockStorageDiscount / 100) +
+              product.elasticIP *
+                optionalResources[1].unitPrice3Years *
+                (1 - elasticIPDiscount / 100) +
               product.highlyAvailable * optionalResources[2].unitPrice3Years) *
             product.quantity *
             24 *
@@ -259,8 +398,12 @@ const SelectedProductsPanel = ({
         } else {
           productCost =
             (product.unitPrice3Years +
-              product.blockStorage * optionalResources[0].unitPrice3Years +
-              product.elasticIP * optionalResources[1].unitPrice3Years +
+              product.blockStorage *
+                optionalResources[0].unitPrice3Years *
+                (1 - blockStorageDiscount / 100) +
+              product.elasticIP *
+                optionalResources[1].unitPrice3Years *
+                (1 - elasticIPDiscount / 100) +
               product.highlyAvailable * optionalResources[2].unitPrice3Years) *
             product.quantity *
             24 *
@@ -272,8 +415,12 @@ const SelectedProductsPanel = ({
         if (product.quantity >= product.tiers3MinimumUnits) {
           productCost =
             (product.unitPrice * (1 - product.tiers3PercentDiscount / 100) +
-              product.blockStorage * optionalResources[0].unitPrice +
-              product.elasticIP * optionalResources[1].unitPrice +
+              product.blockStorage *
+                optionalResources[0].unitPrice *
+                (1 - blockStorageDiscount / 100) +
+              product.elasticIP *
+                optionalResources[1].unitPrice *
+                (1 - elasticIPDiscount / 100) +
               product.highlyAvailable * optionalResources[2].unitPrice) *
             product.quantity *
             24 *
@@ -281,8 +428,12 @@ const SelectedProductsPanel = ({
         } else {
           productCost =
             (product.unitPrice +
-              product.blockStorage * optionalResources[0].unitPrice +
-              product.elasticIP * optionalResources[1].unitPrice +
+              product.blockStorage *
+                optionalResources[0].unitPrice *
+                (1 - blockStorageDiscount / 100) +
+              product.elasticIP *
+                optionalResources[1].unitPrice *
+                (1 - elasticIPDiscount / 100) +
               product.highlyAvailable * optionalResources[2].unitPrice) *
             product.quantity *
             24 *
@@ -293,8 +444,12 @@ const SelectedProductsPanel = ({
           productCost =
             (product.unitPrice1Month *
               (1 - product.tiers3PercentDiscount / 100) +
-              product.blockStorage * optionalResources[0].unitPrice1Month +
-              product.elasticIP * optionalResources[1].unitPrice1Month +
+              product.blockStorage *
+                optionalResources[0].unitPrice1Month *
+                (1 - blockStorageDiscount / 100) +
+              product.elasticIP *
+                optionalResources[1].unitPrice1Month *
+                (1 - elasticIPDiscount / 100) +
               product.highlyAvailable * optionalResources[2].unitPrice1Month) *
             product.quantity *
             24 *
@@ -302,8 +457,12 @@ const SelectedProductsPanel = ({
         } else {
           productCost =
             (product.unitPrice1Month +
-              product.blockStorage * optionalResources[0].unitPrice1Month +
-              product.elasticIP * optionalResources[1].unitPrice1Month +
+              product.blockStorage *
+                optionalResources[0].unitPrice1Month *
+                (1 - blockStorageDiscount / 100) +
+              product.elasticIP *
+                optionalResources[1].unitPrice1Month *
+                (1 - elasticIPDiscount / 100) +
               product.highlyAvailable * optionalResources[2].unitPrice1Month) *
             product.quantity *
             24 *
@@ -314,8 +473,12 @@ const SelectedProductsPanel = ({
           productCost =
             (product.unitPrice1Year *
               (1 - product.tiers3PercentDiscount / 100) +
-              product.blockStorage * optionalResources[0].unitPrice1Year +
-              product.elasticIP * optionalResources[1].unitPrice1Year +
+              product.blockStorage *
+                optionalResources[0].unitPrice1Year *
+                (1 - blockStorageDiscount / 100) +
+              product.elasticIP *
+                optionalResources[1].unitPrice1Year *
+                (1 - elasticIPDiscount / 100) +
               product.highlyAvailable * optionalResources[2].unitPrice1Year) *
             product.quantity *
             24 *
@@ -323,8 +486,12 @@ const SelectedProductsPanel = ({
         } else {
           productCost =
             (product.unitPrice1Year +
-              product.blockStorage * optionalResources[0].unitPrice1Year +
-              product.elasticIP * optionalResources[1].unitPrice1Year +
+              product.blockStorage *
+                optionalResources[0].unitPrice1Year *
+                (1 - blockStorageDiscount / 100) +
+              product.elasticIP *
+                optionalResources[1].unitPrice1Year *
+                (1 - elasticIPDiscount / 100) +
               product.highlyAvailable * optionalResources[2].unitPrice1Year) *
             product.quantity *
             24 *
@@ -335,8 +502,12 @@ const SelectedProductsPanel = ({
           productCost =
             (product.unitPrice3Years *
               (1 - product.tiers3PercentDiscount / 100) +
-              product.blockStorage * optionalResources[0].unitPrice3Years +
-              product.elasticIP * optionalResources[1].unitPrice3Years +
+              product.blockStorage *
+                optionalResources[0].unitPrice3Years *
+                (1 - blockStorageDiscount / 100) +
+              product.elasticIP *
+                optionalResources[1].unitPrice3Years *
+                (1 - elasticIPDiscount / 100) +
               product.highlyAvailable * optionalResources[2].unitPrice3Years) *
             product.quantity *
             24 *
@@ -344,8 +515,12 @@ const SelectedProductsPanel = ({
         } else {
           productCost =
             (product.unitPrice3Years +
-              product.blockStorage * optionalResources[0].unitPrice3Years +
-              product.elasticIP * optionalResources[1].unitPrice3Years +
+              product.blockStorage *
+                optionalResources[0].unitPrice3Years *
+                (1 - blockStorageDiscount / 100) +
+              product.elasticIP *
+                optionalResources[1].unitPrice3Years *
+                (1 - elasticIPDiscount / 100) +
               product.highlyAvailable * optionalResources[2].unitPrice3Years) *
             product.quantity *
             24 *
@@ -385,12 +560,14 @@ const SelectedProductsPanel = ({
                 {product.blockStorage > 0 && 'BS' + product.blockStorage} x{' '}
                 {product.quantity} = {productCost}
                 €/month
-                <button
-                  onClick={() => handleRemoveProduct(product)}
-                  style={{ marginLeft: '10px' }}
-                >
-                  Remove
-                </button>
+                {tier === 'None' && (
+                  <button
+                    onClick={() => handleRemoveProduct(product)}
+                    style={{ marginLeft: '10px' }}
+                  >
+                    Remove
+                  </button>
+                )}
               </li>
             );
           })}
@@ -424,7 +601,7 @@ const SelectedProductsPanel = ({
                         ? 'not-allowed'
                         : 'pointer',
                   }}
-                  disabled={totalCostWithDuration > budget}
+                  disabled={totalCostWithDuration > budget || budget === 0}
                   onClick={() => handleAddButtonClick(row.id)}
                 >
                   Deploy solution
