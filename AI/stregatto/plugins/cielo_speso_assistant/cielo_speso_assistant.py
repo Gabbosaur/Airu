@@ -51,9 +51,9 @@ def json_to_csv_variable(json_data):
     Returns:
         str: The CSV representation of the JSON data.
     """
-    # Ensure input is a list
-    if not isinstance(json_data, list):
-        raise ValueError("JSON data must be a list of dictionaries.")
+    # # Ensure input is a list
+    # if not isinstance(json_data, list):
+    #     raise ValueError("JSON data must be a list of dictionaries.")
 
     # Flatten the structure where needed
     flattened_data = []
@@ -130,7 +130,7 @@ def get_catalog(items, cat):
         cat.send_ws_message("Loading catalog..", msg_type='notification')
 
         # Fetch the catalog from the API
-        response = requests.get("http://cielospeso_web_1:8000/api/v1/aruba/catalog_products")
+        response = requests.get("http://cielospeso-web-1:8000/api/v1/aruba/catalog_products")
 
         # Ensure the response is JSON
         if response.headers.get('Content-Type') != 'application/json':
@@ -158,6 +158,41 @@ def get_catalog(items, cat):
     except Exception as e:
         return f"Unexpected error: {str(e)}"
 
+
+@tool(
+    examples=["show me the active projects", "get the active projects", "list the active projects"],
+    return_direct = True
+)
+def get_projects(items, cat):
+    """
+    Returns the active projects from Aruba servers.
+    """
+    try:
+        # Notify about the process
+        cat.send_ws_message("Looking for active projects..", msg_type='notification')
+
+        # Fetch the projects from the API
+        response = requests.get("http://cielospeso-web-1:8000/api/v1/aruba/projects")
+
+        # Ensure the response is JSON
+        if response.headers.get('Content-Type') != 'application/json':
+            return "Error: Response content is not JSON."
+
+        # Parse the JSON data
+        proj_data = response.json()
+        proj_data = json.dumps(proj_data, indent=None)
+        log.info(proj_data)
+        # Use the minified data to generate a summary
+        summary = cat.llm("Make a brief summary of the following active projects: " + proj_data)
+        return summary
+
+    except requests.exceptions.RequestException as e:
+        return f"Error fetching projects: {str(e)}"
+    except ValueError as e:
+        return f"Error in projects format: {str(e)}"
+    except Exception as e:
+        return f"Unexpected error: {str(e)}"
+
 # @hook
 # def before_cat_sends_message(message, cat):
     
@@ -168,64 +203,64 @@ def get_catalog(items, cat):
 
 
 
-class PizzaOrder(BaseModel): #
-    pizza_type: str
-    phone: str
-    address: str
+# class PizzaOrder(BaseModel): #
+#     pizza_type: str
+#     phone: str
+#     address: str
 
 
-@form
-class PizzaForm(CatForm): #
-    description = "Pizza Order" #
-    model_class = PizzaOrder #
-    start_examples = [ #
-        "ordinare una pizza",
-        "voglio fare un ordine per la pizza",
-        "i want to order a pizza",
-        "i need a pizza order",
-    ]
-    stop_examples = [ #
-        "non ho più voglia di ordinare",
-        "arrivederci",
-        "no more order",
-    ]
-    ask_confirm = True #
+# @form
+# class PizzaForm(CatForm): #
+#     description = "Pizza Order" #
+#     model_class = PizzaOrder #
+#     start_examples = [ #
+#         "ordinare una pizza",
+#         "voglio fare un ordine per la pizza",
+#         "i want to order a pizza",
+#         "i need a pizza order",
+#     ]
+#     stop_examples = [ #
+#         "non ho più voglia di ordinare",
+#         "arrivederci",
+#         "no more order",
+#     ]
+#     ask_confirm = True #
 
-    # # In the form you define
-    # def message(self): #
-    #     if self._state == CatFormState.CLOSED: #
-    #         return {
-    #             "output": f"Form {type(self).__name__} closed"
-    #         }
-    #     missing_fields: List[str] = self._missing_fields #
-    #     errors: List[str] = self._errors #
-    #     out: str = f"""
-    #     The missing information is: {missing_fields}.
-    #     These are the invalid ones: {errors}
-    #     """
-    #     if self._state == CatFormState.WAIT_CONFIRM:
-    #         out += "\n --> Confirm? Yes or no?"
+#     # # In the form you define
+#     # def message(self): #
+#     #     if self._state == CatFormState.CLOSED: #
+#     #         return {
+#     #             "output": f"Form {type(self).__name__} closed"
+#     #         }
+#     #     missing_fields: List[str] = self._missing_fields #
+#     #     errors: List[str] = self._errors #
+#     #     out: str = f"""
+#     #     The missing information is: {missing_fields}.
+#     #     These are the invalid ones: {errors}
+#     #     """
+#     #     if self._state == CatFormState.WAIT_CONFIRM:
+#     #         out += "\n --> Confirm? Yes or no?"
 
-    #     return {
-    #         "output": out
-    #     }
+#     #     return {
+#     #         "output": out
+#     #     }
 
-    def submit(self, form_data):
+#     def submit(self, form_data):
 
-        # Fake API call to order the pizza
-        response = requests.post(
-            "https://fakecallpizza/order",
-            json={
-                "pizza_type": form_data["pizza_type"],
-                "phone": form_data["phone"],
-                "address": form_data["address"]
-            }
-        )
-        response.raise_for_status()
+#         # Fake API call to order the pizza
+#         response = requests.post(
+#             "https://fakecallpizza/order",
+#             json={
+#                 "pizza_type": form_data["pizza_type"],
+#                 "phone": form_data["phone"],
+#                 "address": form_data["address"]
+#             }
+#         )
+#         response.raise_for_status()
 
-        time = response.json()["estimated_time"]
+#         time = response.json()["estimated_time"]
 
-        # Return a message to the conversation with the order details and estimated time
-        return {
-            "output": f"Pizza order on its way: {form_data}. Estimated time: {time}"
-        }
+#         # Return a message to the conversation with the order details and estimated time
+#         return {
+#             "output": f"Pizza order on its way: {form_data}. Estimated time: {time}"
+#         }
