@@ -170,7 +170,7 @@ async def delete_project(request: Request, projectId: str):
         'Content-Type': 'application/json'
     }
     response = requests.request("DELETE", url, headers=headers)
-    return response.json()
+    return response
 
 
 #
@@ -239,7 +239,7 @@ async def delete_vpc(request: Request, projectIdCreated: str, vpcId: str):
         'Content-Type': 'application/json'
     }
     response = requests.request("DELETE", url, headers=headers)
-    return response.json()
+    return response
 
 
 #
@@ -296,7 +296,7 @@ async def delete_subnet(request: Request, projectIdCreated: str, vpcIdCreated: s
     }
     
     response = requests.request("DELETE", url, headers=headers)
-    return response.json()
+    return response
     
 #
 # SecurityGroup
@@ -361,7 +361,7 @@ async def delete_security_group(request: Request, projectIdCreated: str, vpcIdCr
         'Content-Type': 'application/json'
     }
     response = requests.request("DELETE", url, headers=headers)
-    return response.json()
+    return response
 
 
 #
@@ -426,7 +426,7 @@ async def delete_elastic_ip(request: Request, projectIdCreated: str, elasticIpId
         'Content-Type': 'application/json'
     }
     response = requests.request("DELETE", url, headers=headers)
-    return response.json()
+    return response
 
 
 #
