@@ -7,6 +7,7 @@ import json
 import random
 import string
 import asyncio
+import requests
 
 router = APIRouter(tags=["aruba"])
 
@@ -106,9 +107,12 @@ async def get_projects(request: Request):
     }
     params = request.query_params
 
-    async with httpx.AsyncClient() as client:
-        response = await client.get(url, headers=headers, params=params)
-        return response.json()
+    response = requests.request("GET", url, headers=headers, params=params)
+    return response.json()
+
+    # async with httpx.AsyncClient() as client:
+    #     response = await client.get(url, headers=headers, params=params)
+    #     return response.json()
     
 @router.post("/aruba/projects")
 async def create_project(request: Request):
