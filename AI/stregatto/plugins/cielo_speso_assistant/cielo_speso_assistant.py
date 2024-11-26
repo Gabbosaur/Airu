@@ -130,7 +130,7 @@ def get_catalog(items, cat):
         cat.send_ws_message("Loading catalog..", msg_type='notification')
 
         # Fetch the catalog from the API
-        response = requests.get("http://cielospeso-web-1:8000/api/v1/aruba/catalog_products")
+        response = requests.get("http://cielospeso_web_1:8000/api/v1/aruba/catalog_products")
 
         # Ensure the response is JSON
         if response.headers.get('Content-Type') != 'application/json':
@@ -172,7 +172,7 @@ def get_projects(items, cat):
         cat.send_ws_message("Looking for active projects..", msg_type='notification')
 
         # Fetch the projects from the API
-        response = requests.get("http://cielospeso-web-1:8000/api/v1/aruba/projects")
+        response = requests.get("http://cielospeso_web_1:8000/api/v1/aruba/projects")
 
         # Ensure the response is JSON
         if response.headers.get('Content-Type') != 'application/json':
