@@ -1,5 +1,5 @@
 from io import StringIO
-import json, csv
+import json, csv, requests
 
 def minify_json(json_data):
     """
@@ -85,3 +85,35 @@ def json_to_csv_variable(json_data):
     output.close()
 
     return csv_content
+
+
+def get_project_id_by_name_from_response(url, project_name):
+    """
+    Finds the project ID matching a given project name from a JSON response.
+
+    Args:
+        url (str): The URL to fetch JSON data from.
+        project_name (str): The name of the project to search for.
+
+    Returns:
+        str or None: The project ID if found, otherwise None.
+    """
+    try:
+        # Fetch the JSON response from the URL
+        response = requests.get(url)
+        response.raise_for_status()  # Ensure the request was successful
+        data = response.json()
+        
+        # Traverse the 'values' list to find the project
+        for project in data.get("values", []):
+            if project["metadata"].get("name") == project_name:
+                return project["metadata"].get("id")
+        
+        # Return None if the project name is not found
+        return None
+    except requests.RequestException as e:
+        print(f"Request error: {e}")
+        return None
+    except (KeyError, ValueError) as e:
+        print(f"JSON processing error: {e}")
+        return None

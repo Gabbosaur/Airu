@@ -94,6 +94,40 @@ def get_projects(items, cat):
     except Exception as e:
         return f"Unexpected error: {str(e)}"
 
+@tool(
+    examples=["delete the project with the following name <name>", "remove the project called <name>", "eliminate the project <name>", "can you delete the project <name>", "delete the project <name>", "remove project <name>"],
+    return_direct = True
+)
+def delete_project(input_project_id, cat):
+    """
+    Deletes the project with the given ID from Aruba servers.
+    """
+    try:
+        # Notify about the process
+        cat.send_ws_message(f"Looking for project {input_project_id}..", msg_type='notification')
+
+        # Retrieve the project id from project name
+        project_id = get_project_id_by_name_from_response("http://web_be_1:8000/api/v1/aruba/projects", input_project_id.lower().strip())
+
+        cat.send_ws_message(f"Deleting {input_project_id}..", msg_type='notification')
+
+        # Delete the specific project
+        response = requests.delete(f"http://web_be_1:8000/api/v1/aruba/projects/{project_id}")
+
+        # If response is NOT successful, print the error message
+        if response.status_code != 200:
+            return f"Error deleting project with ID {project_id}: {response.text}"
+
+        prompt = f"""
+Notify the user that the {input_project_id} project has been deleted successfully. Add an meaningful emoji.
+"""
+        return cat.llm(prompt)
+
+    except requests.exceptions.RequestException as e:
+        return f"Error deleting project: {str(e)}"
+    except Exception as e:
+        return f"Unexpected error: {str(e)}"
+
 
 class ProjectStructure(BaseModel):
     name: str = Field(..., min_length=4, max_length=50, description="Name must be 4-50 characters, lowercase, and contain no spaces.")
