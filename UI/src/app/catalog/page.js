@@ -16,6 +16,8 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import SelectedProductsPanel from './SelectedProductsPanel';
 import WidgetCCAT from './Widget_CCAT';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/components/AuthContext/AuthProvider';
 
 const headers = [
   { key: 'flavorName', header: 'Name' },

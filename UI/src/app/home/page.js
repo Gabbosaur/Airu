@@ -135,18 +135,18 @@ export default function LandingPage() {
       <Column lg={16} md={8} sm={4} className="landing-page__r3">
         <InfoSection heading="The Principles">
           <InfoCard
-            heading="Carbon is Open"
-            body="It's a distributed effort, guided by the principles of the open-source movement. Carbon's users are also it's makers, and everyone is encouraged to contribute."
+            heading="Airu is Revolutionary"
+            body="Airu is a revolutionary Cloud Budget Assistant designed to streamline and optimize your experience with Aruba Cloud resources. Its intuitive user interface features simple yet powerful forms for quick setup and configuration, ensuring even the most complex tasks are accessible to all users."
             icon={() => <Advocate size={32} />}
           />
           <InfoCard
-            heading="Carbon is Modular"
-            body="Carbon's modularity ensures maximum flexibility in execution. It's components are designed to work seamlessly with each other, in whichever combination suits the needs of the user."
+            heading="Airu is Intelligent"
+            body="What truly sets Airu apart is its agentic AI-powered chat. Unlike traditional conversational AI, Airu integrates advanced AI capabilities with direct API access to Aruba services. This enables it to move beyond passive dialogue into active problem-solving, resource management, and cost optimization. With Airu, you can not only discuss your cloud needs but also act on them in real-time — deploying resources, monitoring usage, and adjusting budgets with seamless AI-driven interactions."
             icon={() => <AcceleratingTransformation size={32} />}
           />
           <InfoCard
-            heading="Carbon is Consistent"
-            body="Based on the comprehensive IBM Design Language, every element and component of Carbon was designed from the ground up to work elegantly together to ensure consistent, cohesive user experiences."
+            heading="Airu is Dynamic"
+            body="Airu transforms cloud management into a dynamic, intelligent, and efficient experience. Whether you're scaling applications, troubleshooting issues, or controlling costs, Airu is your trusted partner in making smarter cloud decisions. "
             icon={() => <Globe size={32} />}
           />
         </InfoSection>
