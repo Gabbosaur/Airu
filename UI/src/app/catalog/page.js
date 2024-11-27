@@ -29,7 +29,6 @@ const headers = [
 
 const getRowItems = (rows) =>
   rows.map((row) => {
-    console.debug(row); // Log the row data for debugging
     return {
       id: row._id,
       key: row._id,
