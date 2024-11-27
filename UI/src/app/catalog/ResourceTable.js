@@ -134,28 +134,29 @@ const ProductTable = ({ rows, headers, onAdd }) => {
                             </div>
                           )}
 
-                          {row.cells[5].value !== 'elasticIp' && (
-                            <div>
-                              <span>
-                                Add persistent storage with the following size
-                                (GB)
-                              </span>
-                              <input
-                                type="number"
-                                min="0"
-                                max="16000"
-                                placeholder="0-16000"
-                                value={options.blockStorage || ''}
-                                onChange={(e) =>
-                                  handleInputChange(
-                                    row.id,
-                                    'blockStorage',
-                                    e.target.value
-                                  )
-                                }
-                              />
-                            </div>
-                          )}
+                          {row.cells[5].value !== 'elasticIp' &&
+                            row.cells[5].value !== 'kaas' && (
+                              <div>
+                                <span>
+                                  Add persistent storage with the following size
+                                  (GB)
+                                </span>
+                                <input
+                                  type="number"
+                                  min="0"
+                                  max="16000"
+                                  placeholder="0-16000"
+                                  value={options.blockStorage || ''}
+                                  onChange={(e) =>
+                                    handleInputChange(
+                                      row.id,
+                                      'blockStorage',
+                                      e.target.value
+                                    )
+                                  }
+                                />
+                              </div>
+                            )}
 
                           {/* Quantity input and Add button container */}
                           <div

@@ -44,13 +44,14 @@ const getRowItems = (rows) =>
       flavorDescription: row.flavor?.description || '', // Use empty string if flavor is null or undefined
       flavorOsPlatform: row.flavor?.osPlatform || '', // Use empty string if flavor is null or undefined
       template:
-        row.flavor?.osPlatform === 'Windows'
+        row.flavor?.osPlatform === 'windows'
           ? '65f42d72d82fd1d45ce03b0a'
           : '66045544b146b450ddb90975',
       flavorCpu: row.flavor?.cpu || '', // Use empty string if flavor is null or undefined
       flavorRam: row.flavor?.ram || '', // Use empty string if flavor is null or undefined
       flavorDisk: row.flavor?.disk || '', // Use empty string if flavor is null or undefined
       flavorId: row.flavor?.id || '', // Use empty string if flavor is null or undefined
+      flavorCode: row.flavor?.code || '', // Use empty string if flavor is null or undefined
       tiers: row.tiers,
       unitPrice1Month: row.reservations[0].price,
       unitPrice1Year: row.reservations[1].price,

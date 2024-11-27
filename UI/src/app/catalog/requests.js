@@ -1,3 +1,5 @@
+import { get } from 'axios';
+
 const axios = require('axios');
 
 const API_BASE_URL = 'http://localhost:8000/api/v1/aruba';
@@ -21,7 +23,7 @@ const createProject = async () => {
   console.log('Creating project...');
   let data = JSON.stringify({
     metadata: {
-      name: 'hackathon-test',
+      name: 'hackathon-test-prod',
       tags: ['hackathon-test'],
     },
     properties: {
@@ -33,7 +35,7 @@ const createProject = async () => {
   let config = {
     method: 'post',
     maxBodyLength: Infinity,
-    url: 'http://localhost:8000/api/v1/aruba/projects',
+    url: `${API_BASE_URL}/projects`,
     headers: {
       accept: '*/*',
       'Content-Type': 'application/json',
@@ -56,7 +58,7 @@ const getProject = async (projectId) => {
   let config = {
     method: 'get',
     maxBodyLength: Infinity,
-    url: 'http://localhost:8000/api/v1/aruba/projects/' + projectId,
+    url: `${API_BASE_URL}/projects/${projectId}`,
     headers: {
       accept: 'application/json',
       Authorization: 'Bearer ',
@@ -87,7 +89,7 @@ const createVpc = async (projectId) => {
   let config = {
     method: 'post',
     maxBodyLength: Infinity,
-    url: `http://localhost:8000/api/v1/aruba/projects/${projectId}/providers/Aruba.Network/vpcs`,
+    url: `${API_BASE_URL}/projects/${projectId}/providers/Aruba.Network/vpcs`,
     headers: {
       accept: 'text/plain',
       'Content-Type': 'application/json',
@@ -110,7 +112,7 @@ const getVpc = async (projectId, vpcId) => {
   let config = {
     method: 'get',
     maxBodyLength: Infinity,
-    url: `http://localhost:8000/api/v1/aruba/projects/${projectId}/providers/Aruba.Network/vpcs/${vpcId}`,
+    url: `${API_BASE_URL}/projects/${projectId}/providers/Aruba.Network/vpcs/${vpcId}`,
     headers: {
       Authorization: 'Bearer ',
     },
@@ -119,6 +121,7 @@ const getVpc = async (projectId, vpcId) => {
   try {
     const response = await axios.request(config);
     console.log(JSON.stringify(response.data));
+    return response.data.status.state;
   } catch (error) {
     console.error(error);
     throw new Error('Failed to get VPC');
@@ -129,8 +132,8 @@ const createSubnet = async (projectId, vpcId) => {
   console.log('Creating subnet...');
   let data = JSON.stringify({
     metadata: {
-      name: 'kaas-subnet-1',
-      tags: ['tag-1', 'tag-2'],
+      name: 'hackathon-test',
+      tags: ['hackathon-test'],
     },
     properties: {
       type: 'Advanced',
@@ -147,7 +150,7 @@ const createSubnet = async (projectId, vpcId) => {
   let config = {
     method: 'post',
     maxBodyLength: Infinity,
-    url: `http://localhost:8000/api/v1/aruba/projects/${projectId}/providers/Aruba.Network/vpcs/${vpcId}/subnets`,
+    url: `${API_BASE_URL}/projects/${projectId}/providers/Aruba.Network/vpcs/${vpcId}/subnets`,
     headers: {
       accept: 'text/plain',
       'Content-Type': 'application/json',
@@ -167,7 +170,7 @@ const createSubnet = async (projectId, vpcId) => {
 };
 
 const getSubnet = async (projectId, vpcId, subnetId) => {
-  const url = `http://localhost:8000/api/v1/aruba/projects/${projectId}/providers/Aruba.Network/vpcs/${vpcId}/subnets/${subnetId}`;
+  const url = `${API_BASE_URL}/projects/${projectId}/providers/Aruba.Network/vpcs/${vpcId}/subnets/${subnetId}`;
   const config = {
     method: 'get',
     maxBodyLength: Infinity,
@@ -180,14 +183,14 @@ const getSubnet = async (projectId, vpcId, subnetId) => {
   try {
     const response = await axios.request(config);
     console.log('Subnet details:', JSON.stringify(response.data, null, 2)); // Formattazione per una migliore leggibilità
-    return response.data; // Restituisce i dettagli della subnet
+    return response.data.status.state;
   } catch (error) {
     console.error('Failed to get subnet:', error.message);
     throw new Error('Unable to retrieve subnet details');
   }
 };
 
-const createKaas = async (projectId, vpcId, subnetId, product) => {
+const createKaas = async (projectId, vpcId, subnetId, product, i) => {
   const data = JSON.stringify({
     metadata: {
       name: 'hackathon-test',
@@ -204,17 +207,17 @@ const createKaas = async (projectId, vpcId, subnetId, product) => {
         uri: `/projects/${projectId}/providers/Aruba.Network/vpcs/${vpcId}/subnets/${subnetId}`,
       },
       nodeCidr: {
-        address: '192.168.59.0/25',
-        name: 'kaas-test-cidr',
+        address: '192.168.59.' + i + '/24',
+        name: 'cidr-hackathon-test-' + i,
       },
       securityGroup: {
-        name: 'kaas-test-sg',
+        name: 'security-group-hackathon-test-' + i,
       },
       nodePools: [
         {
-          name: 'hackathon-test',
-          nodes: product.quantity,
-          instance: product.resourceName,
+          name: 'node-pools-hackathon-test-' + i,
+          nodes: 1,
+          instance: product.flavorName,
           dataCenter: 'ITBG-1',
         },
       ],
@@ -274,7 +277,7 @@ const getSecurityGroup = async (projectId, vpcId, securityGroupId) => {
   try {
     const response = await axios.request(config);
     console.log('Security group details:', response.data);
-    return response.data;
+    return response.data.status.state;
   } catch (error) {
     console.error('Error retrieving security group:', error.message);
     throw error;
@@ -286,15 +289,30 @@ const createCloudServer = async (
   vpcId,
   subnetId,
   securityGroupId,
-  product,
   elasticIpId,
-  blockStorageId
+  blockStorageId,
+  product,
+  i
 ) => {
+  const volumes = [];
+  if (blockStorageId !== '') {
+    volumes.push({
+      uri: `/projects/${projectId}/providers/Aruba.Storage/volumes/${blockStorageId}`,
+    });
+  }
+
+  let elasticIp = {};
+  if (product.elasticIP) {
+    elasticIp = {
+      uri: `/projects/${projectId}/providers/Aruba.Network/elasticIps/${elasticIpId}`,
+    };
+  }
+
   const data = JSON.stringify({
     metadata: {
-      name: 'cloud-server-1-win',
+      name: 'hackathon-test-' + i,
       location: { value: 'ITBG-Bergamo' },
-      tags: ['tag-1'],
+      tags: ['hackathon-test'],
     },
     properties: {
       dataCenter: 'ITBG-1',
@@ -302,14 +320,12 @@ const createCloudServer = async (
         uri: `/projects/${projectId}/providers/Aruba.Network/vpcs/${vpcId}`,
       },
       vpcPreset: false,
-      flavorId: product.flavorId,
+      flavorId: product.flavorCode,
       template: {
         uri: `/providers/Aruba.Compute/templates/${product.template}`,
       },
       addElasticIp: product.elasticIP,
-      elasticIp: {
-        uri: `/projects/${projectId}/providers/Aruba.Network/elasticIps/${elasticIpId}`,
-      },
+      elasticIp: elasticIp,
       initialPassword: 'Aruba2024!',
       subnets: [
         {
@@ -321,17 +337,13 @@ const createCloudServer = async (
           uri: `/projects/${projectId}/providers/Aruba.Network/vpcs/${vpcId}/securityGroups/${securityGroupId}`,
         },
       ],
-      volumes: [
-        {
-          uri: `/projects/${projectId}/providers/Aruba.Storage/blockStorages/${blockStorageId}`,
-        },
-      ],
+      volumes: volumes,
     },
   });
 
   const config = createConfig(
     'post',
-    `${API_BASE_URL}/projects/${projectId}/providers/Aruba.Compute/cloudServers`,
+    `${API_BASE_URL}/projects/${projectId}/providers/Aruba.Compute/cloudServers?api-version=1.1`,
     data
   );
 
@@ -345,12 +357,12 @@ const createCloudServer = async (
   }
 };
 
-const createElasticIp = async (projectId) => {
+const createElasticIp = async (projectId, i) => {
   console.log('Creating elastic IP...');
 
   let data = JSON.stringify({
     metadata: {
-      name: 'elastic-ip-hackathon', // Nome significativo
+      name: 'elastic-ip-hackathon' + i,
       tags: ['hackathon-test'],
       location: {
         value: 'ITBG-Bergamo',
@@ -358,7 +370,7 @@ const createElasticIp = async (projectId) => {
     },
     properties: {
       billingPlan: {
-        billingPeriod: 'Hour', // Periodo di fatturazione
+        billingPeriod: 'Hour',
       },
     },
   });
@@ -366,7 +378,7 @@ const createElasticIp = async (projectId) => {
   let config = {
     method: 'post',
     maxBodyLength: Infinity,
-    url: `http://localhost:8000/api/v1/aruba/projects/${projectId}/providers/Aruba.Network/elasticIps`,
+    url: `${API_BASE_URL}/projects/${projectId}/providers/Aruba.Network/elasticIps`,
     headers: {
       accept: 'text/plain',
       'Content-Type': 'application/json',
@@ -378,10 +390,90 @@ const createElasticIp = async (projectId) => {
   try {
     const response = await axios.request(config);
     console.log('Elastic IP created:', JSON.stringify(response.data));
-    return response.data.metadata.id; // Restituisce l'ID dell'Elastic IP
+    return response.data.metadata.id;
   } catch (error) {
     console.error('Failed to create Elastic IP:', error.message);
     throw new Error('Elastic IP creation failed');
+  }
+};
+
+const getElasticIp = async (projectId, elasticIpId) => {
+  try {
+    let config = {
+      method: 'get',
+      maxBodyLength: Infinity,
+      url: `${API_BASE_URL}/projects/${projectId}/providers/Aruba.Network/elasticIps/${elasticIpId}`,
+      headers: {
+        Authorization: 'Bearer ', // Add your token here
+      },
+    };
+
+    const response = await axios.request(config);
+    console.log('Elastic IP:', JSON.stringify(response.data));
+    return response.data.status.state;
+  } catch (error) {
+    console.error('Error fetching Elastic IP:', error);
+    throw error; // Rethrow the error if needed
+  }
+};
+
+const createBlockStorage = async (projectId, i, blockStorage) => {
+  console.log('Creating block storage...');
+
+  let data = JSON.stringify({
+    metadata: {
+      name: `block-storage-hackathon-test-${i}`,
+      location: {
+        value: 'ITBG-Bergamo',
+      },
+      tags: ['tag-1'],
+    },
+    properties: {
+      sizeGb: blockStorage,
+      billingPeriod: 'Hour',
+      dataCenter: 'ITBG-1',
+    },
+  });
+
+  let config = {
+    method: 'post',
+    maxBodyLength: Infinity,
+    url: `${API_BASE_URL}/projects/${projectId}/providers/Aruba.Storage/blockStorages`,
+    headers: {
+      accept: 'text/plain',
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer ',
+    },
+    data: data,
+  };
+
+  try {
+    const response = await axios.request(config);
+    console.log('Block storage created:', JSON.stringify(response.data));
+    return response.data.metadata.id;
+  } catch (error) {
+    console.error('Error creating block storage:', error.message);
+    throw error;
+  }
+};
+
+const getBlockStorage = async (projectId, blockStorageId) => {
+  try {
+    let config = {
+      method: 'get',
+      maxBodyLength: Infinity,
+      url: `${API_BASE_URL}/projects/${projectId}/providers/Aruba.Storage/blockStorages/${blockStorageId}`,
+      headers: {
+        Authorization: 'Bearer ', // Add your token here
+      },
+    };
+
+    const response = await axios.request(config);
+    console.log('Block Storage:', JSON.stringify(response.data));
+    return response.data.status.state; // Return the data if needed
+  } catch (error) {
+    console.error('Error fetching Block Storage:', error);
+    throw error; // Rethrow the error if needed
   }
 };
 
@@ -390,59 +482,119 @@ export const deploySolution = async (uniqueProducts) => {
   console.debug(uniqueProducts);
   if (uniqueProducts.length === 0) return;
 
-  console.log('Deploying solution...');
   try {
-    const projectId = await createProject();
-    console.debug('Project ID:', projectId);
+    //     const projectId = await createProject();
+    //     console.debug('Project ID:', projectId);
 
-    //await sleep(5000); // Wait for the project to be created
-    await getProject(projectId);
+    //     await sleep(5000); // Wait for the project to be created
+    //     await getProject(projectId);
 
-    // const vpcId = await createVpc(projectId);
-    // console.debug('VPC ID:', vpcId);
+    //     const vpcId = await createVpc(projectId);
+    //     console.debug('VPC ID:', vpcId);
 
-    // await sleep(5000); // Wait for the VPC to be created
-    // await getVpc(projectId, vpcId);
-
-    // const subnetId = await createSubnet(projectId, vpcId);
-    // console.debug('Subnet ID:', subnetId);
-
-    // await sleep(5000); // Wait for the subnet to be created
-
-    // uniqueProducts.forEach((product) => {
-    //     if (product.resourceName === 'elasticIp') {
-    //       createElasticIp(projectId);
-    //     } else if (product.resourceName === 'blockStorage') {
-    //       createBlockStorage(projectId);
-    //     } else if (product.resourceName === 'cloudServer') {
-    //       let elasticIpId = '';
-    //       if (product.elasticIP) elasticIpId = createElasticIp(projectId);
-    //       let blockStorageId = '';
-    //       if (product.blockStorageId) blockStorageId = createElasticIp(projectId);
-    //       createCloudServer(
-    //         projectId,
-    //         vpcId,
-    //         subnetId,
-    //         securityGroupId,
-    //         product.flavorName,
-    //         elasticIpId,
-    //         blockStorageId
-    //       );
-    //     } else if (product.resourceName === 'kaas') {
-    //       let blockStorageId = '';
-    //       if (product.blockStorageId) blockStorageId = createElasticIp(projectId);
-    //       createKaas(
-    //         projectId,
-    //         vpcId,
-    //         subnetId,
-    //         securityGroupId,
-    //         product.flavorName,
-    //         blockStorageId
-    //       );
+    //     while(true) {
+    //         await sleep(30000); // Wait for the VPC to be created
+    //         const vpcState = await getVpc(projectId, vpcId);
+    //         if( vpcState === 'Active')
+    //             break;
+    //         console.debug('VPC state: creating');
     //     }
-    //   });
+    //     console.debug('VPC state: created');
+
+    //     const subnetId = await createSubnet(projectId, vpcId);
+    //     console.debug('Subnet ID:', subnetId);
+    //     while(true) {
+    //         await sleep(30000);
+    //         const subentState = await getSubnet(projectId, vpcId, subnetId);
+    //         if( subentState === 'Active')
+    //             break;
+    //         console.debug('Subnet state: creating');
+    //     }
+    //     console.debug('Subnet state: created');
+
+    //     // const securityGroupId = await createSecurityGroup(projectId, vpcId);
+    //     // console.debug('Security Group ID:', subnetId);
+    //     // while(true) {
+    //     //     await sleep(30000);
+    //     //     const subentState = await getSecurityGroup(projectId, vpcId, securityGroupId);
+    //     //     if( subentState === 'Active')
+    //     //         break;
+    //     //     console.debug('Security Group state: creating');
+    //     // }
+    //     // console.debug('Security Group state: created');
+
+    //     // const projectId = "6747148ab5516a6b8f90fed0";
+    //     // const vpcId = "6747148af37b2b43c3961e12";
+    //     // const subnetId = "674714e5f37b2b43c3961e23";
+    //     // const securityGroupId = "67471526f37b2b43c3961e34";
+    //     // const securityGroupName = "hackathon-test";
+
+    //     uniqueProducts.forEach(async (product) => {
+    //         if (product.resourceName === 'elasticIp') {
+    //             for (let i = 0; i < product.quantity; i++) {
+    //                 createElasticIp(projectId, i);
+    //             }
+    //         } else if (product.resourceName === 'blockStorage') {
+    //             for (let i = 0; i < product.quantity; i++) {
+    //                 createBlockStorage(projectId, i, product.blockStorage);
+    //             }
+    //         } else if (product.resourceName === 'cloudServer') {
+
+    //             for (let i = 0; i < product.quantity; i++) {
+    //                 let elasticIpId = '';
+    //           if (product.elasticIP) {
+    //             elasticIpId = await createElasticIp(projectId, i);
+    //             console.debug("Elastic IP ID:", elasticIpId);
+    //             while(true) {
+    //                 await sleep(30000);
+    //                 const elasticIPState = await getElasticIp(projectId, elasticIpId);
+    //                 if( elasticIPState === 'Active' || elasticIPState === 'NotUsed') {
+    //                     console.debug('ElasticIP state: created');
+    //                     break;
+    //                 }
+    //                 console.debug('ElasticIP state: creating');
+    //                 }
+    //             }
+    //           let blockStorageId = '';
+    //           if (product.blockStorage) {
+    //             blockStorageId = await createBlockStorage(projectId, i, product.blockStorage);
+    //             while(true) {
+    //                 await sleep(30000);
+    //                 const blockstorageState = await getBlockStorage(projectId, blockStorageId);
+    //                 if( blockstorageState === 'Active' || blockstorageState === 'NotUsed') {
+    //                     console.debug('Blockstorage state: created');
+    //                     break;
+    //                 }
+    //                 console.debug('Blockstorage state: creating');
+    //                 }
+    //           }
+    //           createCloudServer(
+    //             projectId,
+    //             vpcId,
+    //             subnetId,
+    //             securityGroupId,
+    //             elasticIpId,
+    //             blockStorageId,
+    //             product,
+    //             i
+    //           );
+    //         }
+    //         } else if (product.resourceName === 'kaas') {
+    //             for (let i = 0; i < product.quantity; i++) {
+    //                 createKaas(
+    //                     projectId,
+    //                     vpcId,
+    //                     subnetId,
+    //                     product,
+    //                     i
+    //                   );
+    //             }
+    //         }
+    //       });
     console.log('Deployment completed successfully!');
+    return true;
   } catch (error) {
     console.error('Error during deployment:', error.message);
+    return false;
   }
 };
