@@ -407,7 +407,7 @@ export const login = async (username, password) => {
   try {
     const response = await axios.request(config);
     console.log(JSON.stringify(response.data));
-    return response.data.metadata.id;
+    return response
   } catch (error) {
     console.error(error);
     throw new Error('Failed login');

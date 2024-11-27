@@ -16,9 +16,19 @@ const LoginPage = () => {
     e.preventDefault();
     console.log('Login submitted', { username, password });
     
+    
+
     login(username, password)
       .then((response) => {
+        const { accessToken } = response.data;
+        localStorage.setItem('accessToken', accessToken);
         console.log('Login successful', response);
+        const cookies = document.cookie.split(';').reduce((cookies, cookie) => {
+          const [name, value] = cookie.split('=').map(c => c.trim());
+          cookies[name] = value;
+          return cookies;
+        }, {});
+        console.log('Cookies:', cookies);
       })
       .catch((error) => {
         console.error('Login failed', error);
