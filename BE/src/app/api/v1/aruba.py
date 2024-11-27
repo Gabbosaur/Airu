@@ -497,7 +497,9 @@ async def create_cloud_server(request: Request, projectIdCreated: str):
         'Content-Type': 'application/json'
     }
     params = request.query_params
-    response = requests.request("GET", url, headers=headers, params=params)
+    response = requests.request("POST", url, headers=headers, params=params, json=body)
+    logging.info("Response create cloud server")
+    logging.info(response.json())
     return response.json()
 
 @router.get("/aruba/projects/{projectIdCreated}/providers/Aruba.Compute/cloudServers/{cloudServerId}")
@@ -517,17 +519,53 @@ async def get_cloud_server(request: Request, projectIdCreated: str, cloudServerI
 
 @router.get("/aruba/projects/{projectIdCreated}/providers/Aruba.Storage/blockStorages")
 async def get_block_storages(request: Request, projectIdCreated: str):
-     logging.info("Getting block storages")
-     url = f"{aruba_base_url}/projects/{projectIdCreated}/providers/Aruba.Storage/blockStorages"
-     headers = {
+    logging.info("Getting block storages")
+    url = f"{aruba_base_url}/projects/{projectIdCreated}/providers/Aruba.Storage/blockStorages"
+    headers = {
          'Authorization': dict(request.scope['headers'])['Authorization'],
          'Content-Type': 'application/json'
         }
-     params = request.query_params
-     response = requests.request("GET", url, headers=headers, params=params)
-         
+    params = request.query_params
+    response = requests.request("GET", url, headers=headers, params=params)
+    return response.json()
+
+@router.post("/aruba/projects/{projectIdCreated}/providers/Aruba.Storage/blockStorages")
+async def create_block_storage(request: Request, projectIdCreated: str):
+    body = await request.json()
+    logging.info("Creating block storage")
+    logging.info(body)
+    url = f"{aruba_base_url}/projects/{projectIdCreated}/providers/Aruba.Storage/blockStorages"
+    headers = {
+        'Authorization': dict(request.scope['headers'])['Authorization'],
+        'Content-Type': 'application/json'
+    }
+    response = requests.request("POST", url, headers=headers, json=body)
+    return response.json()
     
-    
+@router.get("/aruba/projects/{projectIdCreated}/providers/Aruba.Storage/blockStorages/{blockStorageId}")
+async def get_block_storage(request: Request, projectIdCreated: str, blockStorageId: str):
+    logging.info("Getting block storage")
+    url = f"{aruba_base_url}/projects/{projectIdCreated}/providers/Aruba.Storage/blockStorages/{blockStorageId}"
+    headers = {
+        'Authorization': dict(request.scope['headers'])['Authorization'],
+        'Content-Type': 'application/json'
+    }
+    response = requests.request("GET", url, headers=headers)
+    return response.json()
+
+@router.put("/aruba/projects/{projectIdCreated}/providers/Aruba.Storage/blockStorages/{blockStorageId}")
+async def update_block_storage(request: Request, projectIdCreated: str, blockStorageId: str):
+    body = await request.json()
+    logging.info("Updating block storage")
+    logging.info(body)
+    url = f"{aruba_base_url}/projects/{projectIdCreated}/providers/Aruba.Storage/blockStorages/{blockStorageId}"
+    headers = {
+        'Authorization': dict(request.scope['headers'])['Authorization'],
+        'Content-Type': 'application/json'
+    }
+    response = requests.request("PUT", url, headers=headers, json=body)
+    return response.json()
+
 #
 # 06-Frontend
 #
