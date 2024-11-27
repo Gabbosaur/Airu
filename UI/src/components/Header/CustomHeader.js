@@ -38,6 +38,9 @@ const CustomHeader = () => (
           <Link href="/ai-assistant" passHref legacyBehavior>
             <HeaderMenuItem>AI Assistant</HeaderMenuItem>
           </Link>
+          <Link href="/login" passHref legacyBehavior>
+            <HeaderMenuItem>Login</HeaderMenuItem>
+          </Link>
         </HeaderNavigation>
         <SideNav
           aria-label="Side navigation"
@@ -55,6 +58,13 @@ const CustomHeader = () => (
             <HeaderSideNavItems>
               <Link href="/ai-assistant" passHref legacyBehavior>
                 <HeaderMenuItem>AI Assistant</HeaderMenuItem>
+              </Link>
+            </HeaderSideNavItems>
+          </SideNavItems>
+          <SideNavItems>
+            <HeaderSideNavItems>
+              <Link href="/login" passHref legacyBehavior>
+                <HeaderMenuItem>Login</HeaderMenuItem>
               </Link>
             </HeaderSideNavItems>
           </SideNavItems>
