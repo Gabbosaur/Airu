@@ -1,121 +1,22 @@
-from sympy import sympify
 from cat.mad_hatter.decorators import tool, hook # type: ignore
-from datetime import datetime
-import requests, json, csv
+import requests, json
+from typing import List
 from io import StringIO
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, validator
 from cat.experimental.form import CatForm, CatFormState, form
 from cat.log import log
-
-def minify_json(json_data):
-    """
-    Minifies the JSON data by removing specific fields.
-
-    Args:
-        json_data (list or dict): The JSON data as a Python object.
-
-    Returns:
-        list: The minified JSON as a list of Python dictionaries.
-    """
-    # Ensure the input is a list (for multiple catalog entries)
-    if not isinstance(json_data, list):
-        raise ValueError("Invalid JSON data format: Expected a list of objects")
-
-    # Fields to remove from the root level
-    fields_to_remove = {"_id", "currencyCode", "unitOfMeasure"}
-
-    # Iterate through each JSON object in the list
-    for obj in json_data:
-        if not isinstance(obj, dict):
-            raise ValueError("Invalid JSON data format: Expected dictionary items in the list")
-        # Remove root-level fields
-        for field in fields_to_remove:
-            obj.pop(field, None)
-        
-        # Remove specific fields within the 'flavor' object if it exists
-        if 'flavor' in obj and isinstance(obj['flavor'], dict):
-            obj['flavor'].pop('code', None)
-            obj['flavor'].pop('id', None)
-    
-    return json_data
-
-
-
-def json_to_csv_variable(json_data):
-    """
-    Converts a JSON object to a CSV format and returns it as a string.
-
-    Args:
-        json_data (list): The minified JSON as a list of dictionaries.
-
-    Returns:
-        str: The CSV representation of the JSON data.
-    """
-    # # Ensure input is a list
-    # if not isinstance(json_data, list):
-    #     raise ValueError("JSON data must be a list of dictionaries.")
-
-    # Flatten the structure where needed
-    flattened_data = []
-    for item in json_data:
-        flat_item = item.copy()
-
-        # If there is a 'flavor' key, flatten its contents
-        if 'flavor' in flat_item and isinstance(flat_item['flavor'], dict):
-            for key, value in flat_item['flavor'].items():
-                flat_item[f"flavor_{key}"] = value
-            del flat_item['flavor']
-
-        # If there are nested lists like 'reservations' or 'tiers', handle them as JSON strings
-        if 'reservations' in flat_item and isinstance(flat_item['reservations'], list):
-            flat_item['reservations'] = json.dumps(flat_item['reservations'])
-        if 'tiers' in flat_item and isinstance(flat_item['tiers'], list):
-            flat_item['tiers'] = json.dumps(flat_item['tiers'])
-
-        flattened_data.append(flat_item)
-
-    # Get all unique keys from the data to serve as CSV headers
-    keys = set()
-    for item in flattened_data:
-        keys.update(item.keys())
-    keys = sorted(keys)  # Sorting keys for consistent structure
-
-    # Write to an in-memory string buffer
-    output = StringIO()
-    writer = csv.DictWriter(output, fieldnames=keys)
-    writer.writeheader()
-    writer.writerows(flattened_data)
-
-    # Retrieve the CSV content as a string
-    csv_content = output.getvalue()
-    output.close()
-
-    return csv_content
-
+from datetime import datetime
+from .utils import *
 
 @tool(
     examples=["get the time", "what is the time"],
-    return_direct = True
+    return_direct = False
 )
 def get_the_time(tool_input, cat):
     """Returns the current time"""
     cat.send_ws_message("Looking at the time..", msg_type='notification')
     return f"teh fokken time is {str(datetime.now())}"
 
-@tool(
-    examples=["calculate this", "what is the result of this calculation", "how much am I going to spend if..."],
-    return_direct = False
-)
-def calculate(items, cat) -> float:
-    """
-    Used when there is a mathematical operation to be done
-    """
-    try:
-        cat.send_ws_message("Calculating..", msg_type='notification')
-        total = eval(items)
-        return str(total)
-    except Exception as e:
-        return f"Error in calculation: {str(e)}"
 
 @tool(
     examples=["show me the catalog", "get the catalog"],
@@ -130,7 +31,7 @@ def get_catalog(items, cat):
         cat.send_ws_message("Loading catalog..", msg_type='notification')
 
         # Fetch the catalog from the API
-        response = requests.get("http://cielospeso_web_1:8000/api/v1/aruba/catalog_products")
+        response = requests.get("http://web_be_1:8000/api/v1/aruba/catalog_products")
 
         # Ensure the response is JSON
         if response.headers.get('Content-Type') != 'application/json':
@@ -172,7 +73,7 @@ def get_projects(items, cat):
         cat.send_ws_message("Looking for active projects..", msg_type='notification')
 
         # Fetch the projects from the API
-        response = requests.get("http://cielospeso_web_1:8000/api/v1/aruba/projects")
+        response = requests.get("http://web_be_1:8000/api/v1/aruba/projects")
 
         # Ensure the response is JSON
         if response.headers.get('Content-Type') != 'application/json':
@@ -193,74 +94,104 @@ def get_projects(items, cat):
     except Exception as e:
         return f"Unexpected error: {str(e)}"
 
-# @hook
-# def before_cat_sends_message(message, cat):
-    
-#     prompt = f'Enhance the following message with 1 emoji at the end: {message["content"]}'
-#     message["content"] = cat.llm(prompt)
 
-#     return message
+class ProjectStructure(BaseModel):
+    name: str = Field(..., min_length=4, max_length=50, description="Name must be 4-50 characters, lowercase, and contain no spaces.")
+    description: str
+
+    @validator("name")
+    def validate_name(cls, name):
+        """
+        Custom validation to ensure 'name' is 4-50 characters, all lowercase, and contains no spaces.
+        """
+        if not name.islower():
+            raise ValueError("Name must be all lowercase.")
+        if " " in name:
+            raise ValueError("Name must not contain spaces.")
+        return name
 
 
+@form
+class ProjectCreation(CatForm): #
+    description = "Aruba Projects" #
+    model_class = ProjectStructure #
+    start_examples = [ #
+        "i want to create a new project",
+        "setup a new project",
+        "establish a new project",
+    ]
+    stop_examples = [ #
+        "abort the creation",
+        "exit from the creation",
+        "no more creation",
+    ]
+    ask_confirm = True #
 
-# class PizzaOrder(BaseModel): #
-#     pizza_type: str
-#     phone: str
-#     address: str
+    def submit(self, form_data):
+        """
+        Submits the project data to the API with exception handling.
+        """
+        try:
+            # Perform the API call
+            response = requests.post(
+                "http://web_be_1:8000/api/v1/aruba/projects",
+                json={
+                    "metadata": {
+                        "name": form_data["name"],
+                        "tags": form_data.get("tags", ["airu-generated"]),  # Default to an empty list if not provided
+                    },
+                    "properties": {
+                        "description": form_data.get("description", ""),  # Default to an empty string
+                        "default": form_data.get("default", False)  # Use the actual boolean value
+                    }
+                }
+            )
+            # Raise an HTTPError if the response contains an HTTP error status code
+            response.raise_for_status()
+            prompt = f"""
+            Summarize the following information, focus on the response status and add a relevant emoji to the response.
+            If the response is successful then say that the project was successfully created. Otherwise, explain the error.
+            User input: {form_data}
+            Server response: {response.json()}
+            """
+            # Return success message
+            return {
+                "output": self.cat.llm(prompt)
+            }
 
+        except requests.exceptions.HTTPError as http_err:
+            # Handle HTTP errors (e.g., 4xx or 5xx responses)
+            return {
+                "output": f"HTTP error occurred: {http_err}. Please check the request data and try again."
+            }
 
-# @form
-# class PizzaForm(CatForm): #
-#     description = "Pizza Order" #
-#     model_class = PizzaOrder #
-#     start_examples = [ #
-#         "ordinare una pizza",
-#         "voglio fare un ordine per la pizza",
-#         "i want to order a pizza",
-#         "i need a pizza order",
-#     ]
-#     stop_examples = [ #
-#         "non ho più voglia di ordinare",
-#         "arrivederci",
-#         "no more order",
-#     ]
-#     ask_confirm = True #
+        except requests.exceptions.ConnectionError as conn_err:
+            # Handle connection errors (e.g., server is unreachable)
+            return {
+                "output": f"Connection error occurred: {conn_err}. Please ensure the API is accessible."
+            }
 
-#     # # In the form you define
-#     # def message(self): #
-#     #     if self._state == CatFormState.CLOSED: #
-#     #         return {
-#     #             "output": f"Form {type(self).__name__} closed"
-#     #         }
-#     #     missing_fields: List[str] = self._missing_fields #
-#     #     errors: List[str] = self._errors #
-#     #     out: str = f"""
-#     #     The missing information is: {missing_fields}.
-#     #     These are the invalid ones: {errors}
-#     #     """
-#     #     if self._state == CatFormState.WAIT_CONFIRM:
-#     #         out += "\n --> Confirm? Yes or no?"
+        except requests.exceptions.Timeout as timeout_err:
+            # Handle timeout errors
+            return {
+                "output": f"Timeout error occurred: {timeout_err}. The server took too long to respond."
+            }
 
-#     #     return {
-#     #         "output": out
-#     #     }
+        except requests.exceptions.RequestException as req_err:
+            # Catch all other request-related errors
+            return {
+                "output": f"An error occurred while sending the request: {req_err}. Please try again."
+            }
 
-#     def submit(self, form_data):
+        except KeyError as key_err:
+            # Handle missing keys in `form_data`
+            return {
+                "output": f"Missing required form data field: {key_err}. Please check the input and try again."
+            }
 
-#         # Fake API call to order the pizza
-#         response = requests.post(
-#             "https://fakecallpizza/order",
-#             json={
-#                 "pizza_type": form_data["pizza_type"],
-#                 "phone": form_data["phone"],
-#                 "address": form_data["address"]
-#             }
-#         )
-#         response.raise_for_status()
+        except Exception as err:
+            # Handle any other unexpected exceptions
+            return {
+                "output": f"An unexpected error occurred: {err}. Please try again later."
+            }
 
-#         time = response.json()["estimated_time"]
-
-#         # Return a message to the conversation with the order details and estimated time
-#         return {
-#             "output": f"Pizza order on its way: {form_data}. Estimated time: {time}"
-#         }
