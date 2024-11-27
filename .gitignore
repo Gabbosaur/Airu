@@ -1,4 +1,4 @@
-**/*.env
+
 
 /AI/stregatto/data/models
 /AI/stregatto/data/local_vector_memory
