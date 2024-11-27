@@ -21,9 +21,6 @@ import { InfoSection, InfoCard } from '@/components/Info/Info';
 import Image from 'next/image';
 
 export default function LandingPage() {
-
-  
-
   return (
     <Grid className="landing-page" fullWidth>
       <Column lg={16} md={8} sm={4} className="landing-page__banner">
@@ -32,7 +29,7 @@ export default function LandingPage() {
             <a href="/">Getting started</a>
           </BreadcrumbItem>
         </Breadcrumb>
-        <h1 className="landing-page__heading">Cielospeso</h1>
+        <h1 className="landing-page__heading">Airu</h1>
       </Column>
       <Column lg={16} md={8} sm={4} className="landing-page__r2">
         <Tabs defaultSelectedIndex={0}>
@@ -50,9 +47,7 @@ export default function LandingPage() {
                   sm={4}
                   className="landing-page__tab-content"
                 >
-                  <h3 className="landing-page__subheading">
-                    What is Cielospeso?
-                  </h3>
+                  <h3 className="landing-page__subheading">What is Airu?</h3>
                   <p className="landing-page__p">
                     Our web application simplifies and optimizes cloud budgeting
                     for clients. With the Aruba Cloud catalog, it features a

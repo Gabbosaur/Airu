@@ -21,7 +21,7 @@ import Link from 'next/link';
 const CustomHeader = () => (
   <HeaderContainer
     render={({ isSideNavExpanded, onClickSideNavExpand }) => (
-      <Header aria-label="Cielospeso">
+      <Header aria-label="Airu">
         <SkipToContent />
         <HeaderMenuButton
           aria-label="Open menu"
@@ -29,15 +29,15 @@ const CustomHeader = () => (
           isActive={isSideNavExpanded}
         />
         <Link href="/" passHref legacyBehavior>
-          <HeaderName prefix="">Cielospeso</HeaderName>
+          <HeaderName prefix="">Airu</HeaderName>
         </Link>
-        <HeaderNavigation aria-label="Cielospeso">
+        <HeaderNavigation aria-label="Airu">
           <Link href="/catalog" passHref legacyBehavior>
             <HeaderMenuItem>Catalog</HeaderMenuItem>
           </Link>
-          <Link href="/ai-assistant" passHref legacyBehavior>
+          {/* <Link href="/ai-assistant" passHref legacyBehavior>
             <HeaderMenuItem>AI Assistant</HeaderMenuItem>
-          </Link>
+          </Link> */}
           <Link href="/login" passHref legacyBehavior>
             <HeaderMenuItem>Login</HeaderMenuItem>
           </Link>
@@ -52,17 +52,9 @@ const CustomHeader = () => (
               <Link href="/catalog" passHref legacyBehavior>
                 <HeaderMenuItem>Catalog</HeaderMenuItem>
               </Link>
-            </HeaderSideNavItems>
-          </SideNavItems>
-          <SideNavItems>
-            <HeaderSideNavItems>
-              <Link href="/ai-assistant" passHref legacyBehavior>
+              {/* <Link href="/ai-assistant" passHref legacyBehavior>
                 <HeaderMenuItem>AI Assistant</HeaderMenuItem>
-              </Link>
-            </HeaderSideNavItems>
-          </SideNavItems>
-          <SideNavItems>
-            <HeaderSideNavItems>
+              </Link> */}
               <Link href="/login" passHref legacyBehavior>
                 <HeaderMenuItem>Login</HeaderMenuItem>
               </Link>

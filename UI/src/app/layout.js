@@ -3,7 +3,7 @@ import './globals.scss';
 import { Providers } from './providers';
 
 export const metadata = {
-  title: 'Cielospeso',
+  title: 'Airu',
   description: 'Hackathon challenge',
 };
 

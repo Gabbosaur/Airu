@@ -15,6 +15,7 @@ import {
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import SelectedProductsPanel from './SelectedProductsPanel';
+import WidgetCCAT from './Widget_CCAT';
 
 const headers = [
   { key: 'flavorName', header: 'Name' },
@@ -309,102 +310,103 @@ function ProductsPage() {
   }
 
   return (
-    <Grid className="product-page">
-      <Column lg={16} md={8} sm={4} className="product-page__r1">
-        <div style={{ marginBottom: '1rem' }}>
-          <Grid
-            style={{ gap: '1rem', marginBottom: '1rem', marginTop: '1rem' }}
-          >
-            <Column lg={2} md={4} sm={2}>
-              <TextInput
-                labelText="Search"
-                placeholder="Search by Name"
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-              />
-            </Column>
-            <Column lg={2} md={4} sm={2}>
-              <MultiSelect
-                id="os-filter-multiselect"
-                titleText="OS"
-                label="Select OS"
-                items={osOptions}
-                itemToString={(item) => item.label}
-                onChange={({ selectedItems }) =>
-                  setSelectedOs(selectedItems.map((item) => item.id))
-                }
-              />
-            </Column>
-            <Column lg={2} md={4} sm={2}>
-              <MultiSelect
-                id="cpu-filter-multiselect"
-                titleText="CPU"
-                label="Select CPU"
-                items={cpuOptions}
-                itemToString={(item) => item.label}
-                onChange={({ selectedItems }) =>
-                  setSelectedCpu(selectedItems.map((item) => item.id))
-                }
-              />
-            </Column>
-            <Column lg={2} md={4} sm={2}>
-              <MultiSelect
-                id="ram-filter-multiselect"
-                titleText="RAM"
-                label="Select RAM"
-                items={ramOptions}
-                itemToString={(item) => item.label}
-                onChange={({ selectedItems }) =>
-                  setSelectedRam(selectedItems.map((item) => item.id))
-                }
-              />
-            </Column>
-            <Column lg={2} md={4} sm={2}>
-              <MultiSelect
-                id="disk-filter-multiselect"
-                titleText="Disk"
-                label="Select Disk"
-                items={diskOptions}
-                itemToString={(item) => item.label}
-                onChange={({ selectedItems }) =>
-                  setSelectedDisk(selectedItems.map((item) => item.id))
-                }
-              />
-            </Column>
-            <Column lg={2} md={4} sm={2}>
-              <MultiSelect
-                id="category-filter-multiselect"
-                titleText="Category"
-                label="Select Category"
-                items={categoryOptions}
-                itemToString={(item) => item.label}
-                onChange={({ selectedItems }) =>
-                  setSelectedCategory(selectedItems.map((item) => item.id))
-                }
-              />
-            </Column>
-            <Column lg={2} md={4} sm={2}>
-              <NumberInput
-                id="budget-input" // Ensure a unique ID is set for accessibility
-                label="Budget(Euro)"
-                labelText="Enter your budget"
-                placeholder="Enter your budget"
-                onChange={(e) => setBudget(e.target.value)}
-                hideSteppers
-              />
-            </Column>
-            <Column lg={2} md={4} sm={2}>
-              <NumberInput
-                id="duration-input" // Ensure a unique ID is set for accessibility
-                label="Duration(Months)"
-                labelText="Enter your duration"
-                placeholder="Enter your duration"
-                step={0.01} // Allow increments of 0.1 for floating-point input
-                onChange={(e) => setDuration(e.target.value)}
-                hideSteppers
-              />
-            </Column>
-            {/* <Column lg={1} md={2} sm={1}>
+    <div>
+      <Grid className="product-page">
+        <Column lg={16} md={8} sm={4} className="product-page__r1">
+          <div style={{ marginBottom: '1rem' }}>
+            <Grid
+              style={{ gap: '1rem', marginBottom: '1rem', marginTop: '1rem' }}
+            >
+              <Column lg={2} md={4} sm={2}>
+                <TextInput
+                  labelText="Search"
+                  placeholder="Search by Name"
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                />
+              </Column>
+              <Column lg={2} md={4} sm={2}>
+                <MultiSelect
+                  id="os-filter-multiselect"
+                  titleText="OS"
+                  label="Select OS"
+                  items={osOptions}
+                  itemToString={(item) => item.label}
+                  onChange={({ selectedItems }) =>
+                    setSelectedOs(selectedItems.map((item) => item.id))
+                  }
+                />
+              </Column>
+              <Column lg={2} md={4} sm={2}>
+                <MultiSelect
+                  id="cpu-filter-multiselect"
+                  titleText="CPU"
+                  label="Select CPU"
+                  items={cpuOptions}
+                  itemToString={(item) => item.label}
+                  onChange={({ selectedItems }) =>
+                    setSelectedCpu(selectedItems.map((item) => item.id))
+                  }
+                />
+              </Column>
+              <Column lg={2} md={4} sm={2}>
+                <MultiSelect
+                  id="ram-filter-multiselect"
+                  titleText="RAM"
+                  label="Select RAM"
+                  items={ramOptions}
+                  itemToString={(item) => item.label}
+                  onChange={({ selectedItems }) =>
+                    setSelectedRam(selectedItems.map((item) => item.id))
+                  }
+                />
+              </Column>
+              <Column lg={2} md={4} sm={2}>
+                <MultiSelect
+                  id="disk-filter-multiselect"
+                  titleText="Disk"
+                  label="Select Disk"
+                  items={diskOptions}
+                  itemToString={(item) => item.label}
+                  onChange={({ selectedItems }) =>
+                    setSelectedDisk(selectedItems.map((item) => item.id))
+                  }
+                />
+              </Column>
+              <Column lg={2} md={4} sm={2}>
+                <MultiSelect
+                  id="category-filter-multiselect"
+                  titleText="Category"
+                  label="Select Category"
+                  items={categoryOptions}
+                  itemToString={(item) => item.label}
+                  onChange={({ selectedItems }) =>
+                    setSelectedCategory(selectedItems.map((item) => item.id))
+                  }
+                />
+              </Column>
+              <Column lg={2} md={4} sm={2}>
+                <NumberInput
+                  id="budget-input" // Ensure a unique ID is set for accessibility
+                  label="Budget(Euro)"
+                  labelText="Enter your budget"
+                  placeholder="Enter your budget"
+                  onChange={(e) => setBudget(e.target.value)}
+                  hideSteppers
+                />
+              </Column>
+              <Column lg={2} md={4} sm={2}>
+                <NumberInput
+                  id="duration-input" // Ensure a unique ID is set for accessibility
+                  label="Duration(Months)"
+                  labelText="Enter your duration"
+                  placeholder="Enter your duration"
+                  step={0.01} // Allow increments of 0.1 for floating-point input
+                  onChange={(e) => setDuration(e.target.value)}
+                  hideSteppers
+                />
+              </Column>
+              {/* <Column lg={1} md={2} sm={1}>
           <Select
             id="durationType-select" // Ensure a unique ID is set for accessibility
             labelText="day/mon/year"
@@ -418,63 +420,72 @@ function ProductsPage() {
             ))}
           </Select>
           </Column> */}
-          </Grid>
-        </div>
-      </Column>
+            </Grid>
+          </div>
+        </Column>
 
-      {/* Main Content Section */}
-      <Column lg={16} md={8} sm={4}>
-        <Grid style={{ gap: '1rem' }}>
-          {/* Table Section */}
-          <Column lg={12} md={8} sm={4}>
-            <ResourceTable
-              rows={filteredRows}
-              headers={headers}
-              onAdd={handleAddProduct}
-            />
-          </Column>
+        {/* Main Content Section */}
+        <Column lg={16} md={8} sm={4}>
+          <Grid style={{ gap: '1rem' }}>
+            {/* Table Section */}
+            <Column lg={12} md={8} sm={4}>
+              <ResourceTable
+                rows={filteredRows}
+                headers={headers}
+                onAdd={handleAddProduct}
+              />
+            </Column>
 
-          {/* Selected Products Section */}
-          <Column lg={4} md={8} sm={4}>
-            <h4>Select other Tier to Compare:</h4>
-            <br />
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
-              {panelOptions.map((option) => (
-                <Checkbox
-                  id={option.id}
-                  labelText={option.label}
-                  onChange={(e) =>
-                    handlePanelSelection(option.id, e.target.checked)
-                  }
-                />
-              ))}
-            </div>
-            <br />
-            <SelectedProductsPanel
-              selectedProducts={selectedProducts}
-              optionalResources={optionalResources}
-              budget={budget}
-              duration={duration}
-              updateSelectedProducts={setSelectedProducts}
-            />
-            <br />
-            {selectedPanels.map((panelId) => (
-              <div>
-                <SelectedProductsPanel
-                  selectedProducts={selectedProducts}
-                  optionalResources={optionalResources}
-                  budget={budget}
-                  duration={duration}
-                  updateSelectedProducts={setSelectedProducts}
-                  tier={panelId}
-                />
-                <br />
+            {/* Selected Products Section */}
+            <Column lg={4} md={8} sm={4}>
+              <h4>Select other Tier to Compare:</h4>
+              <br />
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                {panelOptions.map((option) => (
+                  <Checkbox
+                    id={option.id}
+                    labelText={option.label}
+                    onChange={(e) =>
+                      handlePanelSelection(option.id, e.target.checked)
+                    }
+                  />
+                ))}
               </div>
-            ))}
-          </Column>
-        </Grid>
-      </Column>
-    </Grid>
+              <br />
+              <SelectedProductsPanel
+                selectedProducts={selectedProducts}
+                optionalResources={optionalResources}
+                budget={budget}
+                duration={duration}
+                updateSelectedProducts={setSelectedProducts}
+              />
+              <br />
+              {selectedPanels.map((panelId) => (
+                <div>
+                  <SelectedProductsPanel
+                    selectedProducts={selectedProducts}
+                    optionalResources={optionalResources}
+                    budget={budget}
+                    duration={duration}
+                    updateSelectedProducts={setSelectedProducts}
+                    tier={panelId}
+                  />
+                  <br />
+                </div>
+              ))}
+            </Column>
+          </Grid>
+        </Column>
+      </Grid>
+
+      <WidgetCCAT
+        baseUrl="localhost"
+        port="1865"
+        initialPhrase="Ciao! Sono il tuo assistente virtuale. Come posso aiutarti?"
+        sorryPhrase="Mi dispiace, al momento non sono disponibile. Riprova più tardi."
+        chatUnderneathMessage="Ricorda che sono ancora in fase di apprendimento e potrei commettere errori."
+      />
+    </div>
   );
 }
 
