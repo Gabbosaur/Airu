@@ -1,7 +1,9 @@
 const axios = require('axios');
 const qs = require('qs');
 
-const API_BASE_URL = 'http://localhost:8000/api/v1/aruba';
+const API_BASE_URL = process.env.REACT_APP_API_URL
+  ? process.env.REACT_APP_API_URL + '/api/v1/login'
+  : 'http://localhost:8000/api/v1/login';
 const AUTH_TOKEN = 'Bearer ';
 
 export const loginReq = async (username, password) => {
@@ -14,7 +16,7 @@ export const loginReq = async (username, password) => {
   let config = {
     method: 'post',
     maxBodyLength: Infinity,
-    url: `http://localhost:8000/api/v1/login`,
+    url: API_BASE_URL,
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
     },

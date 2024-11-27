@@ -1,3 +1,5 @@
+'use client';
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -7,16 +9,13 @@ export const AuthProvider = ({ children }) => {
   const router = useRouter();
 
   useEffect(() => {
-    // Only access localStorage on the client side
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('accessToken');
       setIsAuthenticated(!!token);
     }
   }, []);
 
-  const [isAuthenticated, setIsAuthenticated] = useState(
-    !!localStorage.getItem('accessToken')
-  );
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const login = (token) => {
     localStorage.setItem('accessToken', token);

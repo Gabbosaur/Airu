@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Modal } from '@carbon/react';
-import axios from 'axios';
 import { deploySolution } from './requests'; // Adjust the path based on your folder structure
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 let elasticIPDiscount = 0;
 let blockStorageDiscount = 0;
@@ -121,9 +122,12 @@ const SelectedProductsPanel = ({
     setIsModalOpen(true);
   };
 
-  const handleConfirmDeploy = () => {
+  const handleConfirmDeploy = async () => {
     setIsModalOpen(false);
-    deploySolution(uniqueProducts);
+    const isSuccess = await deploySolution(uniqueProducts);
+    if (isSuccess) {
+      toast('Created with success!');
+    }
   };
 
   const handleCancelDeploy = () => {
@@ -562,6 +566,7 @@ const SelectedProductsPanel = ({
         borderRadius: '8px',
       }}
     >
+      <ToastContainer />
       {tier === 'None' ? <h4>Selected products</h4> : <h4>Compare {tier}</h4>}
 
       {selectedProducts.length === 0 ? (

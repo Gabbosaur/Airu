@@ -9,15 +9,15 @@ import {
   TextInput,
   NumberInput,
   Checkbox,
-  Select,
-  SelectItem,
 } from '@carbon/react';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import SelectedProductsPanel from './SelectedProductsPanel';
 import WidgetCCAT from './Widget_CCAT';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/components/AuthContext/AuthProvider';
+
+const API_BASE_URL = process.env.REACT_APP_API_URL
+  ? process.env.REACT_APP_API_URL + '/api/v1/aruba'
+  : 'http://localhost:8000/api/v1/aruba';
 
 const headers = [
   { key: 'flavorName', header: 'Name' },
@@ -136,7 +136,7 @@ function ProductsPage() {
     async function getProducts() {
       let config = {
         method: 'get',
-        url: 'http://localhost:8000/api/v1/aruba/catalog_products',
+        url: `${API_BASE_URL}/catalog_products`,
       };
 
       axios
@@ -479,7 +479,6 @@ function ProductsPage() {
           </Grid>
         </Column>
       </Grid>
-
       <WidgetCCAT
         baseUrl="localhost"
         port="1865"

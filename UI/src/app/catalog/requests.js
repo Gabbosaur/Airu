@@ -1,8 +1,8 @@
-import { get } from 'axios';
-
 const axios = require('axios');
 
-const API_BASE_URL = 'http://localhost:8000/api/v1/aruba';
+const API_BASE_URL = process.env.REACT_APP_API_URL
+  ? process.env.REACT_APP_API_URL + '/api/v1/aruba'
+  : 'http://localhost:8000/api/v1/aruba';
 const AUTH_TOKEN = 'Bearer ';
 
 const createConfig = (method, url, data = null) => ({
