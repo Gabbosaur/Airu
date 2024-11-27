@@ -1,6 +1,7 @@
 **/*.env
 
-/AI/stregatto/data/
+/AI/stregatto/data/models
+/AI/stregatto/data/local_vector_memory
 
 **/__pycache__/
 AI/myenv/
