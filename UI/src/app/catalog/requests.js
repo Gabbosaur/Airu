@@ -483,114 +483,115 @@ export const deploySolution = async (uniqueProducts) => {
   if (uniqueProducts.length === 0) return;
 
   try {
-    //     const projectId = await createProject();
-    //     console.debug('Project ID:', projectId);
+    const projectId = await createProject();
+    console.debug('Project ID:', projectId);
 
-    //     await sleep(5000); // Wait for the project to be created
-    //     await getProject(projectId);
+    await sleep(5000); // Wait for the project to be created
+    await getProject(projectId);
 
-    //     const vpcId = await createVpc(projectId);
-    //     console.debug('VPC ID:', vpcId);
+    const vpcId = await createVpc(projectId);
+    console.debug('VPC ID:', vpcId);
 
-    //     while(true) {
-    //         await sleep(30000); // Wait for the VPC to be created
-    //         const vpcState = await getVpc(projectId, vpcId);
-    //         if( vpcState === 'Active')
-    //             break;
-    //         console.debug('VPC state: creating');
-    //     }
-    //     console.debug('VPC state: created');
+    while (true) {
+      await sleep(30000); // Wait for the VPC to be created
+      const vpcState = await getVpc(projectId, vpcId);
+      if (vpcState === 'Active') break;
+      console.debug('VPC state: creating');
+    }
+    console.debug('VPC state: created');
 
-    //     const subnetId = await createSubnet(projectId, vpcId);
-    //     console.debug('Subnet ID:', subnetId);
-    //     while(true) {
-    //         await sleep(30000);
-    //         const subentState = await getSubnet(projectId, vpcId, subnetId);
-    //         if( subentState === 'Active')
-    //             break;
-    //         console.debug('Subnet state: creating');
-    //     }
-    //     console.debug('Subnet state: created');
+    const subnetId = await createSubnet(projectId, vpcId);
+    console.debug('Subnet ID:', subnetId);
+    while (true) {
+      await sleep(30000);
+      const subentState = await getSubnet(projectId, vpcId, subnetId);
+      if (subentState === 'Active') break;
+      console.debug('Subnet state: creating');
+    }
+    console.debug('Subnet state: created');
 
-    //     // const securityGroupId = await createSecurityGroup(projectId, vpcId);
-    //     // console.debug('Security Group ID:', subnetId);
-    //     // while(true) {
-    //     //     await sleep(30000);
-    //     //     const subentState = await getSecurityGroup(projectId, vpcId, securityGroupId);
-    //     //     if( subentState === 'Active')
-    //     //         break;
-    //     //     console.debug('Security Group state: creating');
-    //     // }
-    //     // console.debug('Security Group state: created');
+    // const securityGroupId = await createSecurityGroup(projectId, vpcId);
+    // console.debug('Security Group ID:', subnetId);
+    // while(true) {
+    //     await sleep(30000);
+    //     const subentState = await getSecurityGroup(projectId, vpcId, securityGroupId);
+    //     if( subentState === 'Active')
+    //         break;
+    //     console.debug('Security Group state: creating');
+    // }
+    // console.debug('Security Group state: created');
 
-    //     // const projectId = "6747148ab5516a6b8f90fed0";
-    //     // const vpcId = "6747148af37b2b43c3961e12";
-    //     // const subnetId = "674714e5f37b2b43c3961e23";
-    //     // const securityGroupId = "67471526f37b2b43c3961e34";
-    //     // const securityGroupName = "hackathon-test";
+    // const projectId = "6747148ab5516a6b8f90fed0";
+    // const vpcId = "6747148af37b2b43c3961e12";
+    // const subnetId = "674714e5f37b2b43c3961e23";
+    // const securityGroupId = "67471526f37b2b43c3961e34";
+    // const securityGroupName = "hackathon-test";
 
-    //     uniqueProducts.forEach(async (product) => {
-    //         if (product.resourceName === 'elasticIp') {
-    //             for (let i = 0; i < product.quantity; i++) {
-    //                 createElasticIp(projectId, i);
-    //             }
-    //         } else if (product.resourceName === 'blockStorage') {
-    //             for (let i = 0; i < product.quantity; i++) {
-    //                 createBlockStorage(projectId, i, product.blockStorage);
-    //             }
-    //         } else if (product.resourceName === 'cloudServer') {
-
-    //             for (let i = 0; i < product.quantity; i++) {
-    //                 let elasticIpId = '';
-    //           if (product.elasticIP) {
-    //             elasticIpId = await createElasticIp(projectId, i);
-    //             console.debug("Elastic IP ID:", elasticIpId);
-    //             while(true) {
-    //                 await sleep(30000);
-    //                 const elasticIPState = await getElasticIp(projectId, elasticIpId);
-    //                 if( elasticIPState === 'Active' || elasticIPState === 'NotUsed') {
-    //                     console.debug('ElasticIP state: created');
-    //                     break;
-    //                 }
-    //                 console.debug('ElasticIP state: creating');
-    //                 }
-    //             }
-    //           let blockStorageId = '';
-    //           if (product.blockStorage) {
-    //             blockStorageId = await createBlockStorage(projectId, i, product.blockStorage);
-    //             while(true) {
-    //                 await sleep(30000);
-    //                 const blockstorageState = await getBlockStorage(projectId, blockStorageId);
-    //                 if( blockstorageState === 'Active' || blockstorageState === 'NotUsed') {
-    //                     console.debug('Blockstorage state: created');
-    //                     break;
-    //                 }
-    //                 console.debug('Blockstorage state: creating');
-    //                 }
-    //           }
-    //           createCloudServer(
-    //             projectId,
-    //             vpcId,
-    //             subnetId,
-    //             securityGroupId,
-    //             elasticIpId,
-    //             blockStorageId,
-    //             product,
-    //             i
-    //           );
-    //         }
-    //         } else if (product.resourceName === 'kaas') {
-    //             for (let i = 0; i < product.quantity; i++) {
-    //                 createKaas(
-    //                     projectId,
-    //                     vpcId,
-    //                     subnetId,
-    //                     product,
-    //                     i
-    //                   );
-    //             }
-    //         }
-    //       });
+    uniqueProducts.forEach(async (product) => {
+      if (product.resourceName === 'elasticIp') {
+        for (let i = 0; i < product.quantity; i++) {
+          createElasticIp(projectId, i);
+        }
+      } else if (product.resourceName === 'blockStorage') {
+        for (let i = 0; i < product.quantity; i++) {
+          createBlockStorage(projectId, i, product.blockStorage);
+        }
+      } else if (product.resourceName === 'cloudServer') {
+        for (let i = 0; i < product.quantity; i++) {
+          let elasticIpId = '';
+          if (product.elasticIP) {
+            elasticIpId = await createElasticIp(projectId, i);
+            console.debug('Elastic IP ID:', elasticIpId);
+            while (true) {
+              await sleep(30000);
+              const elasticIPState = await getElasticIp(projectId, elasticIpId);
+              if (elasticIPState === 'Active' || elasticIPState === 'NotUsed') {
+                console.debug('ElasticIP state: created');
+                break;
+              }
+              console.debug('ElasticIP state: creating');
+            }
+          }
+          let blockStorageId = '';
+          if (product.blockStorage) {
+            blockStorageId = await createBlockStorage(
+              projectId,
+              i,
+              product.blockStorage
+            );
+            while (true) {
+              await sleep(30000);
+              const blockstorageState = await getBlockStorage(
+                projectId,
+                blockStorageId
+              );
+              if (
+                blockstorageState === 'Active' ||
+                blockstorageState === 'NotUsed'
+              ) {
+                console.debug('Blockstorage state: created');
+                break;
+              }
+              console.debug('Blockstorage state: creating');
+            }
+          }
+          createCloudServer(
+            projectId,
+            vpcId,
+            subnetId,
+            securityGroupId,
+            elasticIpId,
+            blockStorageId,
+            product,
+            i
+          );
+        }
+      } else if (product.resourceName === 'kaas') {
+        for (let i = 0; i < product.quantity; i++) {
+          createKaas(projectId, vpcId, subnetId, product, i);
+        }
+      }
+    });
     console.log('Deployment completed successfully!');
     return true;
   } catch (error) {
