@@ -44,9 +44,14 @@ const getRowItems = (rows) =>
       flavorName: row.flavor?.name || row.resourceName, // Use empty string if flavor is null or undefined
       flavorDescription: row.flavor?.description || '', // Use empty string if flavor is null or undefined
       flavorOsPlatform: row.flavor?.osPlatform || '', // Use empty string if flavor is null or undefined
+      template:
+        row.flavor?.osPlatform === 'Windows'
+          ? '65f42d72d82fd1d45ce03b0a'
+          : '66045544b146b450ddb90975',
       flavorCpu: row.flavor?.cpu || '', // Use empty string if flavor is null or undefined
       flavorRam: row.flavor?.ram || '', // Use empty string if flavor is null or undefined
       flavorDisk: row.flavor?.disk || '', // Use empty string if flavor is null or undefined
+      flavorId: row.flavor?.id || '', // Use empty string if flavor is null or undefined
       tiers: row.tiers,
       unitPrice1Month: row.reservations[0].price,
       unitPrice1Year: row.reservations[1].price,
@@ -138,10 +143,7 @@ function ProductsPage() {
           const coreItems = items.filter(
             (item) => item.productName !== 'masterHA'
           );
-          console.debug('items', items);
-          console.debug('coreItems', coreItems);
           const specialItems = items.filter((item) => item.flavorCpu === '');
-          console.debug('specialItems', specialItems);
           setRows(coreItems);
           setOptionalResources(specialItems);
           setFilteredRows(coreItems);
@@ -182,15 +184,15 @@ function ProductsPage() {
   ) => {
     const foundProduct = rows.find((row) => row.id === productID); // Find the matching product in rows
     let productToAdd = { ...foundProduct };
-    console.debug('productToAdd', productToAdd);
-    console.debug('productID', productID);
+    // console.debug('productToAdd', productToAdd);
+    // console.debug('productID', productID);
 
     productToAdd.elasticIP = elasticIP;
     productToAdd.highlyAvailable = ha;
     productToAdd.quantity = quantity;
     productToAdd.blockStorage = blockStorage;
     productToAdd.selectionId = generateUniqueId();
-    console.debug('productToAdd After', productToAdd);
+    // console.debug('productToAdd After', productToAdd);
 
     if (productToAdd) {
       setSelectedProducts((prev) => [...prev, productToAdd]);
@@ -269,7 +271,6 @@ function ProductsPage() {
                 marginTop: '1rem',
               }}
             >
-              {/* Skeleton for Search Input */}
               <div
                 style={{
                   width: '200px',
@@ -279,7 +280,6 @@ function ProductsPage() {
                 }}
               ></div>
 
-              {/* Skeleton for MultiSelect Filters */}
               {Array.from({ length: 5 }).map((_, index) => (
                 <div
                   key={index}
@@ -293,7 +293,6 @@ function ProductsPage() {
               ))}
             </div>
 
-            {/* Resource Table Skeleton */}
             <DataTableSkeleton
               columnCount={headers.length + 1} // Includes action buttons
               rowCount={5} // Simulate a few rows
@@ -311,7 +310,6 @@ function ProductsPage() {
 
   return (
     <Grid className="product-page">
-      {/* Filters Section */}
       <Column lg={16} md={8} sm={4} className="product-page__r1">
         <div style={{ marginBottom: '1rem' }}>
           <Grid
@@ -473,32 +471,6 @@ function ProductsPage() {
                 <br />
               </div>
             ))}
-            {/* <SelectedProductsPanel
-              selectedProducts={selectedProducts}
-              optionalResources={optionalResources}
-              budget={budget}
-              duration={duration}
-              updateSelectedProducts={setSelectedProducts}
-              tier="Base"
-            />
-            <br />
-            <SelectedProductsPanel
-              selectedProducts={selectedProducts}
-              optionalResources={optionalResources}
-              budget={budget}
-              duration={duration}
-              updateSelectedProducts={setSelectedProducts}
-              tier="Partner"
-            />
-            <br />
-            <SelectedProductsPanel
-              selectedProducts={selectedProducts}
-              optionalResources={optionalResources}
-              budget={budget}
-              duration={duration}
-              updateSelectedProducts={setSelectedProducts}
-              tier="Premium"
-            /> */}
           </Column>
         </Grid>
       </Column>
