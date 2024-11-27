@@ -239,7 +239,7 @@ async def delete_vpc(request: Request, projectIdCreated: str, vpcId: str):
         'Content-Type': 'application/json'
     }
     response = requests.request("DELETE", url, headers=headers)
-    return response
+    return response.json()
 
 
 #
@@ -258,6 +258,18 @@ async def get_subnets(request: Request, projectIdCreated: str, vpcIdCreated: str
 
     response = requests.request("GET", url, headers=headers, params=params)
     return response.json()
+
+@router.get("/aruba/projects/{projectIdCreated}/providers/Aruba.Network/vpcs/{vpcIdCreated}/subnets/{subnetId}")
+async def get_subnet(request: Request, projectIdCreated: str, vpcIdCreated: str, subnetId: str):
+    logging.info("Getting subnet")
+    url = f"{aruba_base_url}/projects/{projectIdCreated}/providers/Aruba.Network/vpcs/{vpcIdCreated}/subnets/{subnetId}"
+    headers = {
+        'Authorization': dict(request.scope['headers'])['Authorization'],
+        'Content-Type': 'application/json'
+    }
+    response = requests.request("GET", url, headers=headers)
+    return response.json()
+
 
 @router.post("/aruba/projects/{projectIdCreated}/providers/Aruba.Network/vpcs/{vpcIdCreated}/subnets")
 async def create_subnet(request: Request, projectIdCreated: str, vpcIdCreated: str):
@@ -289,14 +301,14 @@ async def update_subnet(request: Request, projectIdCreated: str, vpcIdCreated: s
 @router.delete("/aruba/projects/{projectIdCreated}/providers/Aruba.Network/vpcs/{vpcIdCreated}/subnets/{subnetId}")
 async def delete_subnet(request: Request, projectIdCreated: str, vpcIdCreated: str, subnetId: str):
     logging.info("Deleting subnet")
-    url = f"{aruba_base_url}/projects/{projectIdCreated}/Aruba.Network/vpcs/{vpcIdCreated}/subnets/{subnetId}"
+    url = f"{aruba_base_url}/projects/{projectIdCreated}/providers/Aruba.Network/vpcs/{vpcIdCreated}/subnets/{subnetId}"
     headers = {
         'Authorization': dict(request.scope['headers'])['Authorization'],
         'Content-Type': 'application/json'
     }
     
     response = requests.request("DELETE", url, headers=headers)
-    return response
+    return response.json()
     
 #
 # SecurityGroup
@@ -361,7 +373,71 @@ async def delete_security_group(request: Request, projectIdCreated: str, vpcIdCr
         'Content-Type': 'application/json'
     }
     response = requests.request("DELETE", url, headers=headers)
-    return response
+    return response.json()
+
+#
+# SecurityGroupRule
+#
+
+@router.get("/aruba/projects/{projectIdCreated}/providers/Aruba.Network/vpcs/{vpcIdCreated}/securityGroups/{securityGroupId}/securityRules")
+async def get_security_group_rules(request: Request, projectIdCreated: str, vpcIdCreated: str, securityGroupId: str):
+    logging.info("Getting security group rules")
+    url = f"{aruba_base_url}/projects/{projectIdCreated}/providers/Aruba.Network/vpcs/{vpcIdCreated}/securityGroups/{securityGroupId}/securityRules"
+    headers = {
+        'Authorization': dict(request.scope['headers'])['Authorization'],
+        'Content-Type': 'application/json'
+    }
+    params = request.query_params
+    response = requests.request("GET", url, headers=headers, params=params)
+    return response.json()
+
+@router.post("/aruba/projects/{projectIdCreated}/providers/Aruba.Network/vpcs/{vpcIdCreated}/securityGroups/{securityGroupId}/securityRules")
+async def create_security_group_rule(request: Request, projectIdCreated: str, vpcIdCreated: str, securityGroupId: str):
+    body = await request.json()
+    logging.info("Creating security group rule")
+    logging.info(body)
+    url = f"{aruba_base_url}/projects/{projectIdCreated}/providers/Aruba.Network/vpcs/{vpcIdCreated}/securityGroups/{securityGroupId}/securityRules"
+    headers = {
+        'Authorization': dict(request.scope['headers'])['Authorization'],
+        'Content-Type': 'application/json'
+    }
+    response = requests.request("POST", url, headers=headers, json=body)
+    return response.json()
+
+@router.get("/aruba/projects/{projectIdCreated}/providers/Aruba.Network/vpcs/{vpcIdCreated}/securityGroups/{securityGroupId}/securityRules/{securityRuleId}")
+async def get_security_group_rule(request: Request, projectIdCreated: str, vpcIdCreated: str, securityGroupId: str, securityRuleId: str):
+    logging.info("Getting security group rule")
+    url = f"{aruba_base_url}/projects/{projectIdCreated}/providers/Aruba.Network/vpcs/{vpcIdCreated}/securityGroups/{securityGroupId}/securityRules/{securityRuleId}"
+    headers = {
+        'Authorization': dict(request.scope['headers'])['Authorization'],
+        'Content-Type': 'application/json'
+    }
+    response = requests.request("GET", url, headers=headers)
+    return response.json()
+
+@router.put("/aruba/projects/{projectIdCreated}/providers/Aruba.Network/vpcs/{vpcIdCreated}/securityGroups/{securityGroupId}/securityRules/{securityRuleId}")
+async def update_security_group_rule(request: Request, projectIdCreated: str, vpcIdCreated: str, securityGroupId: str, securityRuleId: str):
+    body = await request.json()
+    logging.info("Updating security group rule")
+    logging.info(body)
+    url = f"{aruba_base_url}/projects/{projectIdCreated}/providers/Aruba.Network/vpcs/{vpcIdCreated}/securityGroups/{securityGroupId}/securityRules/{securityRuleId}"
+    headers = {
+        'Authorization': dict(request.scope['headers'])['Authorization'],
+        'Content-Type': 'application/json'
+    }
+    response = requests.request("PUT", url, headers=headers, json=body)
+    return response.json()
+
+@router.delete("/aruba/projects/{projectIdCreated}/providers/Aruba.Network/vpcs/{vpcIdCreated}/securityGroups/{securityGroupId}/securityRules/{securityRuleId}")
+async def delete_security_group_rule(request: Request, projectIdCreated: str, vpcIdCreated: str, securityGroupId: str, securityRuleId: str):
+    logging.info("Deleting security group rule")
+    url = f"{aruba_base_url}/projects/{projectIdCreated}/providers/Aruba.Network/vpcs/{vpcIdCreated}/securityGroups/{securityGroupId}/securityRules/{securityRuleId}"
+    headers = {
+        'Authorization': dict(request.scope['headers'])['Authorization'],
+        'Content-Type': 'application/json'
+    }
+    response = requests.request("DELETE", url, headers=headers)
+    return response.json()
 
 
 #
@@ -426,7 +502,33 @@ async def delete_elastic_ip(request: Request, projectIdCreated: str, elasticIpId
         'Content-Type': 'application/json'
     }
     response = requests.request("DELETE", url, headers=headers)
-    return response
+    return response.json()
+
+#
+# LoadBalancer
+#
+@router.get("/aruba/projects/{projectIdCreated}/providers/Aruba.Network/loadBalancers")
+async def get_load_balancers(request: Request, projectIdCreated: str):
+    logging.info("Getting load balancers")
+    url = f"{aruba_base_url}/projects/{projectIdCreated}/providers/Aruba.Network/loadBalancers"
+    headers = {
+        'Authorization': dict(request.scope['headers'])['Authorization'],
+        'Content-Type': 'application/json'
+    }
+    params = request.query_params
+    response = requests.request("GET", url, headers=headers, params=params)
+    return response.json()
+
+@router.get("/aruba/projects/{projectIdCreated}/providers/Aruba.Network/loadBalancers/{loadBalancerId}")
+async def get_load_balancer(request: Request, projectIdCreated: str, loadBalancerId: str):
+    logging.info("Getting load balancer")
+    url = f"{aruba_base_url}/projects/{projectIdCreated}/providers/Aruba.Network/loadBalancers/{loadBalancerId}"
+    headers = {
+        'Authorization': dict(request.scope['headers'])['Authorization'],
+        'Content-Type': 'application/json'
+    }
+    response = requests.request("GET", url, headers=headers)
+    return response.json()
 
 
 #
@@ -443,6 +545,28 @@ async def get_containers(request: Request, projectIdCreated: str):
     params = request.query_params
     
     response = requests.request("GET", url, headers=headers, params=params)
+    return response.json()
+
+@router.get("/aruba/projects/{projectIdCreated}/providers/Aruba.Container/kaas/{containerId}")
+async def get_container(request: Request, projectIdCreated: str, containerId: str):
+    logging.info("Getting container")
+    url = f"{aruba_base_url}/projects/{projectIdCreated}/providers/Aruba.Container/kaas/{containerId}"
+    headers = {
+        'Authorization': dict(request.scope['headers'])['Authorization'],
+        'Content-Type': 'application/json'
+    }
+    response = requests.request("GET", url, headers=headers)
+    return response.json()
+
+@router.get("/aruba/projects/{projectIdCreated}/providers/Aruba.Container/kaas/{containerId}/download")
+async def download_container(request: Request, projectIdCreated: str, containerId: str):
+    logging.info("Downloading container configuration")
+    url = f"{aruba_base_url}/projects/{projectIdCreated}/providers/Aruba.Container/kaas/{containerId}/download"
+    headers = {
+        'Authorization': dict(request.scope['headers'])['Authorization'],
+        'Content-Type': 'application/json'
+    }
+    response = requests.request("GET", url, headers=headers)
     return response.json()
     
 @router.post("/aruba/projects/{projectIdCreated}/providers/Aruba.Container/kaas")
@@ -497,7 +621,9 @@ async def create_cloud_server(request: Request, projectIdCreated: str):
         'Content-Type': 'application/json'
     }
     params = request.query_params
-    response = requests.request("GET", url, headers=headers, params=params)
+    response = requests.request("POST", url, headers=headers, params=params, json=body)
+    logging.info("Response create cloud server")
+    logging.info(response.json())
     return response.json()
 
 @router.get("/aruba/projects/{projectIdCreated}/providers/Aruba.Compute/cloudServers/{cloudServerId}")
@@ -511,23 +637,82 @@ async def get_cloud_server(request: Request, projectIdCreated: str, cloudServerI
     response = requests.request("GET", url, headers=headers)
     return response.json()
 
+@router.put("/aruba/providers/projects/{projectIdCreated}/Aruba.Compute/cloudServers/{cloudServerId}")
+async def update_cloud_server(request: Request, projectIdCreated: str, cloudServerId: str):
+    body = await request.json()
+    logging.info("Updating cloud server")
+    logging.info(body)
+    url = f"{aruba_base_url}/providers/projects/{projectIdCreated}/Aruba.Compute/cloudServers/{cloudServerId}"
+    headers = {
+        'Authorization': dict(request.scope['headers'])['Authorization'],
+        'Content-Type': 'application/json'
+    }
+    response = requests.request("PUT", url, headers=headers, json=body)
+    return response.json()
 #
 # 05-Storage
 #
 
 @router.get("/aruba/projects/{projectIdCreated}/providers/Aruba.Storage/blockStorages")
 async def get_block_storages(request: Request, projectIdCreated: str):
-     logging.info("Getting block storages")
-     url = f"{aruba_base_url}/projects/{projectIdCreated}/providers/Aruba.Storage/blockStorages"
-     headers = {
+    logging.info("Getting block storages")
+    url = f"{aruba_base_url}/projects/{projectIdCreated}/providers/Aruba.Storage/blockStorages"
+    headers = {
          'Authorization': dict(request.scope['headers'])['Authorization'],
          'Content-Type': 'application/json'
         }
-     params = request.query_params
-     response = requests.request("GET", url, headers=headers, params=params)
-         
+    params = request.query_params
+    response = requests.request("GET", url, headers=headers, params=params)
+    return response.json()
+
+@router.post("/aruba/projects/{projectIdCreated}/providers/Aruba.Storage/blockStorages")
+async def create_block_storage(request: Request, projectIdCreated: str):
+    body = await request.json()
+    logging.info("Creating block storage")
+    logging.info(body)
+    url = f"{aruba_base_url}/projects/{projectIdCreated}/providers/Aruba.Storage/blockStorages"
+    headers = {
+        'Authorization': dict(request.scope['headers'])['Authorization'],
+        'Content-Type': 'application/json'
+    }
+    response = requests.request("POST", url, headers=headers, json=body)
+    return response.json()
     
-    
+@router.get("/aruba/projects/{projectIdCreated}/providers/Aruba.Storage/blockStorages/{blockStorageId}")
+async def get_block_storage(request: Request, projectIdCreated: str, blockStorageId: str):
+    logging.info("Getting block storage")
+    url = f"{aruba_base_url}/projects/{projectIdCreated}/providers/Aruba.Storage/blockStorages/{blockStorageId}"
+    headers = {
+        'Authorization': dict(request.scope['headers'])['Authorization'],
+        'Content-Type': 'application/json'
+    }
+    response = requests.request("GET", url, headers=headers)
+    return response.json()
+
+@router.put("/aruba/projects/{projectIdCreated}/providers/Aruba.Storage/blockStorages/{blockStorageId}")
+async def update_block_storage(request: Request, projectIdCreated: str, blockStorageId: str):
+    body = await request.json()
+    logging.info("Updating block storage")
+    logging.info(body)
+    url = f"{aruba_base_url}/projects/{projectIdCreated}/providers/Aruba.Storage/blockStorages/{blockStorageId}"
+    headers = {
+        'Authorization': dict(request.scope['headers'])['Authorization'],
+        'Content-Type': 'application/json'
+    }
+    response = requests.request("PUT", url, headers=headers, json=body)
+    return response.json()
+
+@router.delete("/aruba/projects/{projectIdCreated}/providers/Aruba.Storage/blockStorages/{blockStorageId}")
+async def delete_block_storage(request: Request, projectIdCreated: str, blockStorageId: str):
+    logging.info("Deleting block storage")
+    url = f"{aruba_base_url}/projects/{projectIdCreated}/providers/Aruba.Storage/blockStorages/{blockStorageId}"
+    headers = {
+        'Authorization': dict(request.scope['headers'])['Authorization'],
+        'Content-Type': 'application/json'
+    }
+    response = requests.request("DELETE", url, headers=headers)
+    return response.json()
+
 #
 # 06-Frontend
 #

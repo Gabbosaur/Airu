@@ -1,14 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Modal } from '@carbon/react';
 
 let elasticIPDiscount = 0;
 let blockStorageDiscount = 0;
+const uniqueProducts = [];
 
 function getUniqueProductsWithQuantity(
   selectedProducts,
   optionalResources,
   tier
 ) {
-  const uniqueProducts = [];
+  uniqueProducts.length = 0;
 
   selectedProducts.forEach((product) => {
     const existingProduct = uniqueProducts.find(
@@ -92,7 +94,7 @@ function getUniqueProductsWithQuantity(
     }
   }
 
-  console.debug('uniqueProducts', uniqueProducts);
+  //console.debug('uniqueProducts', uniqueProducts);
   return uniqueProducts;
 }
 
@@ -103,15 +105,446 @@ function formatToTwoDecimals(number) {
   return parseFloat(number.toFixed(2));
 }
 
+const createProject = () => {
+  console.log('Creating project...');
+  let data = JSON.stringify({
+    metadata: {
+      name: 'hackathon-test',
+      tags: ['hackathon-test'],
+    },
+    properties: {
+      description: 'hackathon-test',
+      default: false,
+    },
+  });
+
+  let config = {
+    method: 'post',
+    maxBodyLength: Infinity,
+    url: 'localhost:8000/api/v1/aruba/projects',
+    headers: {
+      accept: '*/*',
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer ',
+    },
+    data: data,
+  };
+
+  axios
+    .request(config)
+    .then((response) => {
+      console.log(JSON.stringify(response.data));
+      return response.data.metadata.id;
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+
+const createElasticIp = (projectId) => {
+  console.log('Creating elastic IP...');
+  let data = JSON.stringify({
+    metadata: {
+      name: '',
+      tags: ['hackathon-test'],
+      location: {
+        value: 'ITBG-Bergamo',
+      },
+    },
+    properties: {
+      billingPlan: {
+        billingPeriod: 'Hour',
+      },
+    },
+  });
+
+  let config = {
+    method: 'post',
+    maxBodyLength: Infinity,
+    url:
+      'localhost:8000/api/v1/aruba/projects/ ' +
+      projectId +
+      '/providers/Aruba.Network/elasticIps',
+    headers: {
+      accept: 'text/plain',
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer ',
+    },
+    data: data,
+  };
+
+  axios
+    .request(config)
+    .then((response) => {
+      console.log(JSON.stringify(response.data));
+      return response.data.metadata.id;
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+
+const createVpc = (projectId) => {
+  let data = JSON.stringify({
+    metadata: {
+      name: 'hackathon-test',
+      tags: ['hackathon-test'],
+      location: {
+        value: 'ITBG-Bergamo',
+      },
+    },
+  });
+
+  let config = {
+    method: 'post',
+    maxBodyLength: Infinity,
+    url:
+      'localhost:8000/api/v1/aruba/projects/ ' +
+      projectId +
+      '/providers/Aruba.Network/vpcs',
+    headers: {
+      accept: 'text/plain',
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer ',
+    },
+    data: data,
+  };
+
+  axios
+    .request(config)
+    .then((response) => {
+      console.log(JSON.stringify(response.data));
+      return response.data.metadata.id;
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+
+const createSubnet = (projectId, vpcId) => {
+  let data = JSON.stringify({
+    metadata: {
+      name: 'kaas-subnet-1',
+      tags: ['tag-1', 'tag-2'],
+    },
+    properties: {
+      type: 'Advanced',
+      default: true,
+      network: {
+        address: '192.168.1.0/25',
+      },
+      dhcp: {
+        enabled: true,
+      },
+    },
+  });
+
+  let config = {
+    method: 'post',
+    maxBodyLength: Infinity,
+    url:
+      'localhost:8000/api/v1/aruba/projects/' +
+      projectId +
+      '/providers/Aruba.Network/vpcs/ ' +
+      vpcId +
+      ' /subnets',
+    headers: {
+      accept: 'text/plain',
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer ',
+    },
+    data: data,
+  };
+
+  axios
+    .request(config)
+    .then((response) => {
+      console.log(JSON.stringify(response.data));
+      return response.data.metadata.id;
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+
+const createKaas = (projectId, vpcId, subnetId, product, blockStorageId) => {
+  let data = JSON.stringify({
+    metadata: {
+      name: 'hackathon-test',
+      location: {
+        value: 'ITBG-Bergamo',
+      },
+      tags: ['hackathon-test'],
+    },
+    properties: {
+      preset: false,
+      vpc: {
+        uri:
+          '/projects/' + projectId + '/providers/Aruba.Network/vpcs/' + vpcId,
+      },
+      kubernetesVersion: {
+        value: '1.29.2',
+      },
+      subnet: {
+        uri:
+          '/projects/' +
+          projectId +
+          '/providers/Aruba.Network/vpcs/' +
+          vpcId +
+          '/subnets/' +
+          subnetId,
+      },
+      nodeCidr: {
+        address: '192.168.59.0/25', // TODO
+        name: 'kaas-test-cidr',
+      },
+      securityGroup: {
+        name: 'kaas-test-sg', // TODO
+      },
+      nodePools: [
+        {
+          name: 'hackathon-test',
+          nodes: product.quantity,
+          instance: product.resourceName,
+          dataCenter: 'ITBG-1',
+        },
+      ],
+      ha: product.highlyAvailable,
+      billingPlan: {
+        billingPeriod: 'Hour',
+      },
+    },
+  });
+
+  let config = {
+    method: 'post',
+    maxBodyLength: Infinity,
+    url:
+      'localhost:8000/api/v1/aruba/projects/' +
+      projectId +
+      '/providers/Aruba.Container/kaas',
+    headers: {
+      accept: 'text/plain',
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer ',
+    },
+    data: data,
+  };
+
+  axios
+    .request(config)
+    .then((response) => {
+      console.log(JSON.stringify(response.data));
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+
+const createSecurityGroup = (projectId, vpcId) => {
+  let data = JSON.stringify({
+    metadata: {
+      name: 'hackathon-test',
+      tags: ['hackahton-test'],
+      location: {
+        value: 'ITBG-Bergamo',
+      },
+    },
+    properties: {
+      default: false,
+    },
+  });
+
+  let config = {
+    method: 'post',
+    maxBodyLength: Infinity,
+    url:
+      'localhost:8000/api/v1/aruba/projects/' +
+      projectId +
+      '/providers/Aruba.Network/vpcs/' +
+      vpcId +
+      '/securityGroups',
+    headers: {
+      accept: 'text/plain',
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer ',
+    },
+    data: data,
+  };
+
+  axios
+    .request(config)
+    .then((response) => {
+      console.log(JSON.stringify(response.data));
+      return response.data.metadata.id;
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+
+const createCloudServer = (
+  projectId,
+  vpcId,
+  subnetId,
+  securityGroupId,
+  product,
+  elasticIpId,
+  blockStorageId
+) => {
+  let data = JSON.stringify({
+    metadata: {
+      name: 'cloud-server-1-win',
+      location: {
+        value: 'ITBG-Bergamo',
+      },
+      tags: ['tag-1'],
+    },
+    properties: {
+      dataCenter: 'ITBG-1',
+      vpc: {
+        uri:
+          '/projects/' + projectId + '/providers/Aruba.Network/vpcs/' + vpcId,
+      },
+      vpcPreset: false,
+      flavorId: product.flavorId,
+      template: {
+        uri: '/providers/Aruba.Compute/templates/' + product.template,
+      },
+      addElasticIp: product.elasticIP,
+      elasticIp: {
+        uri:
+          '/projects/' +
+          projectId +
+          '/providers/Aruba.Network/elasticIps/' +
+          elasticIpId,
+      },
+      initialPassword: 'Aruba2024!',
+      subnets: [
+        {
+          uri:
+            '/projects/' +
+            projectId +
+            '/providers/Aruba.Network/vpcs/' +
+            vpcId +
+            '/subnets/' +
+            subnetId,
+        },
+      ],
+      securityGroups: [
+        {
+          uri:
+            '/projects/' +
+            projectId +
+            '/providers/Aruba.Network/vpcs/' +
+            vpcId +
+            '/securityGroups/' +
+            securityGroupId,
+        },
+      ],
+      volumes: [
+        {
+          uri:
+            '/projects/' +
+            projectId +
+            '/providers/Aruba.Storage/blockStorages/' +
+            blockStorageId,
+        },
+      ],
+    },
+  });
+
+  let config = {
+    method: 'post',
+    maxBodyLength: Infinity,
+    url:
+      'localhost:8000/api/v1/aruba/projects/' +
+      projectId +
+      '/providers/Aruba.Compute/cloudServers',
+    headers: {
+      accept: 'text/plain',
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer ',
+    },
+    data: data,
+  };
+
+  axios
+    .request(config)
+    .then((response) => {
+      console.log(JSON.stringify(response.data));
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+
+const deploySolution = () => {
+  console.log('Deploying solution...');
+  console.debug(uniqueProducts);
+  if (uniqueProducts.length === 0) return;
+
+  const projectId = createProject();
+  const vpcId = createVpc(projectId);
+  const subnetId = createSubnet(projectId, vpcId);
+  const securityGroupId = createSecurityGroup(projectId, vpcId);
+  // TODO polling previous objs
+  uniqueProducts.forEach((product) => {
+    if (product.resourceName === 'elasticIp') {
+      createElasticIp(projectId);
+    } else if (product.resourceName === 'blockStorage') {
+      createBlockStorage(projectId);
+    } else if (product.resourceName === 'cloudServer') {
+      let elasticIpId = '';
+      if (product.elasticIP) elasticIpId = createElasticIp(projectId);
+      let blockStorageId = '';
+      if (product.blockStorageId) blockStorageId = createElasticIp(projectId);
+      createCloudServer(
+        projectId,
+        vpcId,
+        subnetId,
+        securityGroupId,
+        product.flavorName,
+        elasticIpId,
+        blockStorageId
+      );
+    } else if (product.resourceName === 'kaas') {
+      let blockStorageId = '';
+      if (product.blockStorageId) blockStorageId = createElasticIp(projectId);
+      createKaas(
+        projectId,
+        vpcId,
+        subnetId,
+        securityGroupId,
+        product.flavorName,
+        blockStorageId
+      );
+    }
+  });
+};
+
 const SelectedProductsPanel = ({
   selectedProducts,
   optionalResources,
   budget,
   duration,
   updateSelectedProducts,
-  handleAddButtonClick,
   tier = 'None',
 }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleDeployClick = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleConfirmDeploy = () => {
+    setIsModalOpen(false);
+    deploySolution();
+  };
+
+  const handleCancelDeploy = () => {
+    setIsModalOpen(false);
+  };
   const handleRemoveProduct = (product) => {
     const updatedProducts = [...selectedProducts];
     const index = updatedProducts.findIndex(
@@ -592,20 +1025,46 @@ const SelectedProductsPanel = ({
                   style={{
                     padding: '5px 10px',
                     backgroundColor:
-                      totalCostWithDuration > budget ? '#e0e0e0' : '#0f62fe',
+                      totalCostWithDuration > budget ||
+                      budget === 0 ||
+                      duration === 0
+                        ? '#e0e0e0'
+                        : '#0f62fe',
                     color: '#fff',
                     border: 'none',
                     borderRadius: '4px',
                     cursor:
-                      totalCostWithDuration > budget
+                      totalCostWithDuration > budget ||
+                      budget === 0 ||
+                      duration === 0
                         ? 'not-allowed'
                         : 'pointer',
                   }}
-                  disabled={totalCostWithDuration > budget || budget === 0}
-                  onClick={() => handleAddButtonClick(row.id)}
+                  disabled={
+                    totalCostWithDuration > budget ||
+                    budget === 0 ||
+                    duration === 0
+                  }
+                  onClick={() => handleDeployClick()}
                 >
                   Deploy solution
                 </button>
+                {isModalOpen && (
+                  <Modal
+                    open={isModalOpen}
+                    modalHeading="Confirm Deployment"
+                    modalLabel="Deployment Confirmation"
+                    primaryButtonText="Deploy"
+                    secondaryButtonText="Cancel"
+                    onRequestClose={handleCancelDeploy}
+                    onRequestSubmit={handleConfirmDeploy}
+                  >
+                    <p>
+                      Are you sure you want to deploy the solution? This action
+                      cannot be undone.
+                    </p>
+                  </Modal>
+                )}
               </div>
             )}
           </li>
