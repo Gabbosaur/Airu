@@ -21,6 +21,9 @@ import { InfoSection, InfoCard } from '@/components/Info/Info';
 import Image from 'next/image';
 
 export default function LandingPage() {
+
+  
+
   return (
     <Grid className="landing-page" fullWidth>
       <Column lg={16} md={8} sm={4} className="landing-page__banner">
