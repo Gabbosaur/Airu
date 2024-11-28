@@ -1,4 +1,6 @@
 const axios = require('axios');
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL
   ? process.env.REACT_APP_API_URL + '/api/v1/aruba'
@@ -17,13 +19,17 @@ const createConfig = (method, url, data = null) => ({
   data,
 });
 
+function generateUniqueId() {
+  return Math.random().toString(36).substr(2, 8); // Get 8 characters after the decimal
+}
+
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const createProject = async () => {
   console.log('Creating project...');
   let data = JSON.stringify({
     metadata: {
-      name: 'hackathon-test-prod',
+      name: 'hackathon-prod',
       tags: ['hackathon-test'],
     },
     properties: {
@@ -78,7 +84,7 @@ const createVpc = async (projectId) => {
   console.log('Creating VPC...');
   let data = JSON.stringify({
     metadata: {
-      name: 'hackathon-test',
+      name: 'vpc-hackathon-test' + generateUniqueId(),
       tags: ['hackathon-test'],
       location: {
         value: 'ITBG-Bergamo',
@@ -132,7 +138,7 @@ const createSubnet = async (projectId, vpcId) => {
   console.log('Creating subnet...');
   let data = JSON.stringify({
     metadata: {
-      name: 'hackathon-test',
+      name: 'subnet-hackathon-test-' + generateUniqueId(),
       tags: ['hackathon-test'],
     },
     properties: {
@@ -193,7 +199,7 @@ const getSubnet = async (projectId, vpcId, subnetId) => {
 const createKaas = async (projectId, vpcId, subnetId, product, i) => {
   const data = JSON.stringify({
     metadata: {
-      name: 'hackathon-test',
+      name: 'kaas-hackathon-test-' + i + generateUniqueId(),
       location: { value: 'ITBG-Bergamo' },
       tags: ['hackathon-test'],
     },
@@ -208,14 +214,14 @@ const createKaas = async (projectId, vpcId, subnetId, product, i) => {
       },
       nodeCidr: {
         address: '192.168.59.' + i + '/24',
-        name: 'cidr-hackathon-test-' + i,
+        name: 'cidr-hackathon-test-' + i + generateUniqueId(),
       },
       securityGroup: {
-        name: 'security-group-hackathon-test-' + i,
+        name: 'security-group-hackathon-test-' + i + generateUniqueId(),
       },
       nodePools: [
         {
-          name: 'node-pools-hackathon-test-' + i,
+          name: 'node-pools-hackathon-test-' + i + generateUniqueId(),
           nodes: 1,
           instance: product.flavorName,
           dataCenter: 'ITBG-1',
@@ -245,7 +251,7 @@ const createKaas = async (projectId, vpcId, subnetId, product, i) => {
 const createSecurityGroup = async (projectId, vpcId) => {
   const data = JSON.stringify({
     metadata: {
-      name: 'hackathon-test',
+      name: 'security-group-hackathon-test' + generateUniqueId(),
       tags: ['hackathon-test'],
       location: { value: 'ITBG-Bergamo' },
     },
@@ -297,7 +303,7 @@ const createCloudServer = async (
   const volumes = [];
   if (blockStorageId !== '') {
     volumes.push({
-      uri: `/projects/${projectId}/providers/Aruba.Storage/volumes/${blockStorageId}`,
+      uri: `/projects/${projectId}/providers/Aruba.Storage/blockStorages/${blockStorageId}`,
     });
   }
 
@@ -310,7 +316,7 @@ const createCloudServer = async (
 
   const data = JSON.stringify({
     metadata: {
-      name: 'hackathon-test-' + i,
+      name: 'cloud-server-hackathon-test-' + i + generateUniqueId(),
       location: { value: 'ITBG-Bergamo' },
       tags: ['hackathon-test'],
     },
@@ -350,7 +356,7 @@ const createCloudServer = async (
   try {
     const response = await axios.request(config);
     console.log('Cloud server created:', response.data);
-    return response.data;
+    return response.data.metadata.id;
   } catch (error) {
     console.error('Error creating cloud server:', error.message);
     throw error;
@@ -362,7 +368,7 @@ const createElasticIp = async (projectId, i) => {
 
   let data = JSON.stringify({
     metadata: {
-      name: 'elastic-ip-hackathon' + i,
+      name: 'elastic-ip-hackathon' + i + generateUniqueId(),
       tags: ['hackathon-test'],
       location: {
         value: 'ITBG-Bergamo',
@@ -422,7 +428,7 @@ const createBlockStorage = async (projectId, i, blockStorage) => {
 
   let data = JSON.stringify({
     metadata: {
-      name: `block-storage-hackathon-test-${i}`,
+      name: `block-storage-hackathon-test-${i}` + generateUniqueId(),
       location: {
         value: 'ITBG-Bergamo',
       },
@@ -485,12 +491,14 @@ export const deploySolution = async (uniqueProducts) => {
   try {
     const projectId = await createProject();
     console.debug('Project ID:', projectId);
+    toast.info('Project ' + projectId + ' created');
 
     await sleep(5000); // Wait for the project to be created
-    await getProject(projectId);
+    // await getProject(projectId);
 
     const vpcId = await createVpc(projectId);
     console.debug('VPC ID:', vpcId);
+    toast.info('VPC ' + vpcId + ' created');
 
     while (true) {
       await sleep(30000); // Wait for the VPC to be created
@@ -499,9 +507,12 @@ export const deploySolution = async (uniqueProducts) => {
       console.debug('VPC state: creating');
     }
     console.debug('VPC state: created');
+    toast.info('VPC ' + vpcId + ' activated');
 
     const subnetId = await createSubnet(projectId, vpcId);
     console.debug('Subnet ID:', subnetId);
+    toast.info('Subnet ID ' + subnetId + ' created');
+
     while (true) {
       await sleep(30000);
       const subentState = await getSubnet(projectId, vpcId, subnetId);
@@ -509,23 +520,24 @@ export const deploySolution = async (uniqueProducts) => {
       console.debug('Subnet state: creating');
     }
     console.debug('Subnet state: created');
+    toast.info('Subnet ID ' + subnetId + ' activated');
 
-    // const securityGroupId = await createSecurityGroup(projectId, vpcId);
-    // console.debug('Security Group ID:', subnetId);
-    // while(true) {
-    //     await sleep(30000);
-    //     const subentState = await getSecurityGroup(projectId, vpcId, securityGroupId);
-    //     if( subentState === 'Active')
-    //         break;
-    //     console.debug('Security Group state: creating');
-    // }
-    // console.debug('Security Group state: created');
+    const securityGroupId = await createSecurityGroup(projectId, vpcId);
+    console.debug('Security Group ID:', securityGroupId);
+    toast.info('Security Group ID ' + securityGroupId + ' created');
 
-    // const projectId = "6747148ab5516a6b8f90fed0";
-    // const vpcId = "6747148af37b2b43c3961e12";
-    // const subnetId = "674714e5f37b2b43c3961e23";
-    // const securityGroupId = "67471526f37b2b43c3961e34";
-    // const securityGroupName = "hackathon-test";
+    while (true) {
+      await sleep(30000);
+      const subentState = await getSecurityGroup(
+        projectId,
+        vpcId,
+        securityGroupId
+      );
+      if (subentState === 'Active') break;
+      console.debug('Security Group state: creating');
+    }
+    console.debug('Security Group state: created');
+    toast.info('Security Group ID ' + securityGroupId + ' activated');
 
     uniqueProducts.forEach(async (product) => {
       if (product.resourceName === 'elasticIp') {
@@ -542,14 +554,18 @@ export const deploySolution = async (uniqueProducts) => {
           if (product.elasticIP) {
             elasticIpId = await createElasticIp(projectId, i);
             console.debug('Elastic IP ID:', elasticIpId);
+            console.debug('Starting creation of Elastic IP:', elasticIpId);
+            toast.info('Starting creation of Elastic IP: ' + elasticIpId);
             while (true) {
               await sleep(30000);
               const elasticIPState = await getElasticIp(projectId, elasticIpId);
               if (elasticIPState === 'Active' || elasticIPState === 'NotUsed') {
                 console.debug('ElasticIP state: created');
+                toast.info('ElasticIP state: created');
                 break;
               }
               console.debug('ElasticIP state: creating');
+              toast.info('ElasticIP state: creating');
             }
           }
           let blockStorageId = '';
@@ -559,6 +575,7 @@ export const deploySolution = async (uniqueProducts) => {
               i,
               product.blockStorage
             );
+            toast.info('Started creating BlockstorageID: ' + blockStorageId);
             while (true) {
               await sleep(30000);
               const blockstorageState = await getBlockStorage(
@@ -570,12 +587,14 @@ export const deploySolution = async (uniqueProducts) => {
                 blockstorageState === 'NotUsed'
               ) {
                 console.debug('Blockstorage state: created');
+                toast.info('Blockstorage state: created');
                 break;
               }
               console.debug('Blockstorage state: creating');
+              toast.info('Blockstorage state: creating');
             }
           }
-          createCloudServer(
+          const cloudServerId = await createCloudServer(
             projectId,
             vpcId,
             subnetId,
@@ -585,6 +604,7 @@ export const deploySolution = async (uniqueProducts) => {
             product,
             i
           );
+          toast.info('Started creating BlockstorageID: ' + cloudServerId);
         }
       } else if (product.resourceName === 'kaas') {
         for (let i = 0; i < product.quantity; i++) {
