@@ -41,7 +41,7 @@ const ProductTable = ({ rows, headers, onAdd }) => {
 
   const handleAddButtonClick = (rowId) => {
     const options = rowOptions[rowId] || {};
-    console.log(`Add button clicked for row: ${rowId}`, options);
+    //console.log(`Add button clicked for row: ${rowId}`, options);
     onAdd(
       rowId,
       options.elasticIP || false,

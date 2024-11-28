@@ -13,6 +13,8 @@ function getUniqueProductsWithQuantity(
   optionalResources,
   tier
 ) {
+  elasticIPDiscount = 0;
+  blockStorageDiscount = 0;
   uniqueProducts.length = 0;
 
   selectedProducts.forEach((product) => {
@@ -95,6 +97,9 @@ function getUniqueProductsWithQuantity(
     ) {
       elasticIPDiscount = optionalResources[1].tiers3PercentDiscount;
     }
+
+    console.debug('elasticIPDiscount', elasticIPDiscount);
+    console.debug('blockStorageDiscount', blockStorageDiscount);
   }
 
   //console.debug('uniqueProducts', uniqueProducts);
