@@ -16,7 +16,7 @@ Airu is designed to be robust, scalable, and user-friendly. Here's a high-level 
 ![airu architecture](Airu-architecture.png)
 
 1. **Frontend:**
-   - Built with **JavaScript**, **React**, and **Next.js** for a dynamic and SEO-friendly user interface.
+   - Built with **JavaScript**, **React**, and **Next.js** for a dynamic and user-friendly user interface.
    - Components for forms, dashboards, and chat interfaces.
 2. **Backend:**
    - Built with **Python** and **FastAPI** for high-performance API development.
@@ -38,7 +38,7 @@ Follow these steps to get started with Airu
 1. **Clone the Repository:**
    ```bash
    git clone https://github.com/Gabbosaur/Airu.git
-   cd airu
+   cd Airu
    ```
 2. **Make sure you have Docker installed**
 3. **Run the following command**
@@ -62,7 +62,13 @@ Follow these steps to get started with Airu
    ```
    localhost:3000
    ```
+- Login with admin/admin
+## ⚠️ Disclaimer
+For the purposes of this demonstration:
 
+- We have included the .env file in the repository to simplify the setup process for the jury. We acknowledge this is a security risk and not a best practice for production environments. Sensitive configurations, such as API keys or credentials, should never be stored directly in the repository. Instead, consider using secure secret management solutions like Vault, AWS Secrets Manager, or environment variable management via CI/CD pipelines.
+
+- We have created a default admin/admin login for both the Cheshire Cat Admin panel and Airu’s main page to provide easy access during evaluation. This is strictly for demonstration and should not be used in production.
 ## 🖋️ Authors
 - Gabriele Guo
 - Chenghao Xia
