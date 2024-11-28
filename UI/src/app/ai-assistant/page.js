@@ -114,9 +114,9 @@ const ChatWithHeader = () => {
       <WidgetCCAT
         baseUrl="localhost"
         port="1865"
-        initialPhrase="Ciao! Sono il tuo assistente virtuale. Come posso aiutarti?"
-        sorryPhrase="Mi dispiace, al momento non sono disponibile. Riprova più tardi."
-        chatUnderneathMessage="Ricorda che sono ancora in fase di apprendimento e potrei commettere errori."
+        initialPhrase="Hey there! Airu here, an agent AI-powered assistant. How can I help you?"
+        sorryPhrase="oops... Airu encountered a technical issue."
+        chatUnderneathMessage="LLM can make mistakes. Check important info."
       />
     </div>
   );

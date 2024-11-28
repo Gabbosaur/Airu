@@ -10,9 +10,9 @@ import ReactMarkdown from 'react-markdown';
 const Widget_CCAT = ({
   baseUrl = 'localhost',
   port = '1865',
-  initialPhrase = 'Ciao Sono lo Stregatto, una intelligenza artificiale curiosa e cortese. Come posso aiutarti?',
-  sorryPhrase = 'ops... il gatto ha avuto qualche problema',
-  chatUnderneathMessage = 'i LLM posso fare errori, stai attento alle allucinazioni',
+  initialPhrase = 'Hey there! Airu here, an agent AI-powered assistant. How can I help you?',
+  sorryPhrase = 'oops... Airu encountered a technical issue.',
+  chatUnderneathMessage = 'LLM can make mistakes. Check important info.',
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isOpenChat, setIsOpenChat] = useState(false);
@@ -153,12 +153,7 @@ const Widget_CCAT = ({
         ) : (
           ''
         )}
-        <img
-          src={
-            'https://cheshire-cat-ai.github.io/docs/assets/img/cheshire-cat-logo.svg'
-          }
-          alt="cat Icon"
-        />
+        <img src={'/favicon/android-chrome-192x192.png'} alt="cat Icon" />
         {isOpenChat ? (
           <div className="chat-page">
             <div className="chat-messages" ref={messagesContainerRef}>
