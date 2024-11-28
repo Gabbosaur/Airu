@@ -45,23 +45,38 @@ Follow these steps to get started with Airu
    ```
    docker compose up
    ```
-4. **Set up the preferred LLM provider on Cheshire Cat**
-- Have an OpenAI/Gemini/Cohere/Groq/etc API key ready
-- Navigate to Cheshire Cat Admin page
+   NB: It may take few minutes to set up the containers
+
+4. **(Optional) Set up the preferred LLM provider and Embedder model on Cheshire Cat**
+   - By default it is already set up with Groq as LLM provider and nomic-embed-text as embedder model
+   - Have an OpenAI/Gemini/Cohere/Groq/etc API key ready
+   - Navigate to Cheshire Cat Admin page
    ```
-   localhost:1865
+   localhost:1865/admin
    ```
-- Login with admin/admin
-- Navigate to Settings page
-- Configure LLM provider, choose the preferred one
-- Configure Embedder model, I suggest nomic-ai/nomic-embed-text-v1.5
-- Save the setting
+   - Login with admin/admin
+   - Navigate to Settings page
+   - Configure LLM provider, choose the preferred one
+   - Configure Embedder model, I suggest nomic-ai/nomic-embed-text-v1.5
+   - Save the setting
 
 
-4. **Navigate to the Airu's main page**
+5. **Navigate to the Airu's main page**
    ```
    localhost:3000
    ```
+   Explore and enjoy the features! 🐱‍🏍
+
+
+
+## Resources
+
+Video: https://youtu.be/QxOWbCD9slg
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/QxOWbCD9slg?si=BQUzKUeQJKUPN9am" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+
+Slides: https://docs.google.com/presentation/d/1WDoEECRgfSmiZ-muWDkCUB-ktjgDrWiHVUI1OPj3XUE/edit?usp=sharing
 
 ## 🖋️ Authors
 - Gabriele Guo
