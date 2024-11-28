@@ -83,7 +83,14 @@ const Widget_CCAT = ({
     }
   };
 
-  // Aggiungi un messaggio iniziale quando il componente viene montato
+  // Auto-scroll to the latest message
+  useEffect(() => {
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop =
+        messagesContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
+
   useEffect(() => {
     async function restCCAT() {
       setcat(
@@ -160,7 +167,7 @@ const Widget_CCAT = ({
               {messages.map((message, index) => (
                 <div key={index} className={`message ${message.sender}`}>
                   {message.sender === 'bot_writing' ? (
-                    <div class="dots">
+                    <div className="dots">
                       <div></div>
                       <div></div>
                       <div></div>
