@@ -28,12 +28,10 @@ Airu is designed to be robust, scalable, and user-friendly. Here's a high-level 
    - **PostgreSQL** for structured relational data.
    - **MongoDB** for unstructured and semi-structured data.
 
-For more information please see the following [slides](https://docs.google.com/presentation/d/1WDoEECRgfSmiZ-muWDkCUB-ktjgDrWiHVUI1OPj3XUE/edit?usp=sharing).
-
 
 ## 🛠️ Installation from zero
 
-Follow these steps to get started with Airu
+Follow these steps to get started with Airu.
 
 1. **Clone the Repository:**
    ```bash
@@ -65,25 +63,24 @@ Follow these steps to get started with Airu
    ```
    localhost:3000
    ```
-- Login with admin/admin
+   - Login with admin/admin
+   - Explore and enjoy the features! 🐱‍🏍
 
 
 ## ⚠️ Disclaimer
 For the purposes of this demonstration:
 
 - We have included the .env file in the repository to simplify the setup process for the jury. We acknowledge this is a security risk and not a best practice for production environments. Sensitive configurations, such as API keys or credentials, should never be stored directly in the repository. Instead, consider using secure secret management solutions like Vault, AWS Secrets Manager, or environment variable management via CI/CD pipelines.
-   Explore and enjoy the features! 🐱‍🏍
+- We have created a default admin/admin login for both the Cheshire Cat Admin panel and Airu’s main page to provide easy access during evaluation. This is strictly for demonstration and should not be used in production.
+
 
 ## Resources
 
 Video: https://youtu.be/QxOWbCD9slg
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/QxOWbCD9slg?si=BQUzKUeQJKUPN9am" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-
-
 Slides: https://docs.google.com/presentation/d/1WDoEECRgfSmiZ-muWDkCUB-ktjgDrWiHVUI1OPj3XUE/edit?usp=sharing
 
-- We have created a default admin/admin login for both the Cheshire Cat Admin panel and Airu’s main page to provide easy access during evaluation. This is strictly for demonstration and should not be used in production.
+
 ## 🖋️ Authors
 - Gabriele Guo
 - Chenghao Xia
