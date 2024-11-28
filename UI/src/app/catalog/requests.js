@@ -29,7 +29,7 @@ const createProject = async () => {
   console.log('Creating project...');
   let data = JSON.stringify({
     metadata: {
-      name: 'hackathon-prod',
+      name: 'hackathon-prod' + generateUniqueId(),
       tags: ['hackathon-test'],
     },
     properties: {
