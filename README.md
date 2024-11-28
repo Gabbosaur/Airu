@@ -49,7 +49,7 @@ Follow these steps to get started with Airu
 - Have an OpenAI/Gemini/Cohere/Groq/etc API key ready
 - Navigate to Cheshire Cat Admin page
    ```
-   localhost:1865
+   localhost:1865/admin
    ```
 - Login with admin/admin
 - Navigate to Settings page
